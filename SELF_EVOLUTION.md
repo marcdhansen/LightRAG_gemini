@@ -30,6 +30,23 @@ This document tracks ideas for continuous improvement of both the AI agent capab
 - Close with detailed reasons for future reference
 - Keep planning docs and issues in sync
 
+### Model Selection Criteria
+When evaluating LLM models, consider these tradeoffs:
+
+| Criterion | Question | Priority |
+|-----------|----------|----------|
+| **Speed** | What are the fastest models? | High for iteration |
+| **Quality** | Does output meet requirements? | High for production |
+| **No-code-change** | Can swap via .env only? | High for flexibility |
+| **Context window** | Fits our document sizes? | Required |
+| **Cost** | Token/API costs acceptable? | Varies |
+
+**Current findings (2026-01-19):**
+- `llama3.2:3b`: Best balance (12.65 t/s, good entity extraction)
+- `qwen2.5-coder:1.5b`: Fastest (35 t/s) but poor quality for RAG tasks
+- `mistral-nemo`: Good quality but slow (3.14 t/s)
+- Embedding: `nomic-embed-text:v1.5` (only dedicated option)
+
 ---
 
 ## Improvement Backlog
