@@ -19,6 +19,14 @@
 - Proactively suggest improvements when patterns emerge
 - Beads issue: `lightrag-o4q` (update memory continuously)
 
+## Learnings Log
+
+### 2026-01-19: Phase 1 Verification
+- BCBC PDF processed in ~7 minutes (3 chunks)
+- Hybrid query mode works well for document understanding
+- Server may run from different directory than workspace - check `.env` path
+- Note: Server config showed old model (`qwen2.5-coder:1.5b`) - verify `.env` is being used
+
 ## ACE Framework Summary
 The **Agentic Context Engineering (ACE)** framework optimizes LLM performance by dynamically evolving context (input instructions, memory, strategies) rather than modifying model weights.
 
