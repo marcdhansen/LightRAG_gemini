@@ -11,6 +11,13 @@
 - **Langfuse**: Self-hosted (no cloud credentials needed)
 - **MCP Integration**: Both client AND server modes; use cases TBD
 - **Beads Sync**: Keep planning docs and beads issues in sync at all times
+- **Continuous Improvement**: Proactively suggest improvements; update memory with learnings
+
+## Self-Improvement Guidelines
+- See `SELF_EVOLUTION.md` for improvement backlog
+- Update this file with learnings after completing significant tasks
+- Proactively suggest improvements when patterns emerge
+- Beads issue: `lightrag-o4q` (update memory continuously)
 
 ## ACE Framework Summary
 The **Agentic Context Engineering (ACE)** framework optimizes LLM performance by dynamically evolving context (input instructions, memory, strategies) rather than modifying model weights.
