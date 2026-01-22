@@ -266,6 +266,14 @@ def parse_args() -> argparse.Namespace:
         help="Enable DOCLING document loading engine (default: from env or DEFAULT)",
     )
 
+    # ACE Framework configuration
+    parser.add_argument(
+        "--enable-ace",
+        action="store_true",
+        default=get_env_value("ENABLE_ACE", False, bool),
+        help="Enable the Agentic Context Evolution (ACE) framework (default: from env or False)",
+    )
+
     # Conditionally add binding options defined in binding_options module
     # This will add command line arguments for all binding options (e.g., --ollama-embedding-num_ctx)
     # and corresponding environment variables (e.g., OLLAMA_EMBEDDING_NUM_CTX)

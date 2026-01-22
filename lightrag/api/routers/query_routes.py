@@ -129,15 +129,11 @@ class QueryRequest(BaseModel):
                 raise ValueError("Each message 'role' must be a non-empty string.")
         return conversation_history
 
-    def to_query_params(self, is_stream: bool) -> "QueryParam":
+    def to_query_params(self, is_stream: bool) -> QueryParam:
         """Converts a QueryRequest instance into a QueryParam instance."""
-        # Use Pydantic's `.model_dump(exclude_none=True)` to remove None values automatically
-        # Exclude API-level parameters that don't belong in QueryParam
         request_data = self.model_dump(
             exclude_none=True, exclude={"query", "include_chunk_content"}
         )
-
-        # Ensure `mode` and `stream` are set explicitly
         param = QueryParam(**request_data)
         param.stream = is_stream
         return param
@@ -172,6 +168,36 @@ class QueryDataResponse(BaseModel):
     )
     metadata: Dict[str, Any] = Field(
         description="Query metadata including mode, keywords, and processing information"
+    )
+
+
+class ACEQueryRequest(QueryRequest):
+    auto_reflect: bool = Field(
+        default=True,
+        description="If True, automatically trigger reflection and playbook update.",
+    )
+
+    def to_query_params(self, is_stream: bool = False) -> QueryParam:
+        """Converts an ACEQueryRequest instance into a QueryParam instance, excluding ACE-specific fields."""
+        request_data = self.model_dump(
+            exclude_none=True, 
+            exclude={"query", "include_chunk_content", "auto_reflect"}
+        )
+        param = QueryParam(**request_data)
+        param.stream = is_stream
+        return param
+
+
+class ACEQueryResponse(BaseModel):
+    response: str = Field(description="The generated response")
+    trajectory: Optional[List[Dict[str, Any]]] = Field(
+        default=None, description="The reasoning trajectory of the generator"
+    )
+    insights: Optional[List[str]] = Field(
+        default=None, description="Insights extracted by the reflector"
+    )
+    playbook_used: Dict[str, Any] = Field(
+        description="The state of the Context Playbook when the query was executed"
     )
 
 
@@ -737,6 +763,42 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
             )
         except Exception as e:
             logger.error(f"Error processing streaming query: {str(e)}", exc_info=True)
+            raise HTTPException(status_code=500, detail=str(e))
+
+    @router.post(
+        "/ace/query",
+        response_model=ACEQueryResponse,
+        dependencies=[Depends(combined_auth)],
+        tags=["ace"],
+    )
+    async def ace_query(request: ACEQueryRequest):
+        """
+        Execute an agentic query using the ACE (Agentic Context Evolution) Framework.
+        
+        This endpoint uses a self-evolving "Context Playbook" to improve retrieval
+        and generation over time through a Generate-Reflect-Curate loop.
+        """
+        from ..lightrag_server import rag
+        if not rag or not rag.enable_ace:
+            raise HTTPException(
+                status_code=501, 
+                detail="ACE Framework is not enabled on this server instance."
+            )
+        
+        try:
+            param = request.to_query_params(is_stream=False)
+            result = await rag.ace_query(
+                query=request.query,
+                param=param,
+                auto_reflect=request.auto_reflect
+            )
+            
+            if "error" in result:
+                raise HTTPException(status_code=500, detail=result["error"])
+                
+            return ACEQueryResponse(**result)
+        except Exception as e:
+            logger.error(f"Error in ACE query: {str(e)}", exc_info=True)
             raise HTTPException(status_code=500, detail=str(e))
 
     @router.post(

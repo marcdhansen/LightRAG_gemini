@@ -113,6 +113,11 @@ from lightrag.utils import (
     normalize_source_ids_limit_method,
 )
 from lightrag.types import KnowledgeGraph
+from lightrag.ace.config import ACEConfig
+from lightrag.ace.playbook import ContextPlaybook
+from lightrag.ace.generator import ACEGenerator
+from lightrag.ace.reflector import ACEReflector
+from lightrag.ace.curator import ACECurator
 from dotenv import load_dotenv
 
 # use the .env that is inside the current folder
@@ -439,12 +444,32 @@ class LightRAG:
     ollama_server_infos: Optional[OllamaServerInfos] = field(default=None)
     """Configuration for Ollama server information."""
 
+    # ACE Framework
+    enable_ace: bool = field(default=False)
+    """Enable the Agentic Context Evolution (ACE) framework."""
+
+    ace_config: Optional[ACEConfig] = field(default=None)
+    """ACE Configuration. If None and enable_ace is True, defaults are used."""
+
     _storages_status: StoragesStatus = field(default=StoragesStatus.NOT_CREATED)
 
     def __post_init__(self):
         from lightrag.kg.shared_storage import (
             initialize_share_data,
         )
+
+        # Initialize ACE components if enabled
+        if self.enable_ace:
+            if self.ace_config is None:
+                # Default ACE directory inside working_dir
+                ace_base_dir = os.path.join(self.working_dir, "ace_data")
+                self.ace_config = ACEConfig(base_dir=ace_base_dir)
+            
+            self.ace_playbook = ContextPlaybook(self.ace_config)
+            self.ace_generator = ACEGenerator(self, self.ace_playbook)
+            self.ace_reflector = ACEReflector(self)
+            self.ace_curator = ACECurator(self.ace_playbook)
+            logger.info("ACE Framework initialized")
 
         # Handle deprecated parameters
         if self.log_level is not None:
@@ -2452,6 +2477,40 @@ class LightRAG:
             return llm_response.get("response_iterator")
         else:
             return llm_response.get("content", "")
+
+    async def ace_query(
+        self,
+        query: str,
+        param: QueryParam = QueryParam(),
+        auto_reflect: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Execute a query using the ACE (Agentic Context Evolution) Framework.
+        
+        Args:
+            query: The user query.
+            param: Query parameters.
+            auto_reflect: If True, automatically trigger reflection and playbook update.
+            
+        Returns:
+            Dict[str, Any]: Contains 'response', 'trajectory' (if reflection enabled), and 'playbook_used'.
+        """
+        if not self.enable_ace:
+            raise RuntimeError("ACE is not enabled for this LightRAG instance.")
+
+        # 1. Generate response using ACE Generator
+        result = await self.ace_generator.generate(query, param)
+        
+        if auto_reflect and "error" not in result:
+            # 2. Reflect on the result
+            insights = await self.ace_reflector.reflect(query, result)
+            
+            # 3. Curate insights into the playbook
+            await self.ace_curator.curate(insights)
+            
+            result["insights"] = insights
+
+        return result
 
     def query_data(
         self,

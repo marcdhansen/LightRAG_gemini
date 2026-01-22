@@ -80,6 +80,8 @@ config.read("config.ini")
 # Global authentication configuration
 auth_configured = bool(auth_handler.accounts)
 
+rag = None
+
 
 class LLMConfigCache:
     """Smart LLM and Embedding configuration cache class"""
@@ -1049,6 +1051,7 @@ def create_app(args):
 
     # Initialize RAG with unified configuration
     try:
+        global rag
         rag = LightRAG(
             working_dir=args.working_dir,
             workspace=args.workspace,
@@ -1082,6 +1085,7 @@ def create_app(args):
                 "entity_types": args.entity_types,
             },
             ollama_server_infos=ollama_server_infos,
+            enable_ace=args.enable_ace,
         )
     except Exception as e:
         logger.error(f"Failed to initialize LightRAG: {e}")
