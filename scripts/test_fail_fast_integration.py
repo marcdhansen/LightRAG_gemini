@@ -51,26 +51,49 @@ async def upload_and_process_file(client, file_path):
             status_resp = await client.get(f"{BASE_URL}/documents/track_status/{track_id}")
             if status_resp.status_code != 200:
                 print(f"Error fetching status: {status_resp.status_code}")
-                # Don't fail immediately on transient network error, wait and retry
                 await asyncio.sleep(POLL_INTERVAL)
                 continue
                 
             status_data = status_resp.json()
-            # Depending on API structure, status might be in summary or root
-            summary = status_data.get("summary", {})
-            status = summary.get("status")
+            documents = status_data.get("documents", [])
+            
+            if not documents:
+                # Should not happen if upload was successful
+                print("No documents found in track status.")
+                await asyncio.sleep(POLL_INTERVAL)
+                continue
+
+            # Check aggregate status
+            all_processed = True
+            any_failed = False
+            failed_docs = []
+            
+            processed_count = 0
+            pending_count = 0
+            
+            for doc in documents:
+                status = doc.get("status")
+                if status == "processed":
+                    processed_count += 1
+                elif status == "failed":
+                    any_failed = True
+                    failed_docs.append(doc.get("file_path", "unknown"))
+                    all_processed = False
+                else:
+                    pending_count += 1
+                    all_processed = False
             
             elapsed = time.time() - start_time
-            sys.stdout.write(f"\rStatus: {status} (Elapsed: {elapsed:.1f}s)")
+            sys.stdout.write(f"\rStatus: {processed_count}/{len(documents)} processed, {pending_count} pending (Elapsed: {elapsed:.1f}s)")
             sys.stdout.flush()
             
-            if status == "processed":
+            if any_failed:
+                print(f"\nFAILURE: The following documents failed: {', '.join(failed_docs)}")
+                return False
+                
+            if all_processed:
                 print(f"\nSUCCESS: {filename} processed successfully.")
                 return True
-            elif status == "failed":
-                error = summary.get("error", "Unknown error")
-                print(f"\nFAILURE: {filename} failed. Error: {error}")
-                return False
                 
             await asyncio.sleep(POLL_INTERVAL)
             
