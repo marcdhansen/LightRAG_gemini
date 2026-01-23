@@ -1,8 +1,16 @@
 # Detailed Agent Instructions for LightRAG Development
 
+
 **For project overview and quick start, see [AGENTS.md](AGENTS.md)**
 
 This document contains detailed operational instructions for AI agents working on LightRAG development, testing, and deployment.
+
+> [!IMPORTANT]
+> **Artifact vs. Physical File Distinction**:
+> When referencing documents in your plans or communications, you MUST explicitly state whether it is a:
+> - **Physical File**: Located in the repository (e.g., `LightRAG/ImplementationPlan.md`).
+> - **Virtual Artifact**: Located in the agent's memory/artifacts directory (e.g., `virtual artifact: implementation_plan.md`).
+> This ensures the user knows exactly where to look.
 
 ## Development Guidelines
 

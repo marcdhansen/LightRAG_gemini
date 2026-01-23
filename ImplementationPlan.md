@@ -154,3 +154,25 @@ Investigate Safari rendering regression (`lightrag-nma`)
 - ✓ **ACE Core Integration** (2026-01-22): Fully integrated GRC loop into `LightRAG` core and exposed via FastAPI (`/ace/query`).
 - ✓ **ACE Minimal Prototype** (2026-01-22): Implemented and verified basic components.
 - **MCP use cases**: TBD - will suggest when more context gathered
+
+## Phase 4a: Local Reranker Integration (p1)
+> [!IMPORTANT]
+> Enabling local reranking to support Ollama-downloaded models (e.g., `bge-reranker-v2-m3`) which lack native API endpoints in Ollama.
+
+**Beads**: `LightRAG-o5v`
+
+### Problem
+Users downloading reranker models via Ollama cannot use them directly because Ollama treats them as generic completion models, lacking a dedicated rerank/score API.
+
+### Solution
+Implement a **Local Backend** in `lightrag/rerank.py` using `FlagEmbedding`.
+- Allows direct loading of BGE/Cross-Encoder models.
+- Python-native execution (bypassing Ollama server, using local GPU/CPU).
+
+### Implementation Plan
+- [x] Create failing test `tests/test_local_reranker.py`
+- [ ] Install `FlagEmbedding` dependency
+- [ ] Implement `local_rerank` in `lightrag/rerank.py`
+- [ ] Add `RERANK_BINDING=local` support
+- [ ] Update `.env` to use `BAAI/bge-reranker-v2-m3`
+- [ ] Verify with `eval_rag_quality.py`

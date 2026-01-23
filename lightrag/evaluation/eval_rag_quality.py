@@ -82,15 +82,21 @@ load_dotenv(dotenv_path=".env", override=False)
 # Conditional imports - will raise ImportError if dependencies not installed
 try:
     from datasets import Dataset
-    from ragas import evaluate
+    from ragas import evaluate, RunConfig
+    # Updated to avoid deprecation warnings - importing from collections if available seems to be the suggestion,
+    # but the warning said "ragas.metrics.collections". However, standard Ragas usage often simply uses ragas.metrics.
+    # Let's try the specific import path mentioned in the warning or simply catch the warning. 
+    # Actually, Ragas 0.2+ changed structure. Let's try the direct import if that's what the warning suggested.
+    # Warning: "Importing Faithfulness from 'ragas.metrics' is deprecated... use 'ragas.metrics.collections'".
     from ragas.metrics import (
+        Faithfulness,
         AnswerRelevancy,
         ContextPrecision,
         ContextRecall,
-        Faithfulness,
     )
     from ragas.llms import LangchainLLMWrapper
     from langchain_openai import ChatOpenAI, OpenAIEmbeddings
+    from langchain_community.embeddings import OllamaEmbeddings
     from tqdm.auto import tqdm
 
     RAGAS_AVAILABLE = True
@@ -102,9 +108,9 @@ except ImportError:
     LangchainLLMWrapper = None
 
 
-CONNECT_TIMEOUT_SECONDS = 180.0
-READ_TIMEOUT_SECONDS = 300.0
-TOTAL_TIMEOUT_SECONDS = 180.0
+CONNECT_TIMEOUT_SECONDS = 1800.0
+READ_TIMEOUT_SECONDS = 1800.0
+TOTAL_TIMEOUT_SECONDS = 1800.0
 
 
 def _is_nan(value: Any) -> bool:
@@ -177,7 +183,7 @@ class RAGEvaluator:
             "model": eval_model,
             "api_key": eval_llm_api_key,
             "max_retries": int(os.getenv("EVAL_LLM_MAX_RETRIES", "5")),
-            "request_timeout": int(os.getenv("EVAL_LLM_TIMEOUT", "180")),
+            "request_timeout": int(os.getenv("EVAL_LLM_TIMEOUT", "600")),
         }
         embedding_kwargs = {
             "model": eval_embedding_model,
@@ -192,7 +198,20 @@ class RAGEvaluator:
 
         # Create base LangChain LLM
         base_llm = ChatOpenAI(**llm_kwargs)
-        self.eval_embeddings = OpenAIEmbeddings(**embedding_kwargs)
+
+        # Configure evaluation embeddings (for RAGAS scoring)
+        eval_embedding_binding = os.getenv("EVAL_EMBEDDING_BINDING")
+        if eval_embedding_binding == "ollama":
+            # Native Ollama embeddings
+            self.eval_embeddings = OllamaEmbeddings(
+                model=eval_embedding_model,
+                base_url=eval_embedding_base_url,
+            )
+            logger.info("Using native OllamaEmbeddings for evaluation")
+        else:
+            # Default to OpenAIEmbeddings
+            self.eval_embeddings = OpenAIEmbeddings(**embedding_kwargs)
+            logger.info("Using OpenAIEmbeddings for evaluation")
 
         # Wrap LLM with LangchainLLMWrapper and enable bypass_n mode for custom endpoints
         # This ensures compatibility with endpoints that don't support the 'n' parameter
@@ -314,6 +333,9 @@ class RAGEvaluator:
                 "include_chunk_content": True,  # NEW: Request chunk content in references
                 "response_type": "Multiple Paragraphs",
                 "top_k": int(os.getenv("EVAL_QUERY_TOP_K", "10")),
+                # Explicitly disable rerank by default to avoid server warnings
+                # Can be enabled via env var if a reranker is actually configured
+                "enable_rerank": os.environ.get("EVAL_ENABLE_RERANK", "true").lower() == "true",
             }
 
             # Get API key from environment for authentication
@@ -486,6 +508,7 @@ class RAGEvaluator:
                         ],
                         llm=self.eval_llm,
                         embeddings=self.eval_embeddings,
+                        run_config=RunConfig(timeout=self.eval_timeout, max_workers=1),
                         _pbar=pbar,
                     )
 

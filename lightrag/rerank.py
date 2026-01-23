@@ -13,6 +13,14 @@ from .utils import logger
 
 from dotenv import load_dotenv
 
+# Optional local reranker
+try:
+    from FlagEmbedding import FlagReranker
+except ImportError:
+    FlagReranker = None
+
+_RERANKER_INSTANCE = None
+
 # use the .env that is inside the current folder
 # allows to use different .env file for each lightrag instance
 # the OS environment variables take precedence over the .env file
@@ -213,6 +221,14 @@ async def generic_rerank_api(
     Returns:
         List of dictionary of ["index": int, "relevance_score": float]
     """
+    if base_url == "local" or (api_key is not None and api_key.lower() == "local"):
+        return await local_rerank(
+            query=query,
+            documents=documents,
+            top_n=top_n,
+            model=model
+        )
+
     if not base_url:
         raise ValueError("Base URL is required")
 
@@ -511,6 +527,67 @@ async def ali_rerank(
         response_format="aliyun",
         request_format="aliyun",
     )
+
+
+async def local_rerank(
+    query: str,
+    documents: List[str],
+    top_n: Optional[int] = None,
+    model: str = "BAAI/bge-reranker-v2-m3",
+    **kwargs: Any,
+) -> List[Dict[str, Any]]:
+    """
+    Rerank documents using local BGE reranker (FlagEmbedding).
+
+    Args:
+        query: The search query
+        documents: List of strings to rerank
+        top_n: Number of top results to return
+        model: HuggingFace model name or local path
+
+    Returns:
+        List of dictionary of ["index": int, "relevance_score": float]
+    """
+    if FlagReranker is None:
+        raise ImportError(
+            "FlagEmbedding is not installed. Please install it with: pip install FlagEmbedding"
+        )
+    
+    # Use global cache to avoid reloading model on every request
+    global _RERANKER_INSTANCE
+    if _RERANKER_INSTANCE is None:
+        logger.info(f"Loading local reranker model: {model}")
+        # use_fp16=True by default for performance
+        _RERANKER_INSTANCE = FlagReranker(model, use_fp16=True)
+    
+    reranker = _RERANKER_INSTANCE
+    
+    # Prepare pairs for scoring
+    pairs = [[query, doc] for doc in documents]
+    
+    # Compute scores
+    scores = reranker.compute_score(pairs)
+    
+    # Normalize result format (FlagEmbedding returns list of floats)
+    # If single pair, it might return float, but with list input it returns list
+    if isinstance(scores, float):
+        scores = [scores]
+        
+    results = []
+    for idx, score in enumerate(scores):
+        results.append({
+            "index": idx,
+            "relevance_score": score
+        })
+        
+    # Sort by score descending
+    results.sort(key=lambda x: x["relevance_score"], reverse=True)
+    
+    # Apply top_n
+    if top_n is not None:
+        results = results[:top_n]
+        
+    return results
 
 
 """Please run this test as a module:
