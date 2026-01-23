@@ -1,1 +1,0 @@
-../BEADS_FIELD_MANUAL.md
