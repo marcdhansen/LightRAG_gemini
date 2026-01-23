@@ -128,13 +128,13 @@ Extract entities and relationships from the input text in YAML format.
 1.  **Strict YAML Output:** Output only valid YAML. Do not include any text before or after the YAML block.
 2.  **Entity Mapping:**
     - name: "<entity_name>"
-    - type: "<entity_type>"
-    - description: "<entity_description>"
+      type: "<entity_type>"
+      description: "<entity_description>"
 3.  **Relationship Mapping:**
     - source: "<source_entity>"
-    - target: "<target_entity>"
-    - keywords: "<keywords>"
-    - description: "<description>"
+      target: "<target_entity>"
+      keywords: "<keywords>"
+      description: "<description>"
 4.  **Language:** Use {language}.
 
 <Input Text>
