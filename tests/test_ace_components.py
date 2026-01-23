@@ -1,6 +1,4 @@
 import pytest
-import os
-import json
 from unittest.mock import MagicMock, AsyncMock
 
 from lightrag.ace.config import ACEConfig

@@ -1,7 +1,4 @@
 import pytest
-import os
-import asyncio
-import numpy as np
 from lightrag.lightrag import LightRAG
 from lightrag.ace.config import ACEConfig
 from lightrag.ace.playbook import ContextPlaybook

@@ -3,7 +3,6 @@ import pytest
 from unittest.mock import AsyncMock, patch, MagicMock
 import asyncio
 from lightrag.llm.ollama import ollama_model_complete
-from lightrag.exceptions import APITimeoutError
 import httpx
 
 @pytest.mark.asyncio

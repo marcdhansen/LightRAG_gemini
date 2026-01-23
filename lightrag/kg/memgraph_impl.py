@@ -20,8 +20,6 @@ from neo4j import (
 from neo4j.exceptions import (
     TransientError,
     ResultFailedError,
-    ServiceUnavailable,
-    SessionExpired,
 )
 
 from dotenv import load_dotenv

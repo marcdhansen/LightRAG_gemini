@@ -458,6 +458,11 @@ def create_app(args):
         ],  # Expose token renewal header for cross-origin requests
     )
 
+    # Root redirect
+    @app.get("/")
+    async def root_redirect():
+        return RedirectResponse(url="/webui/")
+
     # Create combined auth dependency for all endpoints
     combined_auth = get_combined_auth_dependency(api_key)
 

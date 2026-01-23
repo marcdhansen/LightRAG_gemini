@@ -2,19 +2,14 @@ import os
 import shutil
 import pytest
 import sys
-
-# Patch sys.argv to avoid argparse errors during module import in pytest
-sys.argv = [sys.argv[0]]
-
+from unittest.mock import patch
+import numpy as np
 from fastapi.testclient import TestClient
+
 from lightrag.api.config import parse_args, initialize_config
 from lightrag.api.lightrag_server import create_app
-from lightrag import LightRAG, QueryParam
+from lightrag import LightRAG
 from lightrag.utils import EmbeddingFunc
-import numpy as np
-
-# Patch sys.argv to avoid argparse errors
-sys.argv = [sys.argv[0]]
 
 TEST_DIR = "test_ace_api_storage"
 
@@ -49,8 +44,9 @@ def client():
         shutil.rmtree(TEST_DIR)
     os.makedirs(TEST_DIR)
     
-    args = get_mock_args()
-    initialize_config(args, force=True)
+    with patch("sys.argv", ["test_ace_api.py"]):
+        args = get_mock_args()
+        initialize_config(args, force=True)
     
     from unittest.mock import patch
     

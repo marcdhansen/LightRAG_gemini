@@ -1,9 +1,7 @@
 import os
 import shutil
 import pytest
-import asyncio
-from lightrag import LightRAG, QueryParam
-from lightrag.llm.ollama import ollama_model_complete, ollama_embed
+from lightrag import LightRAG
 from lightrag.utils import EmbeddingFunc
 
 # Use short-lived test directory

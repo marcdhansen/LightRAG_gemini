@@ -104,10 +104,14 @@ async def upload_and_process_file(client, file_path):
     print(f"\nTimeout waiting for {filename}")
     return False
 
-async def main():
+import pytest
+
+@pytest.mark.asyncio
+async def test_fail_fast_integration():
     if not os.path.exists(TEST_DOCS_DIR):
         print(f"Error: Directory '{TEST_DOCS_DIR}' not found.")
-        sys.exit(1)
+        # Skip checking for exit code, just assert
+        assert False, f"Directory '{TEST_DOCS_DIR}' not found."
 
     # 1. Collect and Sort Files
     files = []
@@ -133,19 +137,13 @@ async def main():
         try:
             resp = await client.get(f"{BASE_URL}/auth-status")
             if resp.status_code != 200:
-                print("Server is not healthy or accessible.")
-                sys.exit(1)
+                assert False, "Server is not healthy or accessible."
         except Exception:
-            print("Cannot connect to server. Is it running?")
-            sys.exit(1)
+            assert False, "Cannot connect to server. Is it running?"
 
         for path, size in files:
             success = await upload_and_process_file(client, path)
-            if not success:
-                print("\n[FAIL FAST TRIGGERED] Integration test stopped due to failure.")
-                sys.exit(1)
+            assert success, f"Processing failed for {path}"
     
     print("\nAll documents processed successfully!")
 
-if __name__ == "__main__":
-    asyncio.run(main())
