@@ -2085,15 +2085,25 @@ async def _merge_edges_then_upsert(
     # 6.2 Finalize keywords by merging existing and new keywords
     all_keywords = set()
     # Process already_keywords (which are comma-separated)
+    # Process already_keywords
     for keyword_str in already_keywords:
-        if keyword_str:  # Skip empty strings
-            all_keywords.update(k.strip() for k in keyword_str.split(",") if k.strip())
+        if keyword_str:  # Skip empty values
+            if isinstance(keyword_str, list):
+                 all_keywords.update(str(k).strip() for k in keyword_str if str(k).strip())
+            elif isinstance(keyword_str, str):
+                all_keywords.update(
+                    k.strip() for k in keyword_str.split(",") if k.strip()
+                )
     # Process new keywords from edges_data
     for edge in edges_data:
-        if edge.get("keywords"):
-            all_keywords.update(
-                k.strip() for k in edge["keywords"].split(",") if k.strip()
-            )
+        kw_val = edge.get("keywords")
+        if kw_val:
+            if isinstance(kw_val, list):
+                all_keywords.update(str(k).strip() for k in kw_val if str(k).strip())
+            elif isinstance(kw_val, str):
+                all_keywords.update(
+                    k.strip() for k in kw_val.split(",") if k.strip()
+                )
     # Join all unique keywords with commas
     keywords = ",".join(sorted(all_keywords))
 
