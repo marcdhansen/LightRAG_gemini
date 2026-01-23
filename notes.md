@@ -1,0 +1,32 @@
+# add to tasks:
+
+- [ ] I believe some of the markdown files were lost during a git pull. If there are any project md files that are different from ones in the containing directory, then
+    - [ ] merge their contents into the top level file
+    - [ ] remove the project md file
+    - [ ] create a symbolic link to the top level md file
+- [ ] What does RAGAS do (assessing graph retrieval?) Summarize and add to md file section on evals.
+- [ ] Langfuse: anything to learn from this? Summarize what langfuse does and add to md file section on observability.
+- [ ] What is a solution that will track agent prompts and responses?
+- [ ] Investigate adding MemGPT (open source version of Letta?) to the observability section?
+- [ ] Self-evolution enhancements to investigate
+    - [ ] Add link to [ACE github repo](https://github.com/ace-agent/ace) in documentation. Can lightrag server pass tests from ace repo?
+    - [ ] Add link to [memEvolve github repo](https://github.com/bingreeky/MemEvolve) in self-evolution section of documentation.
+- [ ] Agentic RAG: what additional functionality should agent have? 
+    - [ ] pick retrieval method(s)?
+    - [ ] pick LLM for a given task?
+    - [ ] pick chunking method?
+    - [ ] pick chunk size?
+    - [ ] pick chunk overlap?
+- [ ] Experiment with different options 
+    - [ ] RAG modes:
+    - [ ] Naive 
+    - [ ] Local
+    - [ ] Global
+    - [ ] Hybrid
+    - [ ] Mix (graph + vector)
+- [ ] Possible additional features 
+    - [ ] Framework for testing different strategies (e.g., contextual chunking, late chunking, etc.)
+    - [ ] Support for cold graph (neo4j? --ok for demo)
+    - [ ] Support for temporal graph (how to test?)
+    - [ ] Self-healing like greptile 
+    - [ ] Review [n8n harness video](https://youtu.be/RQq3aMV7a5g?si=qfsbiuSGN33DVMrZ): what did they do? 
