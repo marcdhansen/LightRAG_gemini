@@ -24,9 +24,16 @@ const FocusOnNode = ({ node, move }: { node: string | null; move?: boolean }) =>
           console.error('Error focusing on node:', error);
         }
       } else {
-        // If no node is selected but move is true, reset to default view
-        sigma.setCustomBBox(null);
-        sigma.getCamera().animate({ x: 0.5, y: 0.5, ratio: 1 }, { duration: 0 });
+        // If no node is selected but move is true, reset to default view by centering on the graph
+        try {
+          sigma.setCustomBBox(null);
+          sigma.getCamera().animatedReset();
+          console.log('Centered camera on the entire graph');
+        } catch (error) {
+          console.error('Error resetting camera:', error);
+          // Fallback if animatedReset fails
+          sigma.getCamera().animate({ x: 0.5, y: 0.5, ratio: 1 }, { duration: 0 });
+        }
       }
       useGraphStore.getState().setMoveToSelectedNode(false);
     } else if (node && graph.hasNode(node)) {

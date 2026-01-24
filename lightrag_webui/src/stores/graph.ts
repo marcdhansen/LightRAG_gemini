@@ -98,6 +98,11 @@ interface GraphState {
   graphDataFetchAttempted: boolean
   labelsFetchAttempted: boolean
 
+  // Logs for user feedback
+  logs: string[]
+  addLog: (message: string) => void
+  clearLogs: () => void
+
   setSigmaInstance: (instance: any) => void
   setSelectedNode: (nodeId: string | null, moveToSelectedNode?: boolean) => void
   setFocusedNode: (nodeId: string | null) => void
@@ -164,6 +169,7 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
   typeColorMap: new Map<string, string>(),
 
   searchEngine: null,
+  logs: [],
 
   setGraphIsEmpty: (isEmpty: boolean) => set({ graphIsEmpty: isEmpty }),
   setLastSuccessfulQueryLabel: (label: string) => set({ lastSuccessfulQueryLabel: label }),
@@ -214,6 +220,14 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
 
   setSearchEngine: (engine: MiniSearch | null) => set({ searchEngine: engine }),
   resetSearchEngine: () => set({ searchEngine: null }),
+
+  addLog: (message: string) => {
+    const timestamp = new Date().toLocaleTimeString();
+    const logEntry = `[${timestamp}] ${message}`;
+    set((state) => ({ logs: [...state.logs.slice(-99), logEntry] }));
+    console.log(`[GraphStore] ${logEntry}`);
+  },
+  clearLogs: () => set({ logs: [] }),
 
   // Methods to set global flags
   setGraphDataFetchAttempted: (attempted: boolean) => set({ graphDataFetchAttempted: attempted }),
@@ -360,7 +374,7 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
       const edgeIndex = rawGraph.edgeIdMap[String(edgeId)]
       if (edgeIndex !== undefined && rawGraph.edges[edgeIndex]) {
         rawGraph.edges[edgeIndex].properties[propertyName] = newValue
-        if(dynamicId !== undefined && propertyName === 'keywords') {
+        if (dynamicId !== undefined && propertyName === 'keywords') {
           sigmaGraph.setEdgeAttribute(dynamicId, 'label', newValue)
         }
       }

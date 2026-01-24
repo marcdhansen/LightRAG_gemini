@@ -23,7 +23,10 @@ import LegendButton from '@/components/graph/LegendButton'
 
 import { useSettingsStore } from '@/stores/settings'
 import { useGraphStore } from '@/stores/graph'
+import { useBackendState } from '@/stores/state'
 import { labelColorDarkTheme, labelColorLightTheme } from '@/lib/constants'
+import { Terminal, AlertCircle, X, ChevronDown, ChevronUp } from 'lucide-react'
+import Button from '@/components/ui/Button'
 
 import '@react-sigma/core/lib/style.css'
 import '@react-sigma/graph-search/lib/style.css'
@@ -109,8 +112,10 @@ const GraphEvents = () => {
 
 const GraphViewer = () => {
   const [isThemeSwitching, setIsThemeSwitching] = useState(false)
+  const [showLogs, setShowLogs] = useState(false)
   const sigmaRef = useRef<any>(null)
   const prevTheme = useRef<string>('')
+  const logsEndRef = useRef<HTMLDivElement>(null)
 
   const selectedNode = useGraphStore.use.selectedNode()
   const focusedNode = useGraphStore.use.focusedNode()
@@ -121,6 +126,9 @@ const GraphViewer = () => {
   const showNodeSearchBar = useSettingsStore.use.showNodeSearchBar()
   const enableNodeDrag = useSettingsStore.use.enableNodeDrag()
   const showLegend = useSettingsStore.use.showLegend()
+  const logs = useGraphStore.use.logs()
+  const errorMessage = useBackendState.use.message()
+  const errorMessageTitle = useBackendState.use.messageTitle()
   const theme = useSettingsStore.use.theme()
 
   // Memoize sigma settings to prevent unnecessary re-creation
@@ -148,6 +156,13 @@ const GraphViewer = () => {
     prevTheme.current = theme
     console.log('Initialized sigma settings for theme:', theme)
   }, [theme])
+
+  // Auto-scroll logs to bottom
+  useEffect(() => {
+    if (showLogs && logsEndRef.current) {
+      logsEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [logs, showLogs])
 
   // Clean up sigma instance when component unmounts
   useEffect(() => {
@@ -222,6 +237,15 @@ const GraphViewer = () => {
           <FullScreenControl />
           <LegendButton />
           <Settings />
+          <Button
+            variant="ghost"
+            size="icon"
+            tooltip="View Logs"
+            onClick={() => setShowLogs(!showLogs)}
+            className={showLogs ? 'bg-primary/20 text-primary' : ''}
+          >
+            <Terminal className="h-4 w-4" />
+          </Button>
           {/* <ThemeToggle /> */}
         </div>
 
@@ -243,6 +267,66 @@ const GraphViewer = () => {
 
         <SettingsDisplay />
       </SigmaContainer>
+
+      {/* Logs Panel */}
+      {showLogs && (
+        <div className="bg-background/80 absolute bottom-12 left-14 z-50 flex h-64 w-80 flex-col rounded-xl border-2 backdrop-blur-lg transition-all shadow-xl">
+          <div className="flex items-center justify-between border-b p-2">
+            <div className="flex items-center gap-2">
+              <Terminal className="h-4 w-4 text-primary" />
+              <span className="text-xs font-bold uppercase tracking-wider opacity-70">Process Logs</span>
+            </div>
+            <div className="flex gap-1">
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => useGraphStore.getState().clearLogs()}>
+                <X className="h-3 w-3" />
+              </Button>
+              <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => setShowLogs(false)}>
+                <ChevronDown className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+          <div className="flex-1 overflow-y-auto p-2 font-mono text-[10px] leading-tight">
+            {logs.length === 0 ? (
+              <div className="text-muted-foreground italic opacity-50">No logs yet...</div>
+            ) : (
+              logs.map((log, i) => (
+                <div key={i} className="mb-1">
+                  <span className="text-primary opacity-50">{log.split('] ')[0]}]</span>
+                  <span> {log.split('] ')[1]}</span>
+                </div>
+              ))
+            )}
+            <div ref={logsEndRef} />
+          </div>
+        </div>
+      )}
+
+      {/* Error Overlay */}
+      {errorMessage && !isFetching && (
+        <div className="absolute inset-0 z-[60] flex items-center justify-center bg-background/40 backdrop-blur-[2px]">
+          <div className="bg-background max-w-md animate-in fade-in zoom-in duration-300 rounded-xl border-2 border-destructive/50 p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-3 text-destructive">
+              <AlertCircle className="h-8 w-8" />
+              <h3 className="text-xl font-bold">{errorMessageTitle || 'Error'}</h3>
+            </div>
+            <p className="mb-6 text-sm opacity-80 font-mono bg-muted p-3 rounded border overflow-auto max-h-40">
+              {errorMessage}
+            </p>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => useBackendState.getState().clear()}>
+                Dismiss
+              </Button>
+              <Button variant="destructive" onClick={() => {
+                useBackendState.getState().clear();
+                // Optionally retry or reset settings
+                useSettingsStore.getState().setQueryLabel('');
+              }}>
+                Reset Connection
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Loading overlay - shown when data is loading or theme is switching */}
       {(isFetching || isThemeSwitching) && (

@@ -10,7 +10,7 @@ import { getDocumentContent, ReferenceItem } from '@/api/lightrag'
 import { LoaderIcon, ExternalLinkIcon, SearchIcon } from 'lucide-react'
 import { ScrollArea } from '@/components/ui/ScrollArea'
 import { toast } from 'sonner'
-import { Button } from '@/components/ui/Button'
+import Button from '@/components/ui/Button'
 import { useTranslation } from 'react-i18next'
 
 interface ReferenceDocumentViewerProps {

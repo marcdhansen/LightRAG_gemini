@@ -1,6 +1,6 @@
 import { ReferenceItem } from '@/api/lightrag'
 import { FileTextIcon } from 'lucide-react'
-import { Badge } from '@/components/ui/Badge'
+import Badge from '@/components/ui/Badge'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/Tooltip'
 import { useTranslation } from 'react-i18next'
 

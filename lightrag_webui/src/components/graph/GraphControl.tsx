@@ -78,7 +78,8 @@ const GraphControl = ({ disableHoverEffect }: { disableHoverEffect?: boolean }) 
       }
 
       assignLayout();
-      console.log('Initial layout applied to graph');
+      sigma.refresh();
+      console.log('Initial layout applied to graph and sigma refreshed');
     }
   }, [sigma, sigmaGraph, assignLayout, maxIterations])
 

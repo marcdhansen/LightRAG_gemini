@@ -101,10 +101,13 @@ const fetchGraph = async (label: string, maxDepth: number, maxNodes: number) => 
   const queryLabel = label || '*';
 
   try {
-    console.log(`Fetching graph label: ${queryLabel}, depth: ${maxDepth}, nodes: ${maxNodes}`);
+    useGraphStore.getState().addLog(`Fetching graph for label: ${queryLabel}...`);
     rawData = await queryGraphs(queryLabel, maxDepth, maxNodes);
+    useGraphStore.getState().addLog(`Fetched ${rawData?.nodes?.length || 0} nodes and ${rawData?.edges?.length || 0} edges.`);
   } catch (e) {
-    useBackendState.getState().setErrorMessage(errorMessage(e), 'Query Graphs Error!');
+    const err = errorMessage(e);
+    useGraphStore.getState().addLog(`ERROR: ${err}`);
+    useBackendState.getState().setErrorMessage(err, 'Query Graphs Error!');
     return null;
   }
 
@@ -124,6 +127,7 @@ const fetchGraph = async (label: string, maxDepth: number, maxNodes: number) => 
       node.size = 10
     }
 
+    useGraphStore.getState().addLog('Processing graph data...');
     for (let i = 0; i < rawData.edges.length; i++) {
       const edge = rawData.edges[i]
       edgeIdMap[edge.id] = i
@@ -173,8 +177,10 @@ const fetchGraph = async (label: string, maxDepth: number, maxNodes: number) => 
 
     if (!validateGraph(rawGraph)) {
       rawGraph = null
+      useGraphStore.getState().addLog('WARNING: Graph validation failed.');
       console.warn('Invalid graph data')
     }
+    useGraphStore.getState().addLog('Graph data processing complete.');
     console.log('Graph data loaded')
   }
 
@@ -429,7 +435,7 @@ const useLightrangeGraph = () => {
           // Update last successful query label
           state.setLastSuccessfulQueryLabel(currentQueryLabel);
 
-          // Reset camera view
+          // Reset camera view - now triggers centering logic in FocusOnNode
           state.setMoveToSelectedNode(true);
         }
 
@@ -438,6 +444,7 @@ const useLightrangeGraph = () => {
         initialLoadRef.current = true
         fetchInProgressRef.current = false
         state.setIsFetching(false)
+        state.addLog('Graph data load complete.');
 
         // Mark empty data as handled if data is empty and query label is empty
         if ((!data || !data.nodes || data.nodes.length === 0) && !currentQueryLabel) {
@@ -445,12 +452,14 @@ const useLightrangeGraph = () => {
         }
       }).catch((error) => {
         console.error('Error fetching graph data:', error)
+        useGraphStore.getState().addLog(`ERROR fetching graph: ${error.message || error}`);
 
         // Reset state on error
         const state = useGraphStore.getState()
         state.setIsFetching(false)
         dataLoadedRef.current = false;
         fetchInProgressRef.current = false
+        // Allow retry by resetting fetchAttempted if it failed
         state.setGraphDataFetchAttempted(false)
         state.setLastSuccessfulQueryLabel('') // Clear last successful query label on error
       })
@@ -478,12 +487,15 @@ const useLightrangeGraph = () => {
         }
 
         // Fetch the extended subgraph with depth 2
+        useGraphStore.getState().addLog(`Expanding node: ${label}...`);
         const extendedGraph = await queryGraphs(label, 2, 1000);
 
         if (!extendedGraph || !extendedGraph.nodes || !extendedGraph.edges) {
+          useGraphStore.getState().addLog('ERROR: Failed to fetch extended graph.');
           console.error('Failed to fetch extended graph');
           return;
         }
+        useGraphStore.getState().addLog(`Fetched extension: ${extendedGraph.nodes.length} nodes, ${extendedGraph.edges.length} edges.`);
 
         // Process nodes to add required properties for RawNodeType
         const processedNodes: RawNodeType[] = [];
@@ -521,7 +533,7 @@ const useLightrangeGraph = () => {
         }
 
         // Store current node positions
-        const nodePositions: Record<string, {x: number, y: number}> = {};
+        const nodePositions: Record<string, { x: number, y: number }> = {};
         sigmaGraph.forEachNode((node) => {
           nodePositions[node] = {
             x: sigmaGraph.getNodeAttribute(node, 'x'),
@@ -567,7 +579,7 @@ const useLightrangeGraph = () => {
           // Check if this node is connected to the selected node
           const isConnected = processedEdges.some(
             edge => (edge.source === nodeId && edge.target === node.id) ||
-                   (edge.target === nodeId && edge.source === node.id)
+              (edge.target === nodeId && edge.source === node.id)
           );
 
           if (isConnected) {
@@ -698,7 +710,7 @@ const useLightrangeGraph = () => {
         const randomAngle = Math.random() * 2 * Math.PI
 
         console.log('nodeSize:', nodeToExpand.size, 'nodesToAdd:', nodesToAdd.size);
-        console.log('cameraRatio:', Math.round(cameraRatio*100)/100, 'spreadFactor:', Math.round(spreadFactor*100)/100);
+        console.log('cameraRatio:', Math.round(cameraRatio * 100) / 100, 'spreadFactor:', Math.round(spreadFactor * 100) / 100);
 
         // Add new nodes
         for (const nodeId of nodesToAdd) {
@@ -717,9 +729,9 @@ const useLightrangeGraph = () => {
 
           // Calculate final position
           const x = nodePositions[nodeId]?.x ||
-                    (nodePositions[nodeToExpand.id].x + Math.cos(randomAngle + angle) * spreadFactor);
+            (nodePositions[nodeToExpand.id].x + Math.cos(randomAngle + angle) * spreadFactor);
           const y = nodePositions[nodeId]?.y ||
-                    (nodePositions[nodeToExpand.id].y + Math.sin(randomAngle + angle) * spreadFactor);
+            (nodePositions[nodeToExpand.id].y + Math.sin(randomAngle + angle) * spreadFactor);
 
           // Add the new node to the sigma graph with calculated position
           sigmaGraph.addNode(nodeId, {
