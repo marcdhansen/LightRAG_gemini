@@ -307,6 +307,7 @@ def check_external_services(request):
     import urllib.request
     import urllib.error
     import socket
+    import os
 
     print("\n[Fixture] Checking external services for integration tests...")
 
@@ -406,6 +407,19 @@ def check_external_services(request):
             # `lightrag-server` script assumes it can find 'lightrag' module.
             # We use `uv run lightrag-server` which should handle environment.
             
+            # --- CLEANUP: Wipe storage directory before starting server for a fresh test run ---
+            # This ensures no corrupted state from previous runs interferes with tests.
+            # We only do this if we are auto-starting the server (implying a test-controlled environment).
+            working_dir = os.getenv("WORKING_DIR", "./rag_storage")
+            if os.path.exists(working_dir):
+                import shutil
+                print(f"[Fixture] Cleaning up storage directory: {working_dir}")
+                try:
+                    shutil.rmtree(working_dir)
+                    print("[Fixture] Storage directory wiped.")
+                except Exception as e:
+                    print(f"[Fixture] Warning: Failed to wipe storage directory: {e}")
+
             # Start process
             # process = subprocess.Popen(["uv", "run", "lightrag-server"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) 
             # Better to show output? Or log to file?
@@ -435,7 +449,7 @@ def check_external_services(request):
 
             # Wait for healthy
             start_time = time.time()
-            while time.time() - start_time < 30: # 30s timeout
+            while time.time() - start_time < 120: # 120s timeout
                 try:
                     with urllib.request.urlopen(server_url, timeout=1) as response:
                         if response.status == 200:

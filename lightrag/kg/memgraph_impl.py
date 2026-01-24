@@ -1,12 +1,14 @@
 import os
 import asyncio
 import random
+import time
 from dataclasses import dataclass
-from typing import final
+from typing import final, Any
 import configparser
+import numpy as np
 
-from ..utils import logger
-from ..base import BaseGraphStorage
+from ..utils import logger, compute_mdhash_id
+from ..base import BaseGraphStorage, BaseVectorStorage
 from ..core_types import KnowledgeGraph, KnowledgeGraphNode, KnowledgeGraphEdge
 from ..kg.shared_storage import get_data_init_lock
 import pipmaster as pm
@@ -1150,3 +1152,254 @@ class MemgraphStorage(BaseGraphStorage):
             if result is not None:
                 await result.consume()
             return []
+
+
+@final
+@dataclass
+class MemgraphVectorStorage(BaseVectorStorage):
+    def __post_init__(self):
+        self._validate_embedding_func()
+        self._driver = None
+        self._DATABASE = None
+
+        # Priority: 1) MEMGRAPH_WORKSPACE env 2) workspace arg
+        memgraph_workspace = os.environ.get("MEMGRAPH_WORKSPACE")
+        if memgraph_workspace and memgraph_workspace.strip():
+            self.workspace = memgraph_workspace
+
+        if not self.workspace or not str(self.workspace).strip():
+            self.workspace = "base"
+
+        # Unique label for this vector storage namespace in this workspace
+        # Labels in Memgraph/Neo4j cannot contain hyphens without backticks
+        self.label = f"VDB_{self.workspace}_{self.namespace}"
+        self._max_batch_size = self.global_config.get("embedding_batch_num", 32)
+        
+        # Consistent with NanoVectorDBStorage behavior
+        kwargs = self.global_config.get("vector_db_storage_cls_kwargs", {})
+        cosine_threshold = kwargs.get("cosine_better_than_threshold")
+        if cosine_threshold is None:
+            self.cosine_better_than_threshold = 0.2
+        else:
+            self.cosine_better_than_threshold = cosine_threshold
+
+    async def initialize(self):
+        async with get_data_init_lock():
+            URI = os.environ.get(
+                "MEMGRAPH_URI",
+                config.get("memgraph", "uri", fallback="bolt://localhost:7687"),
+            )
+            USERNAME = os.environ.get(
+                "MEMGRAPH_USERNAME", config.get("memgraph", "username", fallback="")
+            )
+            PASSWORD = os.environ.get(
+                "MEMGRAPH_PASSWORD", config.get("memgraph", "password", fallback="")
+            )
+            DATABASE = os.environ.get(
+                "MEMGRAPH_DATABASE",
+                config.get("memgraph", "database", fallback="memgraph"),
+            )
+
+            self._driver = AsyncGraphDatabase.driver(
+                URI,
+                auth=(USERNAME, PASSWORD),
+                max_connection_lifetime=600,
+                keep_alive=True,
+                connection_timeout=60.0,
+            )
+            self._DATABASE = DATABASE
+
+            try:
+                async with self._driver.session(database=DATABASE) as session:
+                    # Attempt to create a vector index if supported (Enterprise feature or enabled)
+                    # We try multiple syntaxes
+                    created = False
+                    try:
+                        # Attempt 1: Native syntax (Memgraph 3.0+)
+                        await session.run(f"CREATE INDEX ON :`{self.label}`(vector) FOR VECTOR")
+                        logger.info(f"[{self.workspace}] Created native vector index on :`{self.label}`(vector).")
+                        created = True
+                    except Exception:
+                        pass
+                    
+                    if not created:
+                        try:
+                            # Attempt 2: Standard index (MAGE fallback might use it or we'll brute force)
+                            await session.run(f"CREATE INDEX ON :`{self.label}`(vector)")
+                            logger.info(f"[{self.workspace}] Created standard index on :`{self.label}`(vector) as fallback.")
+                        except Exception:
+                            # Standard index might already exist
+                            pass
+                    
+                    await session.run("RETURN 1")
+                    logger.info(f"[{self.workspace}] Connected to Memgraph at {URI} for vector storage {self.namespace}")
+            except Exception as e:
+                logger.error(f"[{self.workspace}] Failed to connect to Memgraph at {URI} for vector storage: {e}")
+                raise
+
+    async def finalize(self):
+        if self._driver is not None:
+            await self._driver.close()
+            self._driver = None
+
+    async def index_done_callback(self):
+        pass
+
+    async def upsert(self, data: dict[str, dict[str, Any]]) -> None:
+        if not data:
+            return
+
+        current_time = int(time.time())
+        ids = list(data.keys())
+        
+        # Check which records need embedding
+        records_to_embed = []
+        for doc_id, node_data in data.items():
+            if "embedding" not in node_data or node_data["embedding"] is None:
+                records_to_embed.append({"id": doc_id, "content": node_data.get("content", "")})
+        
+        # Compute missing embeddings in batches
+        if records_to_embed:
+            contents = [r["content"] for r in records_to_embed]
+            batches = [
+                contents[i : i + self._max_batch_size]
+                for i in range(0, len(contents), self._max_batch_size)
+            ]
+            embedding_tasks = [self.embedding_func(batch) for batch in batches]
+            embeddings_list = await asyncio.gather(*embedding_tasks)
+            embeddings = np.concatenate(embeddings_list)
+            
+            for i, r in enumerate(records_to_embed):
+                data[r["id"]]["embedding"] = embeddings[i]
+
+        # Prepare records for UNWIND
+        params_list = []
+        for doc_id, node_data in data.items():
+            embedding = node_data.get("embedding")
+            if isinstance(embedding, np.ndarray):
+                embedding = embedding.tolist()
+            
+            record = {
+                "id": doc_id,
+                "content": node_data.get("content", ""),
+                "vector": embedding,
+                "created_at": current_time
+            }
+            # Add meta fields
+            for field in self.meta_fields:
+                if field in node_data:
+                    record[field] = node_data[field]
+            params_list.append(record)
+
+        async with self._driver.session(database=self._DATABASE) as session:
+            query = f"""
+            UNWIND $records AS record
+            MERGE (n:`{self.label}` {{id: record.id}})
+            SET n += record
+            """
+            await session.run(query, records=params_list)
+        
+        logger.debug(f"[{self.workspace}] Upserted {len(params_list)} vectors to {self.label}")
+
+    async def query(self, query: str, top_k: int, query_embedding: list[float] = None) -> list[dict[str, Any]]:
+        # Use provided embedding or compute it
+        if query_embedding is not None:
+            embedding = query_embedding
+        else:
+            embedding_result = await self.embedding_func([query])
+            embedding = embedding_result[0]
+
+        if isinstance(embedding, np.ndarray):
+            embedding = embedding.tolist()
+
+        async with self._driver.session(database=self._DATABASE, default_access_mode="READ") as session:
+            # Attempt 1: MAGE vector_search (fastest if index exists)
+            search_query = f"""
+            CALL vector_search.search('{self.label}', $limit, $embedding) 
+            YIELD node, similarity
+            RETURN node, similarity
+            """
+            try:
+                result = await session.run(search_query, embedding=embedding, limit=top_k)
+                records = []
+                async for record in result:
+                    if record["similarity"] < self.cosine_better_than_threshold:
+                        continue
+                    node_dict = dict(record["node"])
+                    if "vector" in node_dict: del node_dict["vector"]
+                    records.append({**node_dict, "id": node_dict.get("id"), "distance": record["similarity"]})
+                await result.consume()
+                if records: return records
+            except Exception:
+                pass
+
+            # Attempt 2: Brute force fallback using cosine_similarity function (slow!)
+            logger.warning(f"[{self.workspace}] Native vector search failed for {self.label}. Using slow brute-force fallback.")
+            fallback_query = f"""
+            MATCH (n:`{self.label}`)
+            WHERE n.vector IS NOT NULL
+            WITH n, vector_search.cosine_similarity(n.vector, $embedding) AS sim
+            WHERE sim >= $threshold
+            RETURN n, sim
+            ORDER BY sim DESC
+            LIMIT $limit
+            """
+            result = await session.run(fallback_query, embedding=embedding, limit=top_k, threshold=self.cosine_better_than_threshold)
+            records = []
+            async for record in result:
+                node_dict = dict(record["n"])
+                if "vector" in node_dict: del node_dict["vector"]
+                records.append({**node_dict, "id": node_dict.get("id"), "distance": record["sim"]})
+            await result.consume()
+            return records
+
+    async def get_by_id(self, id: str) -> dict[str, Any] | None:
+        async with self._driver.session(database=self._DATABASE, default_access_mode="READ") as session:
+            query = f"MATCH (n:`{self.label}` {{id: $id}}) RETURN n"
+            result = await session.run(query, id=id)
+            record = await result.single()
+            if record:
+                node_dict = dict(record["n"])
+                if "vector" in node_dict: del node_dict["vector"]
+                node_dict["id"] = node_dict.get("id") # Ensure id is present top-level if needed
+                return node_dict
+            return None
+
+    async def get_by_ids(self, ids: list[str]) -> list[dict[str, Any]]:
+        if not ids: return []
+        async with self._driver.session(database=self._DATABASE, default_access_mode="READ") as session:
+            query = f"MATCH (n:`{self.label}`) WHERE n.id IN $ids RETURN n"
+            result = await session.run(query, ids=ids)
+            records = []
+            async for record in result:
+                node_dict = dict(record["n"])
+                if "vector" in node_dict: del node_dict["vector"]
+                node_dict["id"] = node_dict.get("id")
+                records.append(node_dict)
+            return records
+
+    async def get_vectors_by_ids(self, ids: list[str]) -> dict[str, list[float]]:
+        if not ids: return {}
+        async with self._driver.session(database=self._DATABASE, default_access_mode="READ") as session:
+            query = f"MATCH (n:`{self.label}`) WHERE n.id IN $ids RETURN n.id as id, n.vector as vector"
+            result = await session.run(query, ids=ids)
+            return {record["id"]: record["vector"] async for record in result if record["vector"]}
+
+    async def delete(self, ids: list[str]):
+        if not ids: return
+        async with self._driver.session(database=self._DATABASE) as session:
+            await session.run(f"MATCH (n:`{self.label}`) WHERE n.id IN $ids DETACH DELETE n", ids=ids)
+
+    async def drop(self) -> dict[str, str]:
+        async with self._driver.session(database=self._DATABASE) as session:
+            await session.run(f"MATCH (n:`{self.label}`) DETACH DELETE n")
+        logger.info(f"[{self.workspace}] Dropped all vectors in {self.label}")
+        return {"status": "success"}
+
+    async def delete_entity(self, entity_name: str) -> None:
+        entity_id = compute_mdhash_id(entity_name, prefix="ent-")
+        await self.delete([entity_id])
+
+    async def delete_entity_relation(self, entity_name: str) -> None:
+        async with self._driver.session(database=self._DATABASE) as session:
+            await session.run(f"MATCH (n:`{self.label}`) WHERE n.src_id = $name OR n.tgt_id = $name DETACH DELETE n", name=entity_name)
