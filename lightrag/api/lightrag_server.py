@@ -1111,7 +1111,7 @@ def create_app(args):
     app.include_router(create_query_routes(rag, api_key, args.top_k))
     app.include_router(create_graph_routes(rag, api_key))
     app.include_router(create_highlight_routes(api_key))
- 
+
     # Legacy redirect for /upload to /documents/upload
     @app.post("/upload", include_in_schema=False)
     async def legacy_upload_redirect(request: Request):

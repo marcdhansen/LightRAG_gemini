@@ -1,21 +1,22 @@
 import os
 from dataclasses import dataclass, field
 
+
 @dataclass
 class ACEConfig:
     """Configuration for the ACE (Agentic Context Evolution) Framework."""
-    
+
     # Base directory for ACE data
     base_dir: str = field(default_factory=lambda: os.path.join(os.getcwd(), "ace_data"))
-    
+
     # Paths for persistence
     playbook_path: str = "context_playbook.json"
-    
+
     # Model Configurations
     generator_model: str = "qwen2.5-coder:1.5b"
-    reflector_model: str = "qwen2.5-coder:1.5b" 
+    reflector_model: str = "qwen2.5-coder:1.5b"
     curator_model: str = "qwen2.5-coder:1.5b"
-    
+
     # Evolution Settings
     max_history_items: int = 50
     enable_auto_curation: bool = True

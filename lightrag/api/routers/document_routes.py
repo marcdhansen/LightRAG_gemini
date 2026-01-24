@@ -771,7 +771,9 @@ class PipelineStatusResponse(BaseModel):
         """Process datetime and return as ISO format string with timezone"""
         return format_datetime(value)
 
-    model_config = ConfigDict(extra="allow")  # Allow additional fields from the pipeline status
+    model_config = ConfigDict(
+        extra="allow"
+    )  # Allow additional fields from the pipeline status
 
 
 class DocumentManager:

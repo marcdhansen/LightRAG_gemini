@@ -1052,7 +1052,7 @@ async def _parse_yaml_extraction(
             last_fence = clean_content.rfind("```")
             if first_newline != -1 and last_fence != -1:
                 clean_content = clean_content[first_newline:last_fence].strip()
-        
+
         data = yaml.safe_load(clean_content)
         if not data:
             return {}, {}
@@ -1064,15 +1064,17 @@ async def _parse_yaml_extraction(
                 continue
             ent_type = ent.get("type", "UNKNOWN")
             description = ent.get("description", "")
-            
-            maybe_nodes[name].append({
-                "entity_name": name,
-                "entity_type": ent_type,
-                "description": description,
-                "source_id": chunk_key,
-                "file_path": file_path,
-                "timestamp": timestamp,
-            })
+
+            maybe_nodes[name].append(
+                {
+                    "entity_name": name,
+                    "entity_type": ent_type,
+                    "description": description,
+                    "source_id": chunk_key,
+                    "file_path": file_path,
+                    "timestamp": timestamp,
+                }
+            )
 
         relationships = data.get("relationships", [])
         for rel in relationships:
@@ -1082,17 +1084,19 @@ async def _parse_yaml_extraction(
                 continue
             keywords = rel.get("keywords", "")
             description = rel.get("description", "")
-            
-            maybe_edges[(src, tgt)].append({
-                "src_id": src,
-                "tgt_id": tgt,
-                "weight": 1.0,
-                "description": description,
-                "keywords": keywords,
-                "source_id": chunk_key,
-                "file_path": file_path,
-                "timestamp": timestamp,
-            })
+
+            maybe_edges[(src, tgt)].append(
+                {
+                    "src_id": src,
+                    "tgt_id": tgt,
+                    "weight": 1.0,
+                    "description": description,
+                    "keywords": keywords,
+                    "source_id": chunk_key,
+                    "file_path": file_path,
+                    "timestamp": timestamp,
+                }
+            )
 
     except Exception as e:
         logger.error(f"Failed to parse YAML extraction from {chunk_key}: {e}")
@@ -2089,7 +2093,9 @@ async def _merge_edges_then_upsert(
     for keyword_str in already_keywords:
         if keyword_str:  # Skip empty values
             if isinstance(keyword_str, list):
-                 all_keywords.update(str(k).strip() for k in keyword_str if str(k).strip())
+                all_keywords.update(
+                    str(k).strip() for k in keyword_str if str(k).strip()
+                )
             elif isinstance(keyword_str, str):
                 all_keywords.update(
                     k.strip() for k in keyword_str.split(",") if k.strip()
@@ -2101,9 +2107,7 @@ async def _merge_edges_then_upsert(
             if isinstance(kw_val, list):
                 all_keywords.update(str(k).strip() for k in kw_val if str(k).strip())
             elif isinstance(kw_val, str):
-                all_keywords.update(
-                    k.strip() for k in kw_val.split(",") if k.strip()
-                )
+                all_keywords.update(k.strip() for k in kw_val.split(",") if k.strip())
     # Join all unique keywords with commas
     keywords = ",".join(sorted(all_keywords))
 
@@ -2869,7 +2873,7 @@ async def extract_entities(
     )
 
     extraction_format = global_config.get("extraction_format", "standard")
-    
+
     if extraction_format == "key_value":
         system_prompt_key = "entity_extraction_key_value_system_prompt"
         user_prompt_key = "entity_extraction_key_value_user_prompt"

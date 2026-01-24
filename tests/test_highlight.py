@@ -1,19 +1,23 @@
 import pytest
 from lightrag.highlight import get_highlights
 
+
 @pytest.mark.offline
 @pytest.mark.light
 def test_get_highlights_basic():
     """Test basic highlighting with a simple query and context."""
     query = "What is the capital of France?"
     context = "Paris is the capital of France. Berlin is the capital of Germany."
-    result = get_highlights(query, context, threshold=0.1) # Use low threshold to ensure match
-    
+    result = get_highlights(
+        query, context, threshold=0.1
+    )  # Use low threshold to ensure match
+
     assert "highlighted_sentences" in result
     assert "sentence_probabilities" in result
     assert len(result["highlighted_sentences"]) > 0
     assert any("Paris" in s for s in result["highlighted_sentences"])
     assert len(result["highlighted_sentences"]) == len(result["sentence_probabilities"])
+
 
 @pytest.mark.offline
 @pytest.mark.light
@@ -23,9 +27,10 @@ def test_get_highlights_threshold():
     context = "Berlin is the capital of Germany. London is the capital of the UK."
     # With a high threshold, these should not match
     result = get_highlights(query, context, threshold=0.9)
-    
+
     assert len(result["highlighted_sentences"]) == 0
     assert len(result["sentence_probabilities"]) == 0
+
 
 @pytest.mark.offline
 @pytest.mark.light

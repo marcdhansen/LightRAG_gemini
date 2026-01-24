@@ -180,8 +180,8 @@ class ACEQueryRequest(QueryRequest):
     def to_query_params(self, is_stream: bool = False) -> QueryParam:
         """Converts an ACEQueryRequest instance into a QueryParam instance, excluding ACE-specific fields."""
         request_data = self.model_dump(
-            exclude_none=True, 
-            exclude={"query", "include_chunk_content", "auto_reflect"}
+            exclude_none=True,
+            exclude={"query", "include_chunk_content", "auto_reflect"},
         )
         param = QueryParam(**request_data)
         param.stream = is_stream
@@ -774,28 +774,27 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
     async def ace_query(request: ACEQueryRequest):
         """
         Execute an agentic query using the ACE (Agentic Context Evolution) Framework.
-        
+
         This endpoint uses a self-evolving "Context Playbook" to improve retrieval
         and generation over time through a Generate-Reflect-Curate loop.
         """
         from ..lightrag_server import rag
+
         if not rag or not rag.enable_ace:
             raise HTTPException(
-                status_code=501, 
-                detail="ACE Framework is not enabled on this server instance."
+                status_code=501,
+                detail="ACE Framework is not enabled on this server instance.",
             )
-        
+
         try:
             param = request.to_query_params(is_stream=False)
             result = await rag.ace_query(
-                query=request.query,
-                param=param,
-                auto_reflect=request.auto_reflect
+                query=request.query, param=param, auto_reflect=request.auto_reflect
             )
-            
+
             if "error" in result:
                 raise HTTPException(status_code=500, detail=result["error"])
-                
+
             return ACEQueryResponse(**result)
         except Exception as e:
             logger.error(f"Error in ACE query: {str(e)}", exc_info=True)

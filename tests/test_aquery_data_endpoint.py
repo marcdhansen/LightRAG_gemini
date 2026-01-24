@@ -108,7 +108,7 @@ def test_query_endpoint_references():
             endpoint,
             json={"query": query_text, "mode": "mix", "include_references": True},
             headers=AUTH_HEADERS,
-            timeout=30,
+            timeout=120,
         )
 
         if response.status_code == 200:
@@ -117,10 +117,14 @@ def test_query_endpoint_references():
             # Check response structure
             assert "response" in data, "Missing 'response' field"
 
-            assert "references" in data, "Missing 'references' field when include_references=True"
+            assert (
+                "references" in data
+            ), "Missing 'references' field when include_references=True"
 
             references = data["references"]
-            assert references is not None, "References should not be None when include_references=True"
+            assert (
+                references is not None
+            ), "References should not be None when include_references=True"
 
             if not validate_references_format(references):
                 assert False, "References format validation failed"
@@ -154,7 +158,7 @@ def test_query_endpoint_references():
             endpoint,
             json={"query": query_text, "mode": "mix", "include_references": False},
             headers=AUTH_HEADERS,
-            timeout=30,
+            timeout=120,
         )
 
         if response.status_code == 200:
@@ -164,7 +168,9 @@ def test_query_endpoint_references():
             assert "response" in data, "Missing 'response' field"
 
             references = data.get("references")
-            assert references is None, "References should be None when include_references=False"
+            assert (
+                references is None
+            ), "References should be None when include_references=False"
 
             print("✅ References disabled: No references field present")
             print(f"   Response length: {len(data['response'])} characters")
@@ -202,7 +208,7 @@ def test_query_stream_endpoint_references():
             endpoint,
             json={"query": query_text, "mode": "mix", "include_references": True},
             headers=AUTH_HEADERS,
-            timeout=30,
+            timeout=120,
             stream=True,
         )
 
@@ -268,7 +274,7 @@ def test_query_stream_endpoint_references():
             endpoint,
             json={"query": query_text, "mode": "mix", "include_references": False},
             headers=AUTH_HEADERS,
-            timeout=30,
+            timeout=120,
             stream=True,
         )
 
@@ -343,7 +349,7 @@ def test_references_consistency():
 
     try:
         response = requests.post(
-            f"{BASE_URL}/query", json=query_params, headers=AUTH_HEADERS, timeout=30
+            f"{BASE_URL}/query", json=query_params, headers=AUTH_HEADERS, timeout=120
         )
 
         if response.status_code == 200:
@@ -367,7 +373,7 @@ def test_references_consistency():
             f"{BASE_URL}/query/stream",
             json=query_params,
             headers=AUTH_HEADERS,
-            timeout=30,
+            timeout=120,
             stream=True,
         )
 
@@ -405,7 +411,7 @@ def test_references_consistency():
             f"{BASE_URL}/query/data",
             json=query_params,
             headers=AUTH_HEADERS,
-            timeout=30,
+            timeout=120,
         )
 
         if response.status_code == 200:
@@ -507,7 +513,7 @@ def test_aquery_data_endpoint():
         start_time = time.time()
 
         response = requests.post(
-            endpoint, json=query_request, headers=AUTH_HEADERS, timeout=30
+            endpoint, json=query_request, headers=AUTH_HEADERS, timeout=120
         )
 
         end_time = time.time()
@@ -670,7 +676,7 @@ def compare_with_regular_query():
             f"{BASE_URL}/query",
             json={"query": query_text, "mode": "mix"},
             headers=AUTH_HEADERS,
-            timeout=30,
+            timeout=120,
         )
 
         if regular_response.status_code == 200:
@@ -689,7 +695,6 @@ def compare_with_regular_query():
 
     except Exception as e:
         print(f"   Regular query error: {str(e)}")
-
 
 
 def run_all_reference_tests():

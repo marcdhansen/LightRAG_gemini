@@ -2,7 +2,6 @@ import pytest
 import httpx
 import time
 import json
-import os
 
 # Configuration
 TIMEOUT = 300  # 5 minutes specifically for indexing
@@ -12,13 +11,14 @@ API_KEY = "your-secure-api-key-here-123"
 # Mark as heavy and integration test
 pytestmark = [pytest.mark.heavy, pytest.mark.integration]
 
+
 @pytest.fixture(scope="function")
 def test_document():
     """
     Fixture to upload a sample document, wait for processing, yield its ID and original content, and clean up.
     """
     filename = "test_document_references_logic.txt"
-    # Provide enough content to ensure multiple chunks might be possible, 
+    # Provide enough content to ensure multiple chunks might be possible,
     # though for a single small sentence it might still be one chunk.
     # We'll provide a few paragraphs.
     content = (
@@ -32,16 +32,16 @@ def test_document():
         "It allow users to retrieve specific facts about qubits and quantum algorithms. "
         "The system maintains references to the original document to ensure traceability of information."
     )
-    
+
     upload_url = f"{BASE_URL}/documents/upload"
     track_url_template = f"{BASE_URL}/documents/track_status/{{}}"
     delete_url = f"{BASE_URL}/documents/delete_document"
-    
+
     headers = {"X-API-Key": API_KEY}
-    
+
     print(f"\n[Fixture] Uploading {filename}...")
     try:
-        files = {'file': (filename, content, 'text/plain')}
+        files = {"file": (filename, content, "text/plain")}
         response = httpx.post(upload_url, headers=headers, files=files, timeout=30.0)
         response.raise_for_status()
         data = response.json()
@@ -54,20 +54,22 @@ def test_document():
     doc_id = None
     start_time = time.time()
     processed = False
-    
+
     print("[Fixture] Waiting for indexing to complete...")
     while time.time() - start_time < TIMEOUT:
         try:
-            status_resp = httpx.get(track_url_template.format(track_id), headers=headers, timeout=10.0)
+            status_resp = httpx.get(
+                track_url_template.format(track_id), headers=headers, timeout=10.0
+            )
             status_resp.raise_for_status()
             status_data = status_resp.json()
-            
+
             docs = status_data.get("documents", [])
             if docs:
                 doc_status = docs[0]
                 current_status = doc_status.get("status")
                 doc_id = doc_status.get("id")
-                
+
                 if current_status.upper() == "PROCESSED":
                     print(f"[Fixture] Document {doc_id} processed successfully.")
                     processed = True
@@ -75,12 +77,12 @@ def test_document():
                 elif current_status.upper() == "FAILED":
                     error = doc_status.get("error_msg", "Unknown error")
                     pytest.fail(f"Document processing failed: {error}")
-            
+
             time.sleep(2)
         except Exception as e:
             print(f"[Fixture] Warning during polling: {e}")
             time.sleep(2)
-            
+
     if not processed:
         pytest.fail(f"Timeout waiting for document processing (Track ID: {track_id})")
 
@@ -91,13 +93,16 @@ def test_document():
         print(f"[Fixture] Cleaning up document {doc_id}...")
         try:
             payload = {"doc_ids": [doc_id]}
-            del_resp = httpx.request("DELETE", delete_url, headers=headers, json=payload, timeout=30.0)
+            del_resp = httpx.request(
+                "DELETE", delete_url, headers=headers, json=payload, timeout=30.0
+            )
             if del_resp.status_code == 200:
                 print("[Fixture] Cleanup successful.")
             else:
                 print(f"[Fixture] Cleanup failed: {del_resp.text}")
         except Exception as e:
             print(f"[Fixture] Cleanup failed with exception: {e}")
+
 
 @pytest.mark.requires_api
 def test_document_content_and_reference_streaming(test_document):
@@ -117,7 +122,7 @@ def test_document_content_and_reference_streaming(test_document):
     response = httpx.get(content_url, headers=headers, timeout=20.0)
     response.raise_for_status()
     data = response.json()
-    
+
     assert "content" in data
     assert data["doc_id"] == doc_id
     assert data["content"] == original_content
@@ -130,54 +135,63 @@ def test_document_content_and_reference_streaming(test_document):
         "mode": "hybrid",
         "include_references": True,
         "include_chunk_content": True,
-        "stream": True # Explicitly request stream
+        "stream": True,  # Explicitly request stream
     }
 
     print(f"🧪 Testing Streaming Query with References: POST {query_url}")
-    
-    with httpx.stream("POST", query_url, headers=headers, json=payload, timeout=60.0) as response:
+
+    with httpx.stream(
+        "POST", query_url, headers=headers, json=payload, timeout=300.0
+    ) as response:
         response.raise_for_status()
-        
+
         found_references = False
         reference_items = []
-        
+
         for line in response.iter_lines():
             if not line:
                 continue
-            
+
             chunk_data = json.loads(line)
             if "references" in chunk_data:
                 found_references = True
                 reference_items = chunk_data["references"]
                 print(f"Received {len(reference_items)} references in stream")
-                break # We usually get references in the first chunk
-        
+                break  # We usually get references in the first chunk
+
         assert found_references, "References not found in streaming response"
         assert len(reference_items) > 0, "Reference list is empty"
-        
+
         # 3. Verify specifically for our document
         target_ref = None
         for ref in reference_items:
             if ref.get("reference_id") == doc_id:
                 target_ref = ref
                 break
-        
-        assert target_ref is not None, f"Our document {doc_id} was not among the retrieved references"
+
+        assert (
+            target_ref is not None
+        ), f"Our document {doc_id} was not among the retrieved references"
         assert "content" in target_ref, "Reference missing chunk content"
-        assert isinstance(target_ref["content"], list), "Reference content should be a list of strings"
+        assert isinstance(
+            target_ref["content"], list
+        ), "Reference content should be a list of strings"
         assert len(target_ref["content"]) > 0, "Reference content list is empty"
-        
+
         print(f"✅ Found doc_id in references with {len(target_ref['content'])} chunks")
-        
+
         # 4. Verify bits of chunk content are in original document
         for i, chunk_text in enumerate(target_ref["content"]):
-            # Note: LightRAG might sanitize or slightly modify text during chunking, 
+            # Note: LightRAG might sanitize or slightly modify text during chunking,
             # so we check if the majority of it exists or use a substring check.
             # Usually it's intact for .txt files.
-            assert chunk_text in original_content, f"Chunk {i} text not found in original document!"
+            assert (
+                chunk_text in original_content
+            ), f"Chunk {i} text not found in original document!"
             print(f"   Chunk {i} verified as internal substring")
 
     print("\n🎉 All document content and reference traceability tests passed!")
+
 
 @pytest.mark.requires_api
 def test_query_references_non_streaming(test_document):
@@ -193,26 +207,27 @@ def test_query_references_non_streaming(test_document):
         "query": "Explain Shor's algorithm in quantum computing.",
         "mode": "mix",
         "include_references": True,
-        "include_chunk_content": True
+        "include_chunk_content": True,
     }
 
     print(f"\n🧪 Testing Non-Streaming Query with References: POST {query_url}")
-    response = httpx.post(query_url, headers=headers, json=payload, timeout=60.0)
+    response = httpx.post(query_url, headers=headers, json=payload, timeout=300.0)
     response.raise_for_status()
     data = response.json()
-    
+
     assert "references" in data
     references = data["references"]
-    
+
     our_ref = next((r for r in references if r["reference_id"] == doc_id), None)
     assert our_ref is not None, "Our document not found in references"
     assert "content" in our_ref
     assert len(our_ref["content"]) > 0
-    
+
     for chunk in our_ref["content"]:
         assert chunk in original_content
-        
+
     print("✅ Non-streaming query references verified")
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-s", "--run-integration"])

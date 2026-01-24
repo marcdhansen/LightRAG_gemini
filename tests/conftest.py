@@ -18,18 +18,18 @@ def reset_shared_storage_locks():
     """
     try:
         import lightrag.kg.shared_storage as shared_storage
+
         if shared_storage._storage_keyed_lock:
             # Clear internal async lock cache as they are bound to specific event loops
             shared_storage._storage_keyed_lock._async_lock.clear()
             shared_storage._storage_keyed_lock._async_lock_count.clear()
             shared_storage._storage_keyed_lock._async_lock_cleanup_data.clear()
-            
+
             # Reset cleanup timers
             shared_storage._storage_keyed_lock._earliest_async_cleanup_time = None
             shared_storage._storage_keyed_lock._last_async_cleanup_time = None
     except ImportError:
         pass  # Module might not be importable in some contexts, skip
-
 
 
 @pytest.fixture
@@ -38,13 +38,12 @@ async def storage():
     Fixture to initialize and yield a graph storage instance.
     This fixture ensures clean setup and teardown for graph tests.
     """
-    import os
     from lightrag.kg import STORAGES
     from lightrag.kg.shared_storage import initialize_share_data
 
     # Use NetworkX as default for tests if not specified
     graph_storage_type = os.getenv("LIGHTRAG_GRAPH_STORAGE", "NetworkXStorage")
-    
+
     # Initialize shared data (locks)
     initialize_share_data()
 
@@ -52,7 +51,7 @@ async def storage():
     module_path = STORAGES.get(graph_storage_type)
     if not module_path:
         pytest.skip(f"Unknown storage type: {graph_storage_type}")
-    
+
     try:
         module = importlib.import_module(module_path, package="lightrag")
         storage_class = getattr(module, graph_storage_type)
@@ -62,27 +61,29 @@ async def storage():
     # Mock embedding func
     async def mock_embedding_func(texts):
         import numpy as np
+
         return np.random.rand(len(texts), 10)
 
     global_config = {
         "embedding_batch_num": 10,
         "vector_db_storage_cls_kwargs": {"cosine_better_than_threshold": 0.5},
-        "working_dir": "./test_rag_storage"
+        "working_dir": "./test_rag_storage",
     }
 
     storage_instance = storage_class(
         namespace="test_graph",
         workspace="test_workspace",
         global_config=global_config,
-        embedding_func=mock_embedding_func
+        embedding_func=mock_embedding_func,
     )
 
     await storage_instance.initialize()
     yield storage_instance
-    
+
     # Cleanup (if supported by storage)
     if hasattr(storage_instance, "drop"):
         await storage_instance.drop()
+
 
 def pytest_configure(config):
     """Register custom markers for LightRAG tests."""
@@ -115,8 +116,8 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     is_integration = config.getoption("--run-integration")
     is_manual = config.getoption("--run-manual")
     markexpr = config.getoption("markexpr")
-    
-    suite_label = "INTEGRATION" # Default
+
+    suite_label = "INTEGRATION"  # Default
     if "offline" in markexpr.lower():
         suite_label = "OFFLINE"
     elif is_integration and is_manual:
@@ -128,7 +129,7 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
 
     terminalreporter.ensure_newline()
     terminalreporter.section(f"LightRAG {suite_label} TEST SUMMARY", sep="=", bold=True)
-    
+
     if total == 0:
         terminalreporter.write_line("No tests were executed.")
         return
@@ -203,9 +204,7 @@ def pytest_collection_modifyitems(config, items):
     skip_integration = pytest.mark.skip(
         reason="Requires external services(DB/API), use --run-integration to run"
     )
-    skip_manual = pytest.mark.skip(
-        reason="Manual test, use --run-manual to run"
-    )
+    skip_manual = pytest.mark.skip(reason="Manual test, use --run-manual to run")
 
     for item in items:
         if "integration" in item.keywords and not config.getoption("--run-integration"):
@@ -221,7 +220,6 @@ def keep_test_artifacts(request):
 
     Priority: CLI option > Environment variable > Default (False)
     """
-    import os
 
     # Check CLI option first
     if request.config.getoption("--keep-artifacts"):
@@ -238,7 +236,6 @@ def stress_test_mode(request):
 
     Priority: CLI option > Environment variable > Default (False)
     """
-    import os
 
     # Check CLI option first
     if request.config.getoption("--stress-test"):
@@ -255,7 +252,6 @@ def parallel_workers(request):
 
     Priority: CLI option > Environment variable > Default (3)
     """
-    import os
 
     # Check CLI option first
     cli_workers = request.config.getoption("--test-workers")
@@ -273,7 +269,6 @@ def run_integration_tests(request):
 
     Priority: CLI option > Environment variable > Default (False)
     """
-    import os
 
     # Check CLI option first
     if request.config.getoption("--run-integration"):
@@ -286,9 +281,9 @@ def run_integration_tests(request):
 @pytest.fixture(scope="session", autouse=True)
 def check_external_services(request):
     """
-    Fixture to check and start external services (Docker, LightRAG server) 
+    Fixture to check and start external services (Docker, LightRAG server)
     if integration tests are running.
-    
+
     This fixture runs automatically if --run-integration is set.
     """
     should_run = request.config.getoption("--run-integration")
@@ -296,6 +291,7 @@ def check_external_services(request):
     # (We duplicate logic slightly to avoid circular deps or complex fixture requests if not needed)
     if not should_run:
         import os
+
         should_run = os.getenv("LIGHTRAG_RUN_INTEGRATION", "false").lower() == "true"
 
     if not should_run:
@@ -303,7 +299,6 @@ def check_external_services(request):
 
     import subprocess
     import time
-    import sys
     import urllib.request
     import urllib.error
     import socket
@@ -315,7 +310,12 @@ def check_external_services(request):
     print("[Fixture] Checking Docker...")
     docker_running = False
     try:
-        subprocess.run(["docker", "info"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        subprocess.run(
+            ["docker", "info"],
+            check=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
         docker_running = True
         print("[Fixture] Docker is running.")
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -328,10 +328,15 @@ def check_external_services(request):
                 subprocess.run(["open", "-a", "Docker"], check=True)
                 # Wait for Docker to initialize
                 print("[Fixture] Waiting for Docker to start (up to 60s)...")
-                for i in range(12): # 12 * 5s = 60s
+                for i in range(12):  # 12 * 5s = 60s
                     time.sleep(5)
                     try:
-                        subprocess.run(["docker", "info"], check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                        subprocess.run(
+                            ["docker", "info"],
+                            check=True,
+                            stdout=subprocess.DEVNULL,
+                            stderr=subprocess.DEVNULL,
+                        )
                         print("[Fixture] Docker started successfully.")
                         docker_running = True
                         break
@@ -340,10 +345,14 @@ def check_external_services(request):
             except Exception as e:
                 print(f"[Fixture] Failed to launch Docker: {e}")
         else:
-            print("[Fixture] Auto-start for Docker is only implemented for macOS. Please start Docker manually.")
+            print(
+                "[Fixture] Auto-start for Docker is only implemented for macOS. Please start Docker manually."
+            )
 
     if not docker_running:
-        print("[Fixture] WARNING: Docker is not running. Tests requiring Memgraph/Redis/Postgres may fail.")
+        print(
+            "[Fixture] WARNING: Docker is not running. Tests requiring Memgraph/Redis/Postgres may fail."
+        )
         # We don't exit here because some integration tests might just need the server, not new docker containers if they are mocked or external.
         # But usually 'requires_db' implies docker.
 
@@ -354,26 +363,36 @@ def check_external_services(request):
         try:
             # Check if container exists and is running
             subprocess.run(
-                ["docker", "container", "inspect", "lightrag-postgres"], 
-                check=True, 
-                stdout=subprocess.DEVNULL, 
-                stderr=subprocess.DEVNULL
+                ["docker", "container", "inspect", "lightrag-postgres"],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
             )
             print("[Fixture] Postgres container 'lightrag-postgres' is running.")
         except subprocess.CalledProcessError:
-            print("[Fixture] Postgres container not found or not running. Attempting to start via docker-compose...")
+            print(
+                "[Fixture] Postgres container not found or not running. Attempting to start via docker-compose..."
+            )
             try:
                 subprocess.run(
-                    ["docker", "compose", "up", "-d", "postgres"],
-                    check=True
+                    ["docker", "compose", "up", "-d", "postgres"], check=True
                 )
-                print("[Fixture] Postgres started. Waiting for health check (pg_isready)...")
+                print(
+                    "[Fixture] Postgres started. Waiting for health check (pg_isready)..."
+                )
                 # Wait loop for health
                 for i in range(12):
                     res = subprocess.run(
-                        ["docker", "exec", "lightrag-postgres", "pg_isready", "-U", "postgres"],
+                        [
+                            "docker",
+                            "exec",
+                            "lightrag-postgres",
+                            "pg_isready",
+                            "-U",
+                            "postgres",
+                        ],
                         stdout=subprocess.DEVNULL,
-                        stderr=subprocess.DEVNULL
+                        stderr=subprocess.DEVNULL,
                     )
                     if res.returncode == 0:
                         print("[Fixture] Postgres is ready!")
@@ -386,7 +405,7 @@ def check_external_services(request):
     server_url = "http://localhost:9621/health"
     server_running = False
     print(f"[Fixture] Checking LightRAG Server at {server_url}...")
-    
+
     try:
         with urllib.request.urlopen(server_url, timeout=1) as response:
             if response.status == 200:
@@ -397,22 +416,23 @@ def check_external_services(request):
 
     if not server_running:
         print("[Fixture] Attempting to start LightRAG Server...")
-        # Assume we are in the root or can find the right path. 
+        # Assume we are in the root or can find the right path.
         # The command: uv run lightrag-server
         # We need to run this in the background and ensure it stays alive during session
-        
+
         try:
             # Determine CWD: The tests are likely running from root or LightRAG/
             # If running `uv run pytest Tests/` from root, CWD is root.
             # `lightrag-server` script assumes it can find 'lightrag' module.
             # We use `uv run lightrag-server` which should handle environment.
-            
+
             # --- CLEANUP: Wipe storage directory before starting server for a fresh test run ---
             # This ensures no corrupted state from previous runs interferes with tests.
             # We only do this if we are auto-starting the server (implying a test-controlled environment).
             working_dir = os.getenv("WORKING_DIR", "./rag_storage")
             if os.path.exists(working_dir):
                 import shutil
+
                 print(f"[Fixture] Cleaning up storage directory: {working_dir}")
                 try:
                     shutil.rmtree(working_dir)
@@ -421,23 +441,27 @@ def check_external_services(request):
                     print(f"[Fixture] Warning: Failed to wipe storage directory: {e}")
 
             # Start process
-            # process = subprocess.Popen(["uv", "run", "lightrag-server"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL) 
+            # process = subprocess.Popen(["uv", "run", "lightrag-server"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
             # Better to show output? Or log to file?
-            
+
             # We'll use a log file for the server output to avoid cluttering test output
             with open("testing_server_autostart.log", "w") as log_file:
                 server_process = subprocess.Popen(
-                    ["uv", "run", "lightrag-server"], 
-                    stdout=log_file, 
+                    ["uv", "run", "lightrag-server"],
+                    stdout=log_file,
                     stderr=subprocess.STDOUT,
-                    start_new_session=True # Detach slightly so it doesn't get killed instantly (though we want to kill it at end?)
+                    start_new_session=True,  # Detach slightly so it doesn't get killed instantly (though we want to kill it at end?)
                 )
-            
-            print(f"[Fixture] Server process started (PID: {server_process.pid}). Waiting for health check...")
-            
+
+            print(
+                f"[Fixture] Server process started (PID: {server_process.pid}). Waiting for health check..."
+            )
+
             # Register cleanup to kill server at end of session
             def cleanup_server():
-                print(f"\n[Fixture] Stopping auto-started server (PID: {server_process.pid})...")
+                print(
+                    f"\n[Fixture] Stopping auto-started server (PID: {server_process.pid})..."
+                )
                 server_process.terminate()
                 try:
                     server_process.wait(timeout=5)
@@ -449,18 +473,22 @@ def check_external_services(request):
 
             # Wait for healthy
             start_time = time.time()
-            while time.time() - start_time < 120: # 120s timeout
+            while time.time() - start_time < 120:  # 120s timeout
                 try:
                     with urllib.request.urlopen(server_url, timeout=1) as response:
                         if response.status == 200:
                             server_running = True
-                            print(f"[Fixture] Server is up and healthy! (Took {time.time() - start_time:.1f}s)")
+                            print(
+                                f"[Fixture] Server is up and healthy! (Took {time.time() - start_time:.1f}s)"
+                            )
                             break
                 except (urllib.error.URLError, socket.timeout, ConnectionRefusedError):
                     time.sleep(1)
-            
+
             if not server_running:
-                print(f"[Fixture] ERROR: Server failed to start within 30s. Check 'testing_server_autostart.log' for details.")
+                print(
+                    "[Fixture] ERROR: Server failed to start within 30s. Check 'testing_server_autostart.log' for details."
+                )
                 # We might want to fail the session here if the server is mandatory for integration tests
                 pytest.fail("Auto-started server failed health check.")
 

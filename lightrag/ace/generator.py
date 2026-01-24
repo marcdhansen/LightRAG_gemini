@@ -9,6 +9,7 @@ from lightrag.ace.playbook import ContextPlaybook
 
 logger = logging.getLogger(__name__)
 
+
 class ACEGenerator:
     """
     ACE Generator Component.
@@ -19,12 +20,15 @@ class ACEGenerator:
         self.rag = lightrag_instance
         self.playbook = playbook
 
-    async def generate(self, query: str, param: Optional[QueryParam] = None) -> Dict[str, Any]:
+    async def generate(
+        self, query: str, param: Optional[QueryParam] = None
+    ) -> Dict[str, Any]:
         """
         Generates a response to the query using ACE context.
         """
         if param is None:
             from lightrag.base import QueryParam
+
             param = QueryParam()
 
         logger.info(f"ACE Generator: Executing query '{query}'")
@@ -32,9 +36,11 @@ class ACEGenerator:
         # 1. Retrieve Data (Context) from LightRAG without generation
         # This gets us the entities, relations, and chunks
         context_result = await self.rag.aquery_data(query, param)
-        
+
         if context_result.get("status") != "success":
-            logger.error(f"ACE Generator: Failed to retrieve context: {context_result.get('message')}")
+            logger.error(
+                f"ACE Generator: Failed to retrieve context: {context_result.get('message')}"
+            )
             return {"error": "Failed to retrieve context", "details": context_result}
 
         context_data = context_result.get("data", {})
@@ -47,7 +53,7 @@ class ACEGenerator:
         formatted_context = self._format_context_data(context_data)
 
         # 4. Construct the Prompt
-        # This is a simplified prompt construction. 
+        # This is a simplified prompt construction.
         # In a full implementation, we might want to use specific templates.
         system_msg = (
             "You are an intelligent assistant powered by the ACE (Agentic Context Evolution) Framework.\n"
@@ -58,9 +64,9 @@ class ACEGenerator:
             "### Retrieved Knowledge\n"
             f"{formatted_context}\n"
         )
-        
+
         user_msg = f"User Query: {query}"
-        
+
         full_prompt = f"{system_msg}\n\n{user_msg}"
 
         # 5. Execute LLM
@@ -76,7 +82,7 @@ class ACEGenerator:
             "response": response,
             "context_data": context_data,
             "playbook_used": self.playbook.content.to_dict(),
-            "trajectory": [{"step": "generation", "status": "Execution successful"}] 
+            "trajectory": [{"step": "generation", "status": "Execution successful"}],
         }
 
     def _format_context_data(self, data: Dict[str, Any]) -> str:
@@ -87,21 +93,25 @@ class ACEGenerator:
         entities = data.get("entities", [])
         if entities:
             sections.append("#### Entities")
-            for e in entities[:20]: # Limit for brevity in prototype
-                sections.append(f"- {e.get('entity_name')} ({e.get('entity_type')}): {e.get('description')}")
-        
+            for e in entities[:20]:  # Limit for brevity in prototype
+                sections.append(
+                    f"- {e.get('entity_name')} ({e.get('entity_type')}): {e.get('description')}"
+                )
+
         # Relationships
         relations = data.get("relationships", [])
         if relations:
             sections.append("\n#### Relationships")
             for r in relations[:20]:
-                sections.append(f"- {r.get('src_id')} -> {r.get('tgt_id')}: {r.get('description')}")
+                sections.append(
+                    f"- {r.get('src_id')} -> {r.get('tgt_id')}: {r.get('description')}"
+                )
 
         # Chunks
         chunks = data.get("chunks", [])
         if chunks:
             sections.append("\n#### Text Segments")
-            for c in chunks[:5]: # Limit chunks
+            for c in chunks[:5]:  # Limit chunks
                 sections.append(f"- ...{c.get('content')}...")
 
         return "\n".join(sections)

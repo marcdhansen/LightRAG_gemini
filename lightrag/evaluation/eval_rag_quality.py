@@ -83,9 +83,10 @@ load_dotenv(dotenv_path=".env", override=False)
 try:
     from datasets import Dataset
     from ragas import evaluate, RunConfig
+
     # Updated to avoid deprecation warnings - importing from collections if available seems to be the suggestion,
     # but the warning said "ragas.metrics.collections". However, standard Ragas usage often simply uses ragas.metrics.
-    # Let's try the specific import path mentioned in the warning or simply catch the warning. 
+    # Let's try the specific import path mentioned in the warning or simply catch the warning.
     # Actually, Ragas 0.2+ changed structure. Let's try the direct import if that's what the warning suggested.
     # Warning: "Importing Faithfulness from 'ragas.metrics' is deprecated... use 'ragas.metrics.collections'".
     from ragas.metrics import (
@@ -335,7 +336,8 @@ class RAGEvaluator:
                 "top_k": int(os.getenv("EVAL_QUERY_TOP_K", "10")),
                 # Explicitly disable rerank by default to avoid server warnings
                 # Can be enabled via env var if a reranker is actually configured
-                "enable_rerank": os.environ.get("EVAL_ENABLE_RERANK", "true").lower() == "true",
+                "enable_rerank": os.environ.get("EVAL_ENABLE_RERANK", "true").lower()
+                == "true",
             }
 
             # Get API key from environment for authentication

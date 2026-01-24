@@ -1425,7 +1425,7 @@ class MemgraphVectorStorage(BaseVectorStorage):
 
             for index_name in potential_index_names:
                 search_query = f"""
-                CALL vector_search.search('{index_name}', $limit, $embedding) 
+                CALL vector_search.search('{index_name}', $limit, $embedding)
                 YIELD node, similarity
                 RETURN node, similarity
                 """

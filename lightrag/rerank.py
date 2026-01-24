@@ -223,10 +223,7 @@ async def generic_rerank_api(
     """
     if base_url == "local" or (api_key is not None and api_key.lower() == "local"):
         return await local_rerank(
-            query=query,
-            documents=documents,
-            top_n=top_n,
-            model=model
+            query=query, documents=documents, top_n=top_n, model=model
         )
 
     if not base_url:
@@ -552,41 +549,38 @@ async def local_rerank(
         raise ImportError(
             "FlagEmbedding is not installed. Please install it with: pip install FlagEmbedding"
         )
-    
+
     # Use global cache to avoid reloading model on every request
     global _RERANKER_INSTANCE
     if _RERANKER_INSTANCE is None:
         logger.info(f"Loading local reranker model: {model}")
         # use_fp16=True by default for performance
         _RERANKER_INSTANCE = FlagReranker(model, use_fp16=True)
-    
+
     reranker = _RERANKER_INSTANCE
-    
+
     # Prepare pairs for scoring
     pairs = [[query, doc] for doc in documents]
-    
+
     # Compute scores
     scores = reranker.compute_score(pairs)
-    
+
     # Normalize result format (FlagEmbedding returns list of floats)
     # If single pair, it might return float, but with list input it returns list
     if isinstance(scores, float):
         scores = [scores]
-        
+
     results = []
     for idx, score in enumerate(scores):
-        results.append({
-            "index": idx,
-            "relevance_score": score
-        })
-        
+        results.append({"index": idx, "relevance_score": score})
+
     # Sort by score descending
     results.sort(key=lambda x: x["relevance_score"], reverse=True)
-    
+
     # Apply top_n
     if top_n is not None:
         results = results[:top_n]
-        
+
     return results
 
 

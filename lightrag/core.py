@@ -468,7 +468,7 @@ class LightRAG:
                 # Default ACE directory inside working_dir
                 ace_base_dir = os.path.join(self.working_dir, "ace_data")
                 self.ace_config = ACEConfig(base_dir=ace_base_dir)
-            
+
             self.ace_playbook = ContextPlaybook(self.ace_config)
             self.ace_generator = ACEGenerator(self, self.ace_playbook)
             self.ace_reflector = ACEReflector(self)
@@ -2483,19 +2483,16 @@ class LightRAG:
             return llm_response.get("content", "")
 
     async def ace_query(
-        self,
-        query: str,
-        param: QueryParam = QueryParam(),
-        auto_reflect: bool = True
+        self, query: str, param: QueryParam = QueryParam(), auto_reflect: bool = True
     ) -> Dict[str, Any]:
         """
         Execute a query using the ACE (Agentic Context Evolution) Framework.
-        
+
         Args:
             query: The user query.
             param: Query parameters.
             auto_reflect: If True, automatically trigger reflection and playbook update.
-            
+
         Returns:
             Dict[str, Any]: Contains 'response', 'trajectory' (if reflection enabled), and 'playbook_used'.
         """
@@ -2504,14 +2501,14 @@ class LightRAG:
 
         # 1. Generate response using ACE Generator
         result = await self.ace_generator.generate(query, param)
-        
+
         if auto_reflect and "error" not in result:
             # 2. Reflect on the result
             insights = await self.ace_reflector.reflect(query, result)
-            
+
             # 3. Curate insights into the playbook
             await self.ace_curator.curate(insights)
-            
+
             result["insights"] = insights
 
         return result

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 logger = logging.getLogger(__name__)
 
+
 class ACEReflector:
     """
     ACE Reflector Component.
@@ -30,7 +31,7 @@ class ACEReflector:
             "You are the Reflector component of the ACE Framework.\n"
             "Analyze the following interaction for quality, accuracy, and adherence to instructions.\n"
             "Identify 1-3 key lessons or insights that could improve future performance.\n"
-            "Format your output as a simple JSON list of strings, e.g. [\"Insight 1\", \"Insight 2\"].\n\n"
+            'Format your output as a simple JSON list of strings, e.g. ["Insight 1", "Insight 2"].\n\n'
             f"Query: {query}\n"
             f"Response: {response}\n"
         )
@@ -38,13 +39,15 @@ class ACEReflector:
         try:
             # We use the same LLM for reflection for now
             llm_output = await self.rag.llm_model_func(prompt)
-            
+
             # Simple parsing of the list (robustness improvements needed for prod)
             # Assuming the LLM returns a valid JSON string or close to it
             cleaned_output = llm_output.strip()
             if cleaned_output.startswith("```json"):
-                cleaned_output = cleaned_output.replace("```json", "").replace("```", "")
-            
+                cleaned_output = cleaned_output.replace("```json", "").replace(
+                    "```", ""
+                )
+
             insights = json.loads(cleaned_output)
             if isinstance(insights, list):
                 return [str(i) for i in insights]

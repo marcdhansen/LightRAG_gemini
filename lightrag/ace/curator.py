@@ -5,6 +5,7 @@ from lightrag.ace.playbook import ContextPlaybook
 
 logger = logging.getLogger(__name__)
 
+
 class ACECurator:
     """
     ACE Curator Component.
@@ -22,7 +23,7 @@ class ACECurator:
             return
 
         logger.info(f"ACE Curator: Processing {len(insights)} insights.")
-        
+
         for insight in insights:
             # Prototype logic: directly add as a lesson
             # Future: Contextual deduplication, strategy refinement, etc.
