@@ -188,6 +188,7 @@ markers = [
     "requires_api: marks tests requiring LightRAG API server",
     "light: marks tests that are fast and suitable for continuous runs (unit/smoke)",
     "heavy: marks tests that are slow or resource intensive (integration/stress/benchmarks)",
+    "benchmark: marks tests specifically part of the benchmarking suite",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning:importlib._bootstrap",

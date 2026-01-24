@@ -385,7 +385,15 @@
       "copyManualInstruction": "テキストを手動で選択してコピーしてください",
       "thinking": "思考中...",
       "thinkingTime": "思考時間 {{time}}秒",
-      "thinkingInProgress": "思考中..."
+      "thinkingInProgress": "思考中...",
+      "references": {
+        "sources": "参照元:",
+        "viewInParent": "クリックして元のドキュメントで表示",
+        "viewerTitle": "ドキュメントビューア",
+        "loading": "ドキュメントの内容を読み込み中...",
+        "noContent": "このドキュメントではコンテンツを利用できません。",
+        "chunksHighlighted": "{{count}} 個の取得済みチャンクをハイライト表示"
+      }
     },
     "retrieval": {
       "startPrompt": "下にクエリを入力して検索を開始",
@@ -441,7 +449,11 @@
       "userPromptTooltip": "LLMに追加の応答要件を提供します（クエリコンテンツとは無関係で、出力処理のみに使用）。",
       "userPromptPlaceholder": "カスタムプロンプトを入力（オプション）",
       "enableRerank": "リランクを有効化",
-      "enableRerankTooltip": "取得されたテキストチャンクのリランクを有効にします。Trueに設定してもリランクモデルが設定されていない場合、警告が発行されます。デフォルトはTrueです。"
+      "enableRerankTooltip": "取得されたテキストチャンクのリランクを有効にします。Trueに設定してもリランクモデルが設定されていない場合、警告が発行されます。デフォルトはTrueです。",
+      "includeReferences": "参照元を含める",
+      "includeReferencesTooltip": "Trueの場合、応答にソースの引用が含まれます",
+      "includeChunkContent": "チャンク内容を含める",
+      "includeChunkContentTooltip": "Trueの場合、参照元に実際のテキストチャンクが含まれます（ハイライトに必要）"
     }
   },
   "apiSite": {

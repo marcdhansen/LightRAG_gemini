@@ -13,7 +13,8 @@ import { EraserIcon, SendIcon, CopyIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { copyToClipboard } from '@/utils/clipboard'
-import type { QueryMode } from '@/api/lightrag'
+import { ReferenceDocumentViewer } from '@/components/retrieval/ReferenceDocumentViewer'
+import type { QueryMode, ReferenceItem } from '@/api/lightrag'
 
 // Helper function to generate unique IDs with browser compatibility
 const generateUniqueId = () => {
@@ -140,6 +141,7 @@ export default function RetrievalTesting() {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [inputError, setInputError] = useState('') // Error message for input
+  const [selectedReference, setSelectedReference] = useState<ReferenceItem | null>(null)
   const inputRef = useRef<HTMLInputElement | HTMLTextAreaElement>(null)
 
   // Smart switching logic: use Input for single line, Textarea for multi-line
@@ -337,6 +339,19 @@ export default function RetrievalTesting() {
         }
       }
 
+      // Create a function to update references
+      const updateReferences = (references: ReferenceItem[]) => {
+        assistantMessage.references = references
+        setMessages((prev) => {
+          const newMessages = [...prev]
+          const lastMessage = newMessages[newMessages.length - 1]
+          if (lastMessage && lastMessage.id === assistantMessage.id) {
+            lastMessage.references = references
+          }
+          return newMessages
+        })
+      }
+
       // Prepare query parameters
       const state = useSettingsStore.getState()
 
@@ -371,7 +386,7 @@ export default function RetrievalTesting() {
         // Run query
         if (state.querySettings.stream) {
           let errorMessage = ''
-          await queryTextStream(queryParams, updateAssistantMessage, (error) => {
+          await queryTextStream(queryParams, updateAssistantMessage, updateReferences, (error) => {
             errorMessage += error
           })
           if (errorMessage) {
@@ -383,6 +398,9 @@ export default function RetrievalTesting() {
         } else {
           const response = await queryText(queryParams)
           updateAssistantMessage(response.response)
+          if (response.references) {
+            updateReferences(response.references)
+          }
         }
       } catch (err) {
         // Handle error
@@ -721,7 +739,11 @@ export default function RetrievalTesting() {
                           <CopyIcon className="size-4" />
                         </Button>
                       )}
-                      <ChatMessage message={message} isTabActive={isRetrievalTabActive} />
+                      <ChatMessage
+                        message={message}
+                        isTabActive={isRetrievalTabActive}
+                        onReferenceClick={setSelectedReference}
+                      />
                       {message.role === 'assistant' && (
                         <Button
                           onClick={() => handleCopyMessage(message)}
@@ -819,6 +841,10 @@ export default function RetrievalTesting() {
         </form>
       </div>
       <QuerySettings />
+      <ReferenceDocumentViewer
+        reference={selectedReference}
+        onClose={() => setSelectedReference(null)}
+      />
     </div>
   )
 }

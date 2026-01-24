@@ -385,7 +385,15 @@
       "copyManualInstruction": "请手动选择并复制文本",
       "thinking": "正在思考...",
       "thinkingTime": "思考用时 {{time}} 秒",
-      "thinkingInProgress": "思考进行中..."
+      "thinkingInProgress": "思考进行中...",
+      "references": {
+        "sources": "参考来源：",
+        "viewInParent": "点击在原文中查看",
+        "viewerTitle": "文档查看器",
+        "loading": "正在加载文档内容...",
+        "noContent": "该文档暂无内容可用。",
+        "chunksHighlighted": "已高亮 {{count}} 个检索到的分块"
+      }
     },
     "retrieval": {
       "startPrompt": "输入查询开始检索",
@@ -441,7 +449,11 @@
       "userPromptTooltip": "向LLM提供额外的响应要求（与查询内容无关，仅用于处理输出）。",
       "userPromptPlaceholder": "输入自定义提示词（可选）",
       "enableRerank": "启用重排",
-      "enableRerankTooltip": "为检索到的文本块启用重排。如果为True但未配置重排模型，将发出警告。默认为True。"
+      "enableRerankTooltip": "为检索到的文本块启用重排。如果为True但未配置重排模型，将发出警告。默认为True。",
+      "includeReferences": "包含参考来源",
+      "includeReferencesTooltip": "如果为True，响应中将包含参考来源引用",
+      "includeChunkContent": "包含分块内容",
+      "includeChunkContentTooltip": "如果为True，参考来源中将包含实际文本分块（高亮显示所需）"
     }
   },
   "apiSite": {

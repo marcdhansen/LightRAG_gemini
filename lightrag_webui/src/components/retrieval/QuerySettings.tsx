@@ -447,6 +447,48 @@ export default function QuerySettings() {
                   onCheckedChange={(checked) => handleChange('stream', checked)}
                 />
               </div>
+
+              <div className="flex items-center gap-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <label htmlFor="include_references" className="flex-1 ml-1 cursor-help">
+                        {t('retrievePanel.querySettings.includeReferences')}
+                      </label>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>{t('retrievePanel.querySettings.includeReferencesTooltip')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <Checkbox
+                  className="mr-10 cursor-pointer"
+                  id="include_references"
+                  checked={querySettings.include_references}
+                  onCheckedChange={(checked) => handleChange('include_references', checked)}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <label htmlFor="include_chunk_content" className="flex-1 ml-1 cursor-help">
+                        {t('retrievePanel.querySettings.includeChunkContent')}
+                      </label>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>{t('retrievePanel.querySettings.includeChunkContentTooltip')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <Checkbox
+                  className="mr-10 cursor-pointer"
+                  id="include_chunk_content"
+                  checked={querySettings.include_chunk_content}
+                  onCheckedChange={(checked) => handleChange('include_chunk_content', checked)}
+                />
+              </div>
             </>
 
           </div>

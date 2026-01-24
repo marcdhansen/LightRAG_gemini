@@ -204,7 +204,7 @@ class ACEQueryResponse(BaseModel):
 class StreamChunkResponse(BaseModel):
     """Response model for streaming chunks in NDJSON format"""
 
-    references: Optional[List[Dict[str, str]]] = Field(
+    references: Optional[List[ReferenceItem]] = Field(
         default=None,
         description="Reference list (only in first chunk when include_references=True)",
     )

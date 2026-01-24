@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useMemo, useRef, memo, useState } from 'react' // Import useMemo
-import { Message } from '@/api/lightrag'
+import { Message, ReferenceItem } from '@/api/lightrag'
 import useTheme from '@/hooks/useTheme'
 import { cn } from '@/lib/utils'
 
@@ -10,6 +10,8 @@ import rehypeRaw from 'rehype-raw'
 import remarkMath from 'remark-math'
 import mermaid from 'mermaid'
 import { remarkFootnotes } from '@/utils/remarkFootnotes'
+import { ReferenceList } from './ReferenceList'
+import { ReferenceItem } from '@/api/lightrag'
 
 
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter'
@@ -32,6 +34,7 @@ export type MessageWithError = Message & {
   id: string // Unique identifier for stable React keys
   isError?: boolean
   isThinking?: boolean // Flag to indicate if the message is in a "thinking" state
+  references?: ReferenceItem[]
   /**
    * Indicates if the mermaid diagram in this message has been rendered.
    * Used to persist the rendering state across updates and prevent flickering.
@@ -47,10 +50,12 @@ export type MessageWithError = Message & {
 // Restore original component definition and export
 export const ChatMessage = ({
   message,
-  isTabActive = true
+  isTabActive = true,
+  onReferenceClick
 }: {
   message: MessageWithError
   isTabActive?: boolean
+  onReferenceClick?: (reference: ReferenceItem) => void
 }) => {
   const { t } = useTranslation()
   const { theme } = useTheme()
@@ -145,13 +150,12 @@ export const ChatMessage = ({
 
   return (
     <div
-      className={`${
-        message.role === 'user'
-          ? 'max-w-[80%] bg-primary text-primary-foreground'
-          : message.isError
-            ? 'w-[95%] bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400'
-            : 'w-[95%] bg-muted'
-      } rounded-lg px-4 py-2`}
+      className={`${message.role === 'user'
+        ? 'max-w-[80%] bg-primary text-primary-foreground'
+        : message.isError
+          ? 'w-[95%] bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400'
+          : 'w-[95%] bg-muted'
+        } rounded-lg px-4 py-2`}
     >
       {/* Thinking process display - only for assistant messages */}
       {/* Always render to prevent layout shift when switching tabs */}
@@ -223,13 +227,11 @@ export const ChatMessage = ({
       {finalDisplayContent && (
         <div className="relative">
           <ReactMarkdown
-            className={`prose dark:prose-invert max-w-none text-sm break-words prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 [&_.katex]:text-current [&_.katex-display]:my-4 [&_.katex-display]:max-w-full [&_.katex-display_>.base]:overflow-x-auto [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-8 [&_.footnotes]:pt-4 [&_.footnotes]:border-t [&_.footnotes_ol]:text-sm [&_.footnotes_li]:my-1 ${
-              message.role === 'user' ? 'text-primary-foreground' : 'text-foreground'
-            } ${
-              message.role === 'user'
+            className={`prose dark:prose-invert max-w-none text-sm break-words prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 [&_.katex]:text-current [&_.katex-display]:my-4 [&_.katex-display]:max-w-full [&_.katex-display_>.base]:overflow-x-auto [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-8 [&_.footnotes]:pt-4 [&_.footnotes]:border-t [&_.footnotes_ol]:text-sm [&_.footnotes_li]:my-1 ${message.role === 'user' ? 'text-primary-foreground' : 'text-foreground'
+              } ${message.role === 'user'
                 ? '[&_.footnotes]:border-primary-foreground/30 [&_a[href^="#fn"]]:text-primary-foreground [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary-foreground [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
                 : '[&_.footnotes]:border-border [&_a[href^="#fn"]]:text-primary [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
-            }`}
+              }`}
             remarkPlugins={[remarkGfm, remarkFootnotes, remarkMath]}
             rehypePlugins={[
               rehypeRaw,
@@ -257,6 +259,12 @@ export const ChatMessage = ({
           >
             {finalDisplayContent}
           </ReactMarkdown>
+          {message.role === 'assistant' && message.references && (
+            <ReferenceList
+              references={message.references}
+              onReferenceClick={onReferenceClick}
+            />
+          )}
         </div>
       )}
       {/* Loading indicator - only show in active tab */}
@@ -422,9 +430,9 @@ const CodeHighlight = memo(({ inline, className, children, renderAsDiagram = fal
         clearTimeout(debounceTimerRef.current);
       }
     };
-  // Dependencies: renderAsDiagram ensures effect runs when diagram should be shown.
-  // Dependencies include all values used inside the effect to satisfy exhaustive-deps.
-  // The !hasRendered check prevents re-execution of render logic after success.
+    // Dependencies: renderAsDiagram ensures effect runs when diagram should be shown.
+    // Dependencies include all values used inside the effect to satisfy exhaustive-deps.
+    // The !hasRendered check prevents re-execution of render logic after success.
   }, [renderAsDiagram, hasRendered, language, children, theme]); // Add children and theme back
 
   // For large JSON, skip syntax highlighting completely and use a simple pre tag

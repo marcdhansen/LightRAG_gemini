@@ -138,10 +138,21 @@ export type QueryRequest = {
   user_prompt?: string
   /** Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued. Default is True. */
   enable_rerank?: boolean
+  /** If True, includes reference list in the response for supported endpoints. */
+  include_references?: boolean
+  /** If True, includes actual chunk text content in references. */
+  include_chunk_content?: boolean
+}
+
+export type ReferenceItem = {
+  reference_id: string
+  file_path: string
+  content?: string[] // Optional chunk contents
 }
 
 export type QueryResponse = {
   response: string
+  references?: ReferenceItem[]
 }
 
 export type EntityUpdateResponse = {
@@ -516,6 +527,7 @@ export const queryText = async (request: QueryRequest): Promise<QueryResponse> =
 export const queryTextStream = async (
   request: QueryRequest,
   onChunk: (chunk: string) => void,
+  onReferences?: (references: ReferenceItem[]) => void,
   onError?: (error: string) => void
 ) => {
   const apiKey = useSettingsStore.getState().apiKey;
@@ -589,6 +601,8 @@ export const queryTextStream = async (
                     const parsed = JSON.parse(line);
                     if (parsed.response) {
                       onChunk(parsed.response);
+                    } else if (parsed.references) {
+                      onReferences?.(parsed.references);
                     } else if (parsed.error) {
                       onError?.(parsed.error);
                     }
@@ -606,6 +620,8 @@ export const queryTextStream = async (
                 const parsed = JSON.parse(buffer);
                 if (parsed.response) {
                   onChunk(parsed.response);
+                } else if (parsed.references) {
+                  onReferences?.(parsed.references);
                 } else if (parsed.error) {
                   onError?.(parsed.error);
                 }
@@ -672,6 +688,8 @@ export const queryTextStream = async (
             const parsed = JSON.parse(line);
             if (parsed.response) {
               onChunk(parsed.response);
+            } else if (parsed.references) {
+              onReferences?.(parsed.references);
             } else if (parsed.error && onError) {
               onError(parsed.error);
             }
@@ -689,6 +707,8 @@ export const queryTextStream = async (
         const parsed = JSON.parse(buffer);
         if (parsed.response) {
           onChunk(parsed.response);
+        } else if (parsed.references) {
+          onReferences?.(parsed.references);
         } else if (parsed.error && onError) {
           onError(parsed.error);
         }
@@ -720,27 +740,27 @@ export const queryTextStream = async (
       let userMessage = message;
 
       switch (statusCode) {
-      case 403:
-        userMessage = 'You do not have permission to access this resource (403 Forbidden)';
-        console.error('Permission denied for stream request:', message);
-        break;
-      case 404:
-        userMessage = 'The requested resource does not exist (404 Not Found)';
-        console.error('Resource not found for stream request:', message);
-        break;
-      case 429:
-        userMessage = 'Too many requests, please try again later (429 Too Many Requests)';
-        console.error('Rate limited for stream request:', message);
-        break;
-      case 500:
-      case 502:
-      case 503:
-      case 504:
-        userMessage = `Server error, please try again later (${statusCode})`;
-        console.error('Server error for stream request:', message);
-        break;
-      default:
-        console.error('Stream request failed with status code:', statusCode, message);
+        case 403:
+          userMessage = 'You do not have permission to access this resource (403 Forbidden)';
+          console.error('Permission denied for stream request:', message);
+          break;
+        case 404:
+          userMessage = 'The requested resource does not exist (404 Not Found)';
+          console.error('Resource not found for stream request:', message);
+          break;
+        case 429:
+          userMessage = 'Too many requests, please try again later (429 Too Many Requests)';
+          console.error('Rate limited for stream request:', message);
+          break;
+        case 500:
+        case 502:
+        case 503:
+        case 504:
+          userMessage = `Server error, please try again later (${statusCode})`;
+          console.error('Server error for stream request:', message);
+          break;
+        default:
+          console.error('Stream request failed with status code:', statusCode, message);
       }
 
       if (onError) {
@@ -751,8 +771,8 @@ export const queryTextStream = async (
 
     // Handle network errors (like connection refused, timeout, etc.)
     if (message.includes('NetworkError') ||
-        message.includes('Failed to fetch') ||
-        message.includes('Network request failed')) {
+      message.includes('Failed to fetch') ||
+      message.includes('Network request failed')) {
       console.error('Network error for stream request:', message);
       if (onError) {
         onError('Network connection error, please check your internet connection');
@@ -871,9 +891,9 @@ export const getAuthStatus = async (): Promise<AuthStatusResponse> => {
 
     // Strict validation of the response data
     if (response.data &&
-        typeof response.data === 'object' &&
-        'auth_configured' in response.data &&
-        typeof response.data.auth_configured === 'boolean') {
+      typeof response.data === 'object' &&
+      'auth_configured' in response.data &&
+      typeof response.data.auth_configured === 'boolean') {
 
       // For unconfigured auth, ensure we have an access token
       if (!response.data.auth_configured) {
@@ -1017,5 +1037,9 @@ export const getDocumentsPaginated = async (request: DocumentsRequest): Promise<
  */
 export const getDocumentStatusCounts = async (): Promise<StatusCountsResponse> => {
   const response = await axiosInstance.get('/documents/status_counts')
+  return response.data
+}
+export const getDocumentContent = async (docId: string): Promise<{ doc_id: string; content: string }> => {
+  const response = await axiosInstance.get(`/documents/${docId}/content`)
   return response.data
 }

@@ -385,7 +385,15 @@
       "copyManualInstruction": "Please select and copy the text manually",
       "thinking": "Thinking...",
       "thinkingTime": "Thinking time {{time}}s",
-      "thinkingInProgress": "Thinking in progress..."
+      "thinkingInProgress": "Thinking in progress...",
+      "references": {
+        "sources": "Sources:",
+        "viewInParent": "Click to view in parent document",
+        "viewerTitle": "Document Viewer",
+        "loading": "Loading document content...",
+        "noContent": "No content available for this document.",
+        "chunksHighlighted": "{{count}} retrieved chunks highlighted"
+      }
     },
     "retrieval": {
       "startPrompt": "Start a retrieval by typing your query below",
@@ -441,7 +449,11 @@
       "userPromptTooltip": "Provide additional response requirements to the LLM (unrelated to query content, only for output processing).",
       "userPromptPlaceholder": "Enter custom prompt (optional)",
       "enableRerank": "Enable Rerank",
-      "enableRerankTooltip": "Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued. Default is True."
+      "enableRerankTooltip": "Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued. Default is True.",
+      "includeReferences": "Include References",
+      "includeReferencesTooltip": "If True, includes source citations in the response",
+      "includeChunkContent": "Include Chunk Content",
+      "includeChunkContentTooltip": "If True, includes the actual text chunks in the references (needed for highlighting)"
     }
   },
   "apiSite": {

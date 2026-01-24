@@ -3226,4 +3226,26 @@ def create_document_routes(
             logger.error(traceback.format_exc())
             raise HTTPException(status_code=500, detail=str(e))
 
+    @router.get(
+        "/{doc_id}/content",
+        dependencies=[Depends(combined_auth)],
+        summary="Get the full content of a document by its ID.",
+    )
+    async def get_document_content(doc_id: str):
+        """
+        Get the full content of a document by its ID.
+        """
+        try:
+            doc = await rag.full_docs.get_by_id(doc_id)
+            if doc is None:
+                raise HTTPException(
+                    status_code=404, detail=f"Document {doc_id} not found"
+                )
+            return {"doc_id": doc_id, "content": doc.get("content", "")}
+        except HTTPException:
+            raise
+        except Exception as e:
+            logger.error(f"Error getting content for document {doc_id}: {str(e)}")
+            raise HTTPException(status_code=500, detail=str(e))
+
     return router

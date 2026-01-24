@@ -133,7 +133,9 @@ const useSettingsStoreBase = create<SettingsState>()(
         stream: true,
         history_turns: 0,
         user_prompt: '',
-        enable_rerank: true
+        enable_rerank: true,
+        include_references: true,
+        include_chunk_content: true
       },
 
       setTheme: (theme: Theme) => set({ theme }),
@@ -238,7 +240,7 @@ const useSettingsStoreBase = create<SettingsState>()(
     {
       name: 'settings-storage',
       storage: createJSONStorage(() => localStorage),
-      version: 19,
+      version: 20,
       migrate: (state: any, version: number) => {
         if (version < 2) {
           state.showEdgeLabel = false
@@ -335,10 +337,10 @@ const useSettingsStoreBase = create<SettingsState>()(
           // Add userPromptHistory field for older versions
           state.userPromptHistory = []
         }
-        if (version < 19) {
-          // Remove deprecated response_type parameter
+        if (version < 20) {
           if (state.querySettings) {
-            delete state.querySettings.response_type
+            state.querySettings.include_references = true
+            state.querySettings.include_chunk_content = true
           }
         }
         return state
