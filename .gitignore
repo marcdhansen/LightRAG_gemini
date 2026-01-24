@@ -55,7 +55,6 @@ lightrag/evaluation/results/
 
 # Miscellaneous
 .DS_Store
-TODO.md
 ignore_this.txt
 *.ignore.*
 
@@ -66,9 +65,6 @@ download_models_hf.py
 
 # Frontend build output (built during PyPI release)
 /lightrag/api/webui/
-
-# temporary test files in project root
-/test_*
 
 # Gemini files
 memory-bank
