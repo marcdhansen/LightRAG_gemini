@@ -98,56 +98,70 @@ function App() {
       if (versionCheckRef.current) return;
       versionCheckRef.current = true;
 
-      // Check if version info was already obtained in login page
-      const versionCheckedFromLogin = sessionStorage.getItem('VERSION_CHECKED_FROM_LOGIN') === 'true';
-      if (versionCheckedFromLogin) {
-        setInitializing(false); // Skip initialization if already checked
-        return;
-      }
-
       try {
-        setInitializing(true); // Start initialization
-
-        // Get version info
+        console.log('App initialization: checking version and auth status');
         const token = localStorage.getItem('LIGHTRAG-API-TOKEN');
         const status = await getAuthStatus();
 
-        // If auth is not configured and a new token is returned, use the new token
-        if (!status.auth_configured && status.access_token) {
-          useAuthStore.getState().login(
-            status.access_token, // Use the new token
-            true, // Guest mode
-            status.core_version,
-            status.api_version,
-            status.webui_title || null,
-            status.webui_description || null
-          );
-        } else if (token && (status.core_version || status.api_version || status.webui_title || status.webui_description)) {
-          // Otherwise use the old token (if it exists)
-          const isGuestMode = status.auth_mode === 'disabled' || useAuthStore.getState().isGuestMode;
-          useAuthStore.getState().login(
-            token,
-            isGuestMode,
-            status.core_version,
-            status.api_version,
-            status.webui_title || null,
-            status.webui_description || null
-          );
-        }
+        if (isMountedRef.current) {
+          // Robust handle for login and version info
+          if (!status.auth_configured && status.access_token) {
+            // Guest mode / Auto-login
+            useAuthStore.getState().login(
+              status.access_token,
+              true, // Guest mode
+              status.core_version,
+              status.api_version,
+              status.webui_title || null,
+              status.webui_description || null
+            );
+          } else if (token) {
+            // Re-validate or update existing session
+            const isGuestMode = status.auth_mode === 'disabled' || useAuthStore.getState().isGuestMode;
+            useAuthStore.getState().login(
+              token,
+              isGuestMode,
+              status.core_version,
+              status.api_version,
+              status.webui_title || null,
+              status.webui_description || null
+            );
+          } else {
+            // Fallback: just set version info
+            useAuthStore.getState().setVersion(
+              status.core_version || null,
+              status.api_version || null
+            );
+            if (status.webui_title || status.webui_description) {
+              useAuthStore.getState().setCustomTitle(
+                status.webui_title || null,
+                status.webui_description || null
+              );
+            }
+          }
 
-        // Set flag to indicate version info has been checked
-        sessionStorage.setItem('VERSION_CHECKED_FROM_LOGIN', 'true');
+          // Set flag to indicate version info has been checked
+          sessionStorage.setItem('VERSION_CHECKED_FROM_LOGIN', 'true');
+        }
       } catch (error) {
-        console.error('Failed to get version info:', error);
+        console.error('Critical initialization error caught in App:', error);
+        // We catch here to allow the app to finish loading if possible, 
+        // or let the ErrorBoundary handle it if we re-throw.
+        if (error instanceof InvalidApiKeyError || error instanceof RequireApiKeError) {
+          console.log('Auth required/invalid - keeping initializing=false to show Login or alert');
+        } else {
+          // Re-throw so ErrorBoundary can catch truly unexpected boot crashes
+          throw error;
+        }
       } finally {
-        // Ensure initializing is set to false even if there's an error
-        setInitializing(false);
+        if (isMountedRef.current) {
+          setInitializing(false);
+        }
       }
     };
 
-    // Execute version check
     checkVersion();
-  }, []); // Empty dependency array ensures it only runs once on mount
+  }, []);
 
   const handleTabChange = useCallback(
     (tab: string) => useSettingsStore.getState().setCurrentTab(tab as any),
@@ -168,7 +182,7 @@ function App() {
         {initializing ? (
           // Loading state while initializing with simplified header
           <div className="flex h-screen w-screen flex-col">
-            {/* Simplified header during initialization - matches SiteHeader structure */}
+            {/* Simplified header during initialization */}
             <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-10 w-full border-b px-4 backdrop-blur">
               <div className="min-w-[200px] w-auto flex items-center">
                 <a href={webuiPrefix} className="flex items-center gap-2">
@@ -176,17 +190,11 @@ function App() {
                   <span className="font-bold md:inline-block">{SiteInfo.name}</span>
                 </a>
               </div>
-
-              {/* Empty middle section to maintain layout */}
-              <div className="flex h-10 flex-1 items-center justify-center">
-              </div>
-
-              {/* Empty right section to maintain layout */}
-              <nav className="w-[200px] flex items-center justify-end">
-              </nav>
+              <div className="flex h-10 flex-1 items-center justify-center"></div>
+              <nav className="w-[200px] flex items-center justify-end"></nav>
             </header>
 
-            {/* Loading indicator in content area */}
+            {/* Loading indicator */}
             <div className="flex flex-1 items-center justify-center">
               <div className="text-center">
                 <div className="mb-2 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>

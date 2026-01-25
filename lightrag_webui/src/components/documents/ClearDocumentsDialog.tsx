@@ -14,6 +14,9 @@ import Checkbox from '@/components/ui/Checkbox'
 import { toast } from 'sonner'
 import { errorMessage } from '@/lib/utils'
 import { clearDocuments, clearCache } from '@/api/lightrag'
+import { useGraphStore } from '@/stores/graph'
+import { useSettingsStore } from '@/stores/settings'
+import { SearchHistoryManager } from '@/utils/SearchHistoryManager'
 
 import { EraserIcon, AlertTriangleIcon, Loader2Icon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -114,6 +117,18 @@ export default function ClearDocumentsDialog({ onDocumentsCleared }: ClearDocume
         onDocumentsCleared().catch(console.error)
       }
 
+      // Reset graph store to ensure the graph view is cleared
+      const graphStore = useGraphStore.getState();
+      graphStore.reset();
+      graphStore.setGraphDataFetchAttempted(false);
+
+      // Reset query label to clear the search input
+      useSettingsStore.getState().setQueryLabel('');
+
+      // Clear search history and trigger dropdown refresh
+      SearchHistoryManager.clearHistory();
+      useSettingsStore.getState().triggerSearchLabelDropdownRefresh();
+
       // Close dialog after all operations succeed
       setOpen(false)
     } catch (err) {
@@ -133,7 +148,7 @@ export default function ClearDocumentsDialog({ onDocumentsCleared }: ClearDocume
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" side="bottom" tooltip={t('documentPanel.clearDocuments.tooltip')} size="sm">
-          <EraserIcon/> {t('documentPanel.clearDocuments.button')}
+          <EraserIcon /> {t('documentPanel.clearDocuments.button')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl" onCloseAutoFocus={(e) => e.preventDefault()}>

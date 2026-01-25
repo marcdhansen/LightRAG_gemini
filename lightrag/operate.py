@@ -3512,6 +3512,7 @@ async def _get_vector_context(
                     "file_path": result.get("file_path", "unknown_source"),
                     "source_type": "vector",  # Mark the source type
                     "chunk_id": result.get("id"),  # Add chunk_id for deduplication
+                    "full_doc_id": result.get("full_doc_id"),  # Added for traceability
                 }
                 valid_chunks.append(chunk_with_metadata)
 
@@ -3929,6 +3930,7 @@ async def _merge_all_chunks(
                         "content": chunk["content"],
                         "file_path": chunk.get("file_path", "unknown_source"),
                         "chunk_id": chunk_id,
+                        "full_doc_id": chunk.get("full_doc_id"),
                     }
                 )
 
@@ -3943,6 +3945,7 @@ async def _merge_all_chunks(
                         "content": chunk["content"],
                         "file_path": chunk.get("file_path", "unknown_source"),
                         "chunk_id": chunk_id,
+                        "full_doc_id": chunk.get("full_doc_id"),
                     }
                 )
 
@@ -3957,6 +3960,7 @@ async def _merge_all_chunks(
                         "content": chunk["content"],
                         "file_path": chunk.get("file_path", "unknown_source"),
                         "chunk_id": chunk_id,
+                        "full_doc_id": chunk.get("full_doc_id"),
                     }
                 )
 
@@ -3964,6 +3968,7 @@ async def _merge_all_chunks(
         f"Round-robin merged chunks: {origin_len} -> {len(merged_chunks)} (deduplicated {origin_len - len(merged_chunks)})"
     )
 
+    logger.debug(f"[_merge_all_chunks] Merged {len(merged_chunks)} chunks. Sample chunk: {merged_chunks[0] if merged_chunks else 'None'}")
     return merged_chunks
 
 

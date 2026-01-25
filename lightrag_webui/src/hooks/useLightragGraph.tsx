@@ -299,6 +299,14 @@ const useLightrangeGraph = () => {
 
   // Track if a fetch is in progress to prevent multiple simultaneous fetches
   const fetchInProgressRef = useRef(false)
+  const prevGraphDataVersion = useRef(graphDataVersion)
+
+  // Reset flags if graph data version has changed (e.g. via refreshGraph)
+  if (graphDataVersion !== prevGraphDataVersion.current) {
+    emptyDataHandledRef.current = false
+    prevGraphDataVersion.current = graphDataVersion
+    console.log(`[useLightragGraph] Version changed to ${graphDataVersion}, resetting emptyDataHandledRef`)
+  }
 
   // Reset graph when query label is cleared
   useEffect(() => {

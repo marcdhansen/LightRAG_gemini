@@ -225,6 +225,7 @@ const GraphViewer = () => {
           {showNodeSearchBar && !isThemeSwitching && (
             <GraphSearch
               value={searchInitSelectedNode}
+              queryLabel={useSettingsStore.use.queryLabel()}
               onFocus={onSearchFocus}
               onChange={onSearchSelect}
             />

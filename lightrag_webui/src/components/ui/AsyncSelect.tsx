@@ -110,6 +110,10 @@ export function AsyncSelect<T>({
   useEffect(() => {
     setMounted(true)
     setSelectedValue(value)
+    // Clear search term if value is cleared
+    if (!value || value === '*' || value === '') {
+      setSearchTerm('')
+    }
   }, [value])
 
   // Add an effect to handle initial value display

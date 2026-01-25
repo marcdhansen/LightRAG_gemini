@@ -10,7 +10,28 @@
     <title>Lightrag</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        .initial-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: system-ui, sans-serif; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        #startup-error { display: none; color: #dc2626; padding: 20px; max-width: 600px; margin: 0 auto; background: #fee2e2; border-radius: 8px; margin-top: 20px; font-family: monospace; }
+      </style>
+      <div class="initial-loader">
+        <div class="spinner"></div>
+        <p>Initializing LightRAG...</p>
+        <div id="startup-error"></div>
+      </div>
+    </div>
+    <script>
+      window.onerror = function(msg, url, line, col, error) {
+        const errorDiv = document.getElementById('startup-error');
+        if (errorDiv) {
+          errorDiv.style.display = 'block';
+          errorDiv.innerHTML = '<strong>Startup Error:</strong><br/>' + msg + '<br/><small>' + url + ':' + line + '</small>';
+        }
+      };
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

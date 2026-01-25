@@ -1,6 +1,7 @@
 import { create } from 'zustand'
 import { createSelectors } from '@/lib/utils'
-import { checkHealth, LightragStatus } from '@/api/lightrag'
+import { checkHealth } from '@/api/base'
+import { LightragStatus } from '@/api/types'
 import { useSettingsStore } from './settings'
 import { healthCheckInterval } from '@/lib/constants'
 

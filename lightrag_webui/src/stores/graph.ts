@@ -3,6 +3,7 @@ import { createSelectors } from '@/lib/utils'
 import { DirectedGraph } from 'graphology'
 import MiniSearch from 'minisearch'
 import { resolveNodeColor, DEFAULT_NODE_COLOR } from '@/utils/graphColor'
+import { useSettingsStore } from './settings'
 
 export type RawNodeType = {
   // for NetworkX: id is identical to properties['entity_id']
@@ -141,6 +142,7 @@ interface GraphState {
   // Version counter to trigger data refresh
   graphDataVersion: number
   incrementGraphDataVersion: () => void
+  refreshGraph: () => void
 
   // Methods for updating graph elements and UI state together
   updateNodeAndSelect: (nodeId: string, entityId: string, propertyName: string, newValue: string) => Promise<void>
@@ -243,7 +245,34 @@ const useGraphStoreBase = create<GraphState>()((set, get) => ({
 
   // Version counter implementation
   graphDataVersion: 0,
-  incrementGraphDataVersion: () => set((state) => ({ graphDataVersion: state.graphDataVersion + 1 })),
+  incrementGraphDataVersion: () => set((state) => ({
+    graphDataVersion: state.graphDataVersion + 1,
+    graphDataFetchAttempted: false
+  })),
+
+  // Centralized refresh logic (equivalent to Manual Refresh Button)
+  refreshGraph: () => {
+    const state = get();
+
+    // 1. Ensure we have a valid label to fetch (default to '*')
+    const currentLabel = useSettingsStore.getState().queryLabel;
+    if (!currentLabel || currentLabel.trim() === '') {
+      useSettingsStore.getState().setQueryLabel('*');
+    }
+
+    // 2. Clear caches
+    set({ typeColorMap: new Map<string, string>() });
+    state.resetSearchEngine();
+
+    // 3. Reset flags to trigger re-fetch
+    set((state) => ({
+      graphDataFetchAttempted: false,
+      lastSuccessfulQueryLabel: '',
+      graphDataVersion: state.graphDataVersion + 1
+    }));
+
+    console.log('[GraphStore] Graph refresh triggered programmatically');
+  },
 
   // Methods for updating graph elements and UI state together
   updateNodeAndSelect: async (nodeId: string, entityId: string, propertyName: string, newValue: string) => {

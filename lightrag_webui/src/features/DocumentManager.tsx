@@ -31,6 +31,7 @@ import {
 import { errorMessage } from '@/lib/utils'
 import { toast } from 'sonner'
 import { useBackendState } from '@/stores/state'
+import { useGraphStore } from '@/stores/graph'
 
 import { RefreshCwIcon, ActivityIcon, ArrowUpIcon, ArrowDownIcon, RotateCcwIcon, CheckSquareIcon, XIcon, AlertTriangle, Info } from 'lucide-react'
 import PipelineStatusDialog from '@/components/documents/PipelineStatusDialog'
@@ -1010,6 +1011,31 @@ export default function DocumentManager() {
       status => newStatusCounts[status] !== prevStatusCounts.current[status]
     )
 
+    // Calculate active and total document counts for graph refresh logic
+    const activeCount = newStatusCounts.processing + newStatusCounts.pending + newStatusCounts.preprocessed;
+    const prevActiveCount = prevStatusCounts.current.processing + prevStatusCounts.current.pending + prevStatusCounts.current.preprocessed;
+    const docCounts = {
+      all: newStatusCounts.processed + activeCount + newStatusCounts.failed
+    };
+    const prevDocCounts = {
+      all: prevStatusCounts.current.processed + prevActiveCount + prevStatusCounts.current.failed
+    };
+
+    // Trigger full graph refresh (same as manual refresh button) to ensure all caches are cleared and layout is reset
+    if (activeCount === 0 && prevActiveCount > 0) {
+      console.log(`[DocumentManager] Processing complete (Active: ${prevActiveCount} -> ${activeCount}). Triggering full graph refresh.`);
+      useGraphStore.getState().refreshGraph();
+    } else if (docCounts.all > prevDocCounts.all && activeCount === 0) {
+      // Also trigger if we have new documents and nothing is processing
+      console.log(`[DocumentManager] New documents detected (Total: ${prevDocCounts.all} -> ${docCounts.all}). Triggering full graph refresh.`);
+      useGraphStore.getState().refreshGraph();
+    } else {
+      // Log why we didn't refresh, for debugging
+      if (hasStatusCountChange) {
+        console.log(`[DocumentManager] Status change detected but no refresh: Active(${prevActiveCount}->${activeCount}), Total(${prevDocCounts.all}->${docCounts.all})`);
+      }
+    }
+
     // Trigger health check if changes detected and component is still mounted
     if (hasStatusCountChange && isMountedRef.current) {
       useBackendState.getState().check()
@@ -1046,6 +1072,9 @@ export default function DocumentManager() {
   // Handle documents deleted callback
   const handleDocumentsDeleted = useCallback(async () => {
     setSelectedDocIds([])
+
+    // Trigger full graph refresh
+    useGraphStore.getState().refreshGraph();
 
     // Reset health check timer with 1 second delay to avoid race condition
     useBackendState.getState().resetHealthCheckTimerDelayed(1000)

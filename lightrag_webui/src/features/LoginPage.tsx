@@ -35,6 +35,10 @@ const LoginPage = () => {
       }
       authCheckRef.current = true;
 
+      // Track mount status
+      const isMounted = true;
+      const isMountedRef = { current: true };
+
       try {
         // If already authenticated, redirect to home
         if (isAuthenticated) {
@@ -65,10 +69,11 @@ const LoginPage = () => {
 
       } catch (error) {
         console.error('Failed to check auth configuration:', error)
-        // Also set checkingAuth to false in case of error
-        setCheckingAuth(false);
+      } finally {
+        if (isMountedRef.current) {
+          setCheckingAuth(false);
+        }
       }
-      // Removed finally block as we're setting checkingAuth earlier
     }
 
     // Execute immediately
@@ -79,9 +84,18 @@ const LoginPage = () => {
     }
   }, [isAuthenticated, login, navigate])
 
-  // Don't render anything while checking auth
+  // Show loading indicator while checking auth configuration
   if (checkingAuth) {
-    return null
+    return (
+      <div className="flex h-screen w-screen flex-col bg-background">
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-center">
+            <div className="mb-2 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
+            <p className="text-sm text-muted-foreground font-mono">Initializing LightRAG...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { createSelectors } from '@/lib/utils'
 import { defaultQueryLabel } from '@/lib/constants'
-import { Message, QueryRequest } from '@/api/lightrag'
+import { Message, QueryRequest } from './types'
 
 type Theme = 'dark' | 'light' | 'system'
 type Language = 'en' | 'zh' | 'fr' | 'ar' | 'zh_TW' | 'ru' | 'ja' | 'de' | 'uk'
@@ -241,109 +241,147 @@ const useSettingsStoreBase = create<SettingsState>()(
       name: 'settings-storage',
       storage: createJSONStorage(() => localStorage),
       version: 20,
-      migrate: (state: any, version: number) => {
-        if (version < 2) {
-          state.showEdgeLabel = false
-        }
-        if (version < 3) {
-          state.queryLabel = defaultQueryLabel
-        }
-        if (version < 4) {
-          state.showPropertyPanel = true
-          state.showNodeSearchBar = true
-          state.showNodeLabel = true
-          state.enableHealthCheck = true
-          state.apiKey = null
-        }
-        if (version < 5) {
-          state.currentTab = 'documents'
-        }
-        if (version < 6) {
-          state.querySettings = {
-            mode: 'global',
-            response_type: 'Multiple Paragraphs',
-            top_k: 10,
-            max_token_for_text_unit: 4000,
-            max_token_for_global_context: 4000,
-            max_token_for_local_context: 4000,
-            only_need_context: false,
-            only_need_prompt: false,
-            stream: true,
-            history_turns: 0,
-            hl_keywords: [],
-            ll_keywords: []
+      migrate: (persistedState: any, version: number) => {
+        try {
+          if (!persistedState) return {};
+          const state = persistedState as any
+          console.log(`Migrating settings-storage from version ${version} to 20`);
+
+          if (version < 2) {
+            state.showEdgeLabel = false
           }
-          state.retrievalHistory = []
-        }
-        if (version < 7) {
-          state.graphQueryMaxDepth = 3
-          state.graphLayoutMaxIterations = 15
-        }
-        if (version < 8) {
-          state.graphMinDegree = 0
-          state.language = 'en'
-        }
-        if (version < 9) {
-          state.showFileName = false
-        }
-        if (version < 10) {
-          delete state.graphMinDegree // 删除废弃参数
-          state.graphMaxNodes = 1000  // 添加新参数
-        }
-        if (version < 11) {
-          state.minEdgeSize = 1
-          state.maxEdgeSize = 1
-        }
-        if (version < 12) {
-          // Clear retrieval history to avoid compatibility issues with MessageWithError type
-          state.retrievalHistory = []
-        }
-        if (version < 13) {
-          // Add user_prompt field for older versions
-          if (state.querySettings) {
-            state.querySettings.user_prompt = ''
+          if (version < 3) {
+            state.queryLabel = defaultQueryLabel
           }
-        }
-        if (version < 14) {
-          // Add backendMaxGraphNodes field for older versions
-          state.backendMaxGraphNodes = null
-        }
-        if (version < 15) {
-          // Add new querySettings
-          state.querySettings = {
-            ...state.querySettings,
-            mode: 'mix',
-            response_type: 'Multiple Paragraphs',
-            top_k: 40,
-            chunk_top_k: 10,
-            max_entity_tokens: 10000,
-            max_relation_tokens: 10000,
-            max_total_tokens: 32000,
-            enable_rerank: true,
-            history_turns: 0,
+          if (version < 4) {
+            state.showPropertyPanel = true
+            state.showNodeSearchBar = true
+            state.showNodeLabel = true
+            state.enableHealthCheck = true
+            state.apiKey = null
           }
-        }
-        if (version < 16) {
-          // Add documentsPageSize field for older versions
-          state.documentsPageSize = 10
-        }
-        if (version < 17) {
-          // Force history_turns to 0 for all users
-          if (state.querySettings) {
-            state.querySettings.history_turns = 0
+          if (version < 5) {
+            state.currentTab = 'documents'
           }
-        }
-        if (version < 18) {
-          // Add userPromptHistory field for older versions
-          state.userPromptHistory = []
-        }
-        if (version < 20) {
-          if (state.querySettings) {
-            state.querySettings.include_references = true
-            state.querySettings.include_chunk_content = true
+          if (version < 6) {
+            state.querySettings = {
+              mode: 'global',
+              response_type: 'Multiple Paragraphs',
+              top_k: 10,
+              max_token_for_text_unit: 4000,
+              max_token_for_global_context: 4000,
+              max_token_for_local_context: 4000,
+              only_need_context: false,
+              only_need_prompt: false,
+              stream: true,
+              history_turns: 0,
+              hl_keywords: [],
+              ll_keywords: []
+            }
+            state.retrievalHistory = []
           }
+          if (version < 7) {
+            state.graphQueryMaxDepth = 3
+            state.graphLayoutMaxIterations = 15
+          }
+          if (version < 8) {
+            state.graphMinDegree = 0
+            state.language = 'en'
+          }
+          if (version < 9) {
+            state.showFileName = false
+          }
+          if (version < 10) {
+            delete state.graphMinDegree // 删除废弃参数
+            state.graphMaxNodes = 1000  // 添加新参数
+          }
+          if (version < 11) {
+            state.minEdgeSize = 1
+            state.maxEdgeSize = 1
+          }
+          if (version < 12) {
+            // Clear retrieval history to avoid compatibility issues with MessageWithError type
+            state.retrievalHistory = []
+          }
+          if (version < 13) {
+            // Add user_prompt field for older versions
+            if (state.querySettings) {
+              state.querySettings.user_prompt = ''
+            }
+          }
+          if (version < 14) {
+            // Add backendMaxGraphNodes field for older versions
+            state.backendMaxGraphNodes = null
+          }
+          if (version < 15) {
+            // Add new querySettings
+            state.querySettings = {
+              ...state.querySettings,
+              mode: 'mix',
+              response_type: 'Multiple Paragraphs',
+              top_k: 40,
+              chunk_top_k: 10,
+              max_entity_tokens: 10000,
+              max_relation_tokens: 10000,
+              max_total_tokens: 32000,
+              enable_rerank: true,
+              history_turns: 0,
+            }
+          }
+          if (version < 16) {
+            // Add documentsPageSize field for older versions
+            state.documentsPageSize = 10
+          }
+          if (version < 17) {
+            // Force history_turns to 0 for all users
+            if (state.querySettings) {
+              state.querySettings.history_turns = 0
+            }
+          }
+          if (version < 18) {
+            // Add userPromptHistory field for older versions
+            state.userPromptHistory = []
+          }
+          if (version < 20) {
+            if (state.querySettings) {
+              state.querySettings.include_references = true
+              state.querySettings.include_chunk_content = true
+            }
+          }
+
+          // FINAL VALIDATION: Ensure critical fields exist and have correct types
+          if (!Array.isArray(state.retrievalHistory)) {
+            state.retrievalHistory = []
+          } else {
+            // Sanitize history: Filter out items without role or content
+            state.retrievalHistory = state.retrievalHistory.filter((msg: any) =>
+              msg && typeof msg === 'object' && msg.role && msg.content !== undefined
+            );
+          }
+
+          if (!state.querySettings || typeof state.querySettings !== 'object') {
+            state.querySettings = {
+              mode: 'global',
+              top_k: 40,
+              chunk_top_k: 20,
+              max_entity_tokens: 6000,
+              max_relation_tokens: 8000,
+              max_total_tokens: 30000,
+              stream: true,
+              history_turns: 0,
+              user_prompt: '',
+              include_references: true,
+              include_chunk_content: true
+            }
+          }
+
+          return state
+        } catch (error) {
+          console.error('CRITICAL: State migration failed. Clearing settings to prevent crash.', error);
+          // Return default state (mocked as null here because migrate is expected to return the object)
+          // Actually, return an empty object so the store resets to defaults
+          return {};
         }
-        return state
       }
     }
   )

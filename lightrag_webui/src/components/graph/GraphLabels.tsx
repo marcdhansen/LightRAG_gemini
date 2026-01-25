@@ -152,8 +152,7 @@ const GraphLabels = () => {
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true)
 
-    // Clear legend cache to ensure legend is re-generated on refresh
-    useGraphStore.getState().setTypeColorMap(new Map<string, string>())
+    // Legend cache is cleared within useGraphStore.getState().refreshGraph() which is called below
 
     try {
       let currentLabel = label
@@ -174,16 +173,8 @@ const GraphLabels = () => {
         // Scenario 1: Has specific label, try to refresh current label
         console.log(`Refreshing current label: ${currentLabel}`)
 
-        // Reset graph data fetch status to trigger refresh
-        useGraphStore.getState().setGraphDataFetchAttempted(false)
-        useGraphStore.getState().setLastSuccessfulQueryLabel('')
-
-        // Force data refresh for current label
-        useGraphStore.getState().incrementGraphDataVersion()
-
-        // Note: If the current label has no data after refresh,
-        // the fallback logic would be handled by the graph component itself
-        // For now, we keep the current label and let the user see the result
+        // Use centralized refresh logic
+        useGraphStore.getState().refreshGraph();
 
       } else {
         // Scenario 3: queryLabel is "*", refresh global data and popular labels
@@ -210,11 +201,7 @@ const GraphLabels = () => {
         }
 
         // Reset graph data fetch status
-        useGraphStore.getState().setGraphDataFetchAttempted(false)
-        useGraphStore.getState().setLastSuccessfulQueryLabel('')
-
-        // Force global data refresh
-        useGraphStore.getState().incrementGraphDataVersion()
+        useGraphStore.getState().refreshGraph();
 
         // Ensure data update completes before triggering UI refresh
         await new Promise(resolve => setTimeout(resolve, 0))
@@ -303,7 +290,7 @@ const GraphLabels = () => {
             useSettingsStore.getState().setQueryLabel(newLabel);
 
             // Force graph re-render and reset zoom/scale (must be AFTER setQueryLabel)
-            useGraphStore.getState().incrementGraphDataVersion();
+            // useGraphStore.getState().setTypeColorMap(new Map<string, string>())
           }}
           clearable={false}  // Prevent clearing value on reselect
           debounceTime={500}

@@ -166,14 +166,14 @@ def test_document_content_and_reference_streaming(test_document):
         # 3. Verify specifically for our document
         target_ref = None
         for ref in reference_items:
-            if ref.get("reference_id") == doc_id:
+            if ref.get("doc_id") == doc_id:
                 target_ref = ref
                 break
 
         if target_ref is None:
             print("\n❌ Target document not found! Retrieved references:")
             for ref in reference_items:
-                print(f"   - ID: {ref.get('reference_id')} | File: {ref.get('file_path')}")
+                print(f"   - ID: {ref.get('reference_id')} | DocID: {ref.get('doc_id')} | File: {ref.get('file_path')}")
         
         assert (
             target_ref is not None

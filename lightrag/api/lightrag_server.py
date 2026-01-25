@@ -64,6 +64,7 @@ from lightrag.kg.shared_storage import (
 )
 from fastapi.security import OAuth2PasswordRequestForm
 from lightrag.api.auth import auth_handler
+from pydantic import BaseModel
 
 # use the .env that is inside the current folder
 # allows to use different .env file for each lightrag instance
@@ -286,6 +287,11 @@ def check_frontend_build():
         logger.warning(f"Failed to check frontend source freshness: {e}")
         return (True, False)  # Assume assets exist and up-to-date on error
 
+
+class LogEntry(BaseModel):
+    level: str
+    message: str
+    context: dict = {}
 
 def create_app(args):
     # Check frontend build first and get status
@@ -1111,6 +1117,7 @@ def create_app(args):
     app.include_router(create_query_routes(rag, api_key, args.top_k))
     app.include_router(create_graph_routes(rag, api_key))
     app.include_router(create_highlight_routes(api_key))
+
 
     # Legacy redirect for /upload to /documents/upload
     @app.post("/upload", include_in_schema=False)

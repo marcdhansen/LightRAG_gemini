@@ -4,303 +4,39 @@ import { errorMessage } from '@/lib/utils'
 import { useSettingsStore } from '@/stores/settings'
 import { useAuthStore } from '@/stores/state'
 import { navigationService } from '@/services/navigation'
+import { axiosInstance, checkHealth as baseCheckHealth } from './base'
 
-// Types
-export type LightragNodeType = {
-  id: string
-  labels: string[]
-  properties: Record<string, any>
-}
+import {
+  LightragNodeType,
+  LightragEdgeType,
+  LightragGraphType,
+  LightragStatus,
+  LightragDocumentsScanProgress,
+  QueryMode,
+  Message,
+  QueryRequest,
+  ReferenceItem,
+  QueryResponse,
+  EntityUpdateResponse,
+  DocActionResponse,
+  ScanResponse,
+  ReprocessFailedResponse,
+  DocStatus,
+  DocStatusResponse,
+  DocsStatusesResponse,
+  TrackStatusResponse,
+  DocumentsRequest,
+  PaginationInfo,
+  PaginatedDocsResponse,
+  StatusCountsResponse,
+  AuthStatusResponse,
+  PipelineStatusResponse,
+  LoginResponse
+} from './types'
 
-export type LightragEdgeType = {
-  id: string
-  source: string
-  target: string
-  type: string
-  properties: Record<string, any>
-}
-
-export type LightragGraphType = {
-  nodes: LightragNodeType[]
-  edges: LightragEdgeType[]
-}
-
-export type LightragStatus = {
-  status: 'healthy'
-  working_directory: string
-  input_directory: string
-  configuration: {
-    llm_binding: string
-    llm_binding_host: string
-    llm_model: string
-    embedding_binding: string
-    embedding_binding_host: string
-    embedding_model: string
-    kv_storage: string
-    doc_status_storage: string
-    graph_storage: string
-    vector_storage: string
-    workspace?: string
-    max_graph_nodes?: string
-    enable_rerank?: boolean
-    rerank_binding?: string | null
-    rerank_model?: string | null
-    rerank_binding_host?: string | null
-    summary_language: string
-    force_llm_summary_on_merge: boolean
-    max_parallel_insert: number
-    max_async: number
-    embedding_func_max_async: number
-    embedding_batch_num: number
-    cosine_threshold: number
-    min_rerank_score: number
-    related_chunk_number: number
-  }
-  update_status?: Record<string, any>
-  core_version?: string
-  api_version?: string
-  auth_mode?: 'enabled' | 'disabled'
-  pipeline_busy: boolean
-  keyed_locks?: {
-    process_id: number
-    cleanup_performed: {
-      mp_cleaned: number
-      async_cleaned: number
-    }
-    current_status: {
-      total_mp_locks: number
-      pending_mp_cleanup: number
-      total_async_locks: number
-      pending_async_cleanup: number
-    }
-  }
-  webui_title?: string
-  webui_description?: string
-}
-
-export type LightragDocumentsScanProgress = {
-  is_scanning: boolean
-  current_file: string
-  indexed_count: number
-  total_files: number
-  progress: number
-}
-
-/**
- * Specifies the retrieval mode:
- * - "naive": Performs a basic search without advanced techniques.
- * - "local": Focuses on context-dependent information.
- * - "global": Utilizes global knowledge.
- * - "hybrid": Combines local and global retrieval methods.
- * - "mix": Integrates knowledge graph and vector retrieval.
- * - "bypass": Bypasses knowledge retrieval and directly uses the LLM.
- */
-export type QueryMode = 'naive' | 'local' | 'global' | 'hybrid' | 'mix' | 'bypass'
-
-export type Message = {
-  role: 'user' | 'assistant' | 'system'
-  content: string
-  thinkingContent?: string
-  displayContent?: string
-  thinkingTime?: number | null
-}
-
-export type QueryRequest = {
-  query: string
-  /** Specifies the retrieval mode. */
-  mode: QueryMode
-  /** If True, only returns the retrieved context without generating a response. */
-  only_need_context?: boolean
-  /** If True, only returns the generated prompt without producing a response. */
-  only_need_prompt?: boolean
-  /** Defines the response format. Examples: 'Multiple Paragraphs', 'Single Paragraph', 'Bullet Points'. */
-  response_type?: string
-  /** If True, enables streaming output for real-time responses. */
-  stream?: boolean
-  /** Number of top items to retrieve. Represents entities in 'local' mode and relationships in 'global' mode. */
-  top_k?: number
-  /** Maximum number of text chunks to retrieve and keep after reranking. */
-  chunk_top_k?: number
-  /** Maximum number of tokens allocated for entity context in unified token control system. */
-  max_entity_tokens?: number
-  /** Maximum number of tokens allocated for relationship context in unified token control system. */
-  max_relation_tokens?: number
-  /** Maximum total tokens budget for the entire query context (entities + relations + chunks + system prompt). */
-  max_total_tokens?: number
-  /**
-   * Stores past conversation history to maintain context.
-   * Format: [{"role": "user/assistant", "content": "message"}].
-   */
-  conversation_history?: Message[]
-  /** Number of complete conversation turns (user-assistant pairs) to consider in the response context. */
-  history_turns?: number
-  /** User-provided prompt for the query. If provided, this will be used instead of the default value from prompt template. */
-  user_prompt?: string
-  /** Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued. Default is True. */
-  enable_rerank?: boolean
-  /** If True, includes reference list in the response for supported endpoints. */
-  include_references?: boolean
-  /** If True, includes actual chunk text content in references. */
-  include_chunk_content?: boolean
-}
-
-export type ReferenceItem = {
-  reference_id: string
-  file_path: string
-  content?: string[] // Optional chunk contents
-}
-
-export type QueryResponse = {
-  response: string
-  references?: ReferenceItem[]
-}
-
-export type EntityUpdateResponse = {
-  status: string
-  message: string
-  data: Record<string, any>
-  operation_summary?: {
-    merged: boolean
-    merge_status: 'success' | 'failed' | 'not_attempted'
-    merge_error: string | null
-    operation_status: 'success' | 'partial_success' | 'failure'
-    target_entity: string | null
-    final_entity?: string | null
-    renamed?: boolean
-  }
-}
-
-export type DocActionResponse = {
-  status: 'success' | 'partial_success' | 'failure' | 'duplicated'
-  message: string
-  track_id?: string
-}
-
-export type ScanResponse = {
-  status: 'scanning_started'
-  message: string
-  track_id: string
-}
-
-export type ReprocessFailedResponse = {
-  status: 'reprocessing_started'
-  message: string
-  track_id: string
-}
-
-export type DeleteDocResponse = {
-  status: 'deletion_started' | 'busy' | 'not_allowed'
-  message: string
-  doc_id: string
-}
-
-export type DocStatus = 'pending' | 'processing' | 'preprocessed' | 'processed' | 'failed'
-
-export type DocStatusResponse = {
-  id: string
-  content_summary: string
-  content_length: number
-  status: DocStatus
-  created_at: string
-  updated_at: string
-  track_id?: string
-  chunks_count?: number
-  error_msg?: string
-  metadata?: Record<string, any>
-  file_path: string
-}
-
-export type DocsStatusesResponse = {
-  statuses: Record<DocStatus, DocStatusResponse[]>
-}
-
-export type TrackStatusResponse = {
-  track_id: string
-  documents: DocStatusResponse[]
-  total_count: number
-  status_summary: Record<string, number>
-}
-
-export type DocumentsRequest = {
-  status_filter?: DocStatus | null
-  page: number
-  page_size: number
-  sort_field: 'created_at' | 'updated_at' | 'id' | 'file_path'
-  sort_direction: 'asc' | 'desc'
-}
-
-export type PaginationInfo = {
-  page: number
-  page_size: number
-  total_count: number
-  total_pages: number
-  has_next: boolean
-  has_prev: boolean
-}
-
-export type PaginatedDocsResponse = {
-  documents: DocStatusResponse[]
-  pagination: PaginationInfo
-  status_counts: Record<string, number>
-}
-
-export type StatusCountsResponse = {
-  status_counts: Record<string, number>
-}
-
-export type AuthStatusResponse = {
-  auth_configured: boolean
-  access_token?: string
-  token_type?: string
-  auth_mode?: 'enabled' | 'disabled'
-  message?: string
-  core_version?: string
-  api_version?: string
-  webui_title?: string
-  webui_description?: string
-}
-
-export type PipelineStatusResponse = {
-  autoscanned: boolean
-  busy: boolean
-  job_name: string
-  job_start?: string
-  docs: number
-  batchs: number
-  cur_batch: number
-  request_pending: boolean
-  cancellation_requested?: boolean
-  latest_message: string
-  history_messages?: string[]
-  update_status?: Record<string, any>
-}
-
-export type LoginResponse = {
-  access_token: string
-  token_type: string
-  auth_mode?: 'enabled' | 'disabled'  // Authentication mode identifier
-  message?: string                    // Optional message
-  core_version?: string
-  api_version?: string
-  webui_title?: string
-  webui_description?: string
-}
-
-export const InvalidApiKeyError = 'Invalid API Key'
-export const RequireApiKeError = 'API Key required'
-
-// Axios instance
-const axiosInstance = axios.create({
-  baseURL: backendBaseUrl,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-})
-
-// ========== Token Management ==========
-// Prevent multiple requests from triggering token refresh simultaneously
-let isRefreshingGuestToken = false;
-let refreshTokenPromise: Promise<string> | null = null;
+// Export basic health check from here too for convenience
+export const checkHealth = baseCheckHealth;
+export { InvalidApiKeyError, RequireApiKeError } from './types'
 
 // Silent refresh for guest token
 const silentRefreshGuestToken = async (): Promise<string> => {
@@ -313,8 +49,7 @@ const silentRefreshGuestToken = async (): Promise<string> => {
   refreshTokenPromise = (async () => {
     try {
       // Call /auth-status to get new guest token
-      const response = await axios.get('/auth-status', {
-        baseURL: backendBaseUrl,
+      const response = await axiosInstance.get('/auth-status', {
         // This request must skip the interceptor to avoid adding expired token
         headers: { 'X-Skip-Interceptor': 'true' }
       });
@@ -345,28 +80,7 @@ const silentRefreshGuestToken = async (): Promise<string> => {
   return refreshTokenPromise;
 };
 
-// Interceptor: add api key and check authentication
-axiosInstance.interceptors.request.use((config) => {
-  // Skip interceptor for token refresh requests
-  if (config.headers['X-Skip-Interceptor']) {
-    delete config.headers['X-Skip-Interceptor'];
-    return config;
-  }
-
-  const apiKey = useSettingsStore.getState().apiKey
-  const token = localStorage.getItem('LIGHTRAG-API-TOKEN');
-
-  // Always include token if it exists, regardless of path
-  if (token) {
-    config.headers['Authorization'] = `Bearer ${token}`
-  }
-  if (apiKey) {
-    config.headers['X-API-Key'] = apiKey
-  }
-  return config
-})
-
-// Interceptor：handle token renewal and authentication errors
+// Response Interceptor：handle token renewal and authentication errors
 axiosInstance.interceptors.response.use(
   (response) => {
     // ========== Check for new token from backend ==========
@@ -381,19 +95,15 @@ axiosInstance.interceptors.response.use(
 
       // Update auth state with renewal tracking
       try {
-        const payload = JSON.parse(atob(newToken.split('.')[1]));
-        const authStore = useAuthStore.getState();
-        if (authStore.isAuthenticated) {
-          // Track token renewal time and expiration
-          const renewalTime = Date.now();
-          const expiresAt = payload.exp ? payload.exp * 1000 : 0;
-          authStore.setTokenRenewal(renewalTime, expiresAt);
-
-          // Update username (usually unchanged, but just in case)
-          const newUsername = payload.sub;
-          if (newUsername && newUsername !== authStore.username) {
-            // Need to add setUsername method or just update via login
-            // For now, we'll skip username update as it's rare
+        const payloadParts = newToken.split('.');
+        if (payloadParts.length === 3) {
+          const payload = JSON.parse(atob(payloadParts[1]));
+          const authStore = useAuthStore.getState();
+          if (authStore.isAuthenticated) {
+            // Track token renewal time and expiration
+            const renewalTime = Date.now();
+            const expiresAt = payload.exp ? payload.exp * 1000 : 0;
+            authStore.setTokenRenewal(renewalTime, expiresAt);
           }
         }
       } catch (error) {
@@ -485,22 +195,10 @@ export const searchLabels = async (query: string, limit: number = searchLabelsDe
   return response.data
 }
 
-export const checkHealth = async (): Promise<
-  LightragStatus | { status: 'error'; message: string }
-> => {
-  try {
-    const response = await axiosInstance.get('/health')
-    return response.data
-  } catch (error) {
-    return {
-      status: 'error',
-      message: errorMessage(error)
-    }
-  }
-}
 
-export const getDocuments = async (): Promise<DocsStatusesResponse> => {
-  const response = await axiosInstance.get('/documents')
+export const getDocuments = async (timestamp?: number): Promise<DocsStatusesResponse> => {
+  const url = timestamp ? `/documents?_t=${timestamp}` : '/documents';
+  const response = await axiosInstance.get(url)
   return response.data
 }
 
@@ -1042,4 +740,12 @@ export const getDocumentStatusCounts = async (): Promise<StatusCountsResponse> =
 export const getDocumentContent = async (docId: string): Promise<{ doc_id: string; content: string }> => {
   const response = await axiosInstance.get(`/documents/${docId}/content`)
   return response.data
+}
+
+export const logToServer = async (level: string, message: string, context: Record<string, any> = {}): Promise<void> => {
+  try {
+    await axiosInstance.post('/documents/log', { level, message, context });
+  } catch (e) {
+    console.error('Failed to send log to server:', e);
+  }
 }

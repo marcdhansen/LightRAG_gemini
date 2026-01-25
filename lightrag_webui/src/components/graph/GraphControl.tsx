@@ -63,23 +63,78 @@ const GraphControl = ({ disableHoverEffect }: { disableHoverEffect?: boolean }) 
    * => ensure graph reference and apply layout
    */
   useEffect(() => {
-    if (sigmaGraph && sigma) {
-      // Ensure sigma binding to sigmaGraph
-      try {
-        if (typeof sigma.setGraph === 'function') {
-          sigma.setGraph(sigmaGraph as unknown as AbstractGraph<NodeType, EdgeType>);
-          console.log('Binding graph to sigma instance');
-        } else {
-          (sigma as any).graph = sigmaGraph;
-          console.warn('Simgma missing setGraph function, set graph property directly');
+    if (sigma) {
+      if (sigmaGraph) {
+        // Ensure sigma binding to sigmaGraph
+        try {
+          if (typeof sigma.setGraph === 'function') {
+            sigma.setGraph(sigmaGraph as unknown as AbstractGraph<NodeType, EdgeType>);
+            console.log('Binding graph to sigma instance');
+          } else {
+            (sigma as any).graph = sigmaGraph;
+            console.warn('Simgma missing setGraph function, set graph property directly');
+          }
+        } catch (error) {
+          console.error('Error setting graph on sigma instance:', error);
         }
-      } catch (error) {
-        console.error('Error setting graph on sigma instance:', error);
-      }
 
-      assignLayout();
-      sigma.refresh();
-      console.log('Initial layout applied to graph and sigma refreshed');
+        // Initialize random coordinates if nodes are at (0,0) or missing coordinates
+        // This is crucial for ForceAtlas2 to work, as it fails to disperse nodes if they all start at the same point
+        let zeroCoordCount = 0;
+        sigmaGraph.forEachNode((node, attributes) => {
+          if (!attributes.x || !attributes.y || (attributes.x === 0 && attributes.y === 0)) {
+            sigmaGraph.setNodeAttribute(node, 'x', Math.random() * 100);
+            sigmaGraph.setNodeAttribute(node, 'y', Math.random() * 100);
+            zeroCoordCount++;
+          }
+        });
+
+        if (zeroCoordCount > 0) {
+          console.log(`Initialized random coordinates for ${zeroCoordCount} nodes to prevent layout singularity`);
+        }
+
+        assignLayout();
+
+        // Log coordinate stats to verify dispersion
+        let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+        sigmaGraph.forEachNode((_, attr) => {
+          if (attr.x < minX) minX = attr.x;
+          if (attr.x > maxX) maxX = attr.x;
+          if (attr.y < minY) minY = attr.y;
+          if (attr.y > maxY) maxY = attr.y;
+        });
+        console.log(`Layout bounds after assign: X[${minX.toFixed(2)}, ${maxX.toFixed(2)}], Y[${minY.toFixed(2)}, ${maxY.toFixed(2)}]`);
+
+        // Robust camera centering sequence to handle race conditions with container sizing
+        const resetCamera = () => {
+          // duration: 0 ensures immediate update without animation for initial load
+          sigma.getCamera().animatedReset({ duration: 0 });
+          sigma.refresh();
+        };
+
+        resetCamera();
+        console.log('Initial layout applied, camera reset, and sigma refreshed');
+
+        // Retry sequence to handle container resizing or rendering delays
+        // This ensures nodes are visible even if the container dimensions weren't ready immediately
+        const retryDelays = [50, 150, 300];
+        retryDelays.forEach(delay => {
+          setTimeout(() => {
+            // Only reset if we still have the same graph instance to avoid jumping if user switched graphs
+            if (sigma && sigma.getGraph() === sigmaGraph) {
+              resetCamera();
+              console.log(`Retry camera reset at ${delay}ms`);
+            }
+          }, delay);
+        });
+      } else {
+        // Explicitly clear the graph if sigmaGraph is null (reset state)
+        if (sigma.getGraph()) {
+          sigma.getGraph().clear();
+          sigma.refresh();
+          console.log('Graph cleared (sigmaGraph is null)');
+        }
+      }
     }
   }, [sigma, sigmaGraph, assignLayout, maxIterations])
 

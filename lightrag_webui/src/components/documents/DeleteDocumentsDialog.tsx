@@ -12,7 +12,7 @@ import {
 import Input from '@/components/ui/Input'
 import { toast } from 'sonner'
 import { errorMessage } from '@/lib/utils'
-import { deleteDocuments } from '@/api/lightrag'
+import { deleteDocuments, getDocuments, logToServer } from '@/api/lightrag'
 
 import { TrashIcon, AlertTriangleIcon } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -49,13 +49,18 @@ export default function DeleteDocumentsDialog({ selectedDocIds, onDocumentsDelet
 
   // Reset state when dialog closes
   useEffect(() => {
-    if (!open) {
+    if (open) {
+      console.log('[DeleteDocumentsDialog] Open with IDs:', selectedDocIds);
+      logToServer('info', `[DeleteDocumentsDialog] Open with IDs: ${JSON.stringify(selectedDocIds)}`);
+      setConfirmText('')
+      setIsDeleting(false)
+    } else { // This else block handles the original "reset on close" functionality
       setConfirmText('')
       setDeleteFile(false)
       setDeleteLLMCache(false)
       setIsDeleting(false)
     }
-  }, [open])
+  }, [open, selectedDocIds])
 
   const handleDelete = useCallback(async () => {
     if (!isConfirmEnabled || selectedDocIds.length === 0) return
@@ -83,17 +88,63 @@ export default function DeleteDocumentsDialog({ selectedDocIds, onDocumentsDelet
         return
       }
 
-      // Refresh document list if provided
-      if (onDocumentsDeleted) {
-        onDocumentsDeleted().catch(console.error)
-      }
+      // Close dialog immediately to unblock UI
+      setOpen(false);
+      setIsDeleting(false);
 
-      // Close dialog after successful operation
-      setOpen(false)
+      // Run polling in background
+      (async () => {
+        // Poll for up to 30 seconds (60 attempts * 500ms)
+        const maxAttempts = 60;
+
+        for (let i = 0; i < maxAttempts; i++) {
+          try {
+            // Fetch latest documents with cache busting
+            const response = await getDocuments(Date.now());
+
+            const allDocs = Object.values(response.statuses).flat();
+            const remainingIds = selectedDocIds.filter(id => allDocs.some(doc => doc.id === id));
+
+            if (remainingIds.length === 0) {
+              console.log(`[DeleteDocumentsDialog] Deletion confirmed after ${i + 1} checks`);
+
+              // Trigger final update
+              if (onDocumentsDeleted) {
+                await onDocumentsDeleted();
+                toast.success(t('documentPanel.deleteDocuments.complete'));
+              }
+              return;
+            }
+
+            if ((i + 1) % 5 === 0) {
+              const allDocs = Object.values(response.statuses).flat();
+              const remainingDocs = allDocs.filter(doc => selectedDocIds.includes(doc.id));
+              const statuses = remainingDocs.map(d => `${d.id}(${d.status})`).join(', ');
+
+              const msg = `[DeleteDocumentsDialog] Documents still present: ${statuses}. Waiting... (Attempt ${i + 1}/${maxAttempts})`;
+              console.log(msg);
+              logToServer('info', msg);
+            }
+
+            // Wait 500ms before next check
+            await new Promise(resolve => setTimeout(resolve, 500));
+          } catch (e) {
+            console.error('Error polling document status:', e);
+            await new Promise(resolve => setTimeout(resolve, 500));
+          }
+        }
+
+        // Timeout fallback
+        console.warn('[DeleteDocumentsDialog] Deletion polling timed out');
+        if (onDocumentsDeleted) {
+          await onDocumentsDeleted();
+          toast.warning(t('documentPanel.deleteDocuments.timeout'));
+        }
+      })();
+
     } catch (err) {
       toast.error(t('documentPanel.deleteDocuments.error', { error: errorMessage(err) }))
       setConfirmText('')
-    } finally {
       setIsDeleting(false)
     }
   }, [isConfirmEnabled, selectedDocIds, deleteFile, deleteLLMCache, setOpen, t, onDocumentsDeleted])
@@ -107,7 +158,7 @@ export default function DeleteDocumentsDialog({ selectedDocIds, onDocumentsDelet
           tooltip={t('documentPanel.deleteDocuments.tooltip', { count: selectedDocIds.length })}
           size="sm"
         >
-          <TrashIcon/> {t('documentPanel.deleteDocuments.button')}
+          <TrashIcon /> {t('documentPanel.deleteDocuments.button')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-xl" onCloseAutoFocus={(e) => e.preventDefault()}>

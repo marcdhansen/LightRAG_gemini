@@ -45,15 +45,18 @@ export class SearchHistoryManager {
         return []
       }
 
-      // Ensure items is an array
+      // Ensure items is an array and each item is valid
       if (!Array.isArray(parsed.items)) {
         console.warn('Invalid search history format. Clearing history.')
         this.clearHistory()
         return []
       }
 
+      // Filter and validate items
+      const validItems = parsed.items.filter(item => this.validateItem(item));
+
       // Sort by last accessed time (descending) then by access count (descending)
-      return parsed.items.sort((a, b) => {
+      return validItems.sort((a, b) => {
         if (b.lastAccessed !== a.lastAccessed) {
           return b.lastAccessed - a.lastAccessed
         }
@@ -61,9 +64,23 @@ export class SearchHistoryManager {
       })
     } catch (error) {
       console.error('Error reading search history:', error)
-      this.clearHistory()
       return []
     }
+  }
+
+  /**
+   * Validate an individual history item
+   * @param item Item to validate
+   * @returns True if valid
+   */
+  private static validateItem(item: any): item is SearchHistoryItem {
+    return (
+      item &&
+      typeof item === 'object' &&
+      typeof item.label === 'string' &&
+      item.label.trim().length > 0 &&
+      (typeof item.lastAccessed === 'number' || typeof item.lastAccessed === 'string')
+    );
   }
 
   /**

@@ -4,14 +4,20 @@ import './index.css'
 import AppRouter from './AppRouter'
 import './i18n.ts';
 import 'katex/dist/katex.min.css';
-// Import KaTeX extensions at app startup to ensure they are registered before any rendering
-import 'katex/contrib/mhchem'; // Chemistry formulas: \ce{} and \pu{}
-import 'katex/contrib/copy-tex'; // Allow copying rendered formulas as LaTeX source
+import { initExtensions } from '@/lib/extensions';
 
+const initApp = async () => {
+  try {
+    await initExtensions();
+  } catch (e) {
+    console.error('Extension initialization failed', e);
+  }
 
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <AppRouter />
+    </StrictMode>
+  )
+};
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <AppRouter />
-  </StrictMode>
-)
+initApp();

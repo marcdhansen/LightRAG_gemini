@@ -66,11 +66,13 @@ function OptionComponent(item: OptionItem) {
 export const GraphSearchInput = ({
   onChange,
   onFocus,
-  value
+  value,
+  queryLabel
 }: {
   onChange: GraphSearchInputProps['onChange']
   onFocus?: GraphSearchInputProps['onFocus']
   value?: GraphSearchInputProps['value']
+  queryLabel?: string
 }) => {
   const { t } = useTranslation()
   const graph = useGraphStore.use.sigmaGraph()
@@ -83,10 +85,26 @@ export const GraphSearchInput = ({
     }
   }, [graph]);
 
+  // Sync with global queryLabel: clear local selection if queryLabel changes to empty or matches global reset
+  useEffect(() => {
+    if (queryLabel === '' || queryLabel === undefined) {
+      if (value) {
+        onChange(null);
+      }
+    }
+  }, [queryLabel]);
+
   // Create search engine when needed
   useEffect(() => {
     // Skip if no graph, empty graph, or search engine already exists
-    if (!graph || graph.nodes().length === 0 || searchEngine) {
+    if (!graph || graph.nodes().length === 0) {
+      if (searchEngine) {
+        useGraphStore.getState().setSearchEngine(null);
+      }
+      return
+    }
+
+    if (searchEngine) {
       return
     }
 
@@ -174,9 +192,9 @@ export const GraphSearchInput = ({
             const label = graph.getNodeAttribute(id, 'label')
             // Match if label contains query string but doesn't start with it
             return label &&
-                   typeof label === 'string' &&
-                   !label.toLowerCase().startsWith(query.toLowerCase()) &&
-                   label.toLowerCase().includes(query.toLowerCase())
+              typeof label === 'string' &&
+              !label.toLowerCase().startsWith(query.toLowerCase()) &&
+              label.toLowerCase().includes(query.toLowerCase())
           })
           .map(id => ({
             id,
@@ -225,7 +243,7 @@ export const GraphSearchInput = ({
 /**
  * Component that display the search.
  */
-const GraphSearch: FC<GraphSearchInputProps & GraphSearchContextProviderProps> = ({ ...props }) => {
+const GraphSearch: FC<GraphSearchInputProps & GraphSearchContextProviderProps & { queryLabel?: string }> = ({ ...props }) => {
   return <GraphSearchInput {...props} />
 }
 

@@ -84,6 +84,26 @@ router = APIRouter(
 # Temporary file prefix
 temp_prefix = "__tmp__"
 
+class LogEntry(BaseModel):
+    level: str
+    message: str
+    context: dict = {}
+
+@router.post("/log", include_in_schema=False)
+async def log_message(entry: LogEntry):
+    """Log message from frontend"""
+    msg = f"[Frontend] {entry.message}"
+    if entry.context:
+        msg += f" | {entry.context}"
+    
+    if entry.level.lower() == "error":
+        logger.error(msg)
+    elif entry.level.lower() == "warn" or entry.level.lower() == "warning":
+        logger.warning(msg)
+    else:
+        logger.info(msg)
+    return {"status": "ok"}
+
 
 def sanitize_filename(filename: str, input_dir: Path) -> str:
     """
@@ -2722,30 +2742,6 @@ def create_document_routes(
         doc_id: str = Field(description="The ID of the document to delete")
 
     @router.delete(
-        "/{doc_id}",
-        response_model=DeleteDocByIdResponse,
-        dependencies=[Depends(combined_auth)],
-        summary="Delete a single document and all its associated data by its ID.",
-    )
-    async def delete_document_by_id(
-        doc_id: str,
-        background_tasks: BackgroundTasks,
-        delete_file: bool = False,
-        delete_llm_cache: bool = False,
-    ) -> DeleteDocByIdResponse:
-        """
-        Delete a single document and all its associated data by its ID.
-        """
-        return await delete_document(
-            DeleteDocRequest(
-                doc_ids=[doc_id],
-                delete_file=delete_file,
-                delete_llm_cache=delete_llm_cache,
-            ),
-            background_tasks,
-        )
-
-    @router.delete(
         "/delete_document",
         response_model=DeleteDocByIdResponse,
         dependencies=[Depends(combined_auth)],
@@ -2823,6 +2819,31 @@ def create_document_routes(
             logger.error(error_msg)
             logger.error(traceback.format_exc())
             raise HTTPException(status_code=500, detail=error_msg)
+
+    @router.delete(
+        "/{doc_id}",
+        response_model=DeleteDocByIdResponse,
+        dependencies=[Depends(combined_auth)],
+        summary="Delete a single document and all its associated data by its ID.",
+    )
+    async def delete_document_by_id(
+        doc_id: str,
+        background_tasks: BackgroundTasks,
+        delete_file: bool = False,
+        delete_llm_cache: bool = False,
+    ) -> DeleteDocByIdResponse:
+        """
+        Delete a single document and all its associated data by its ID.
+        """
+        return await delete_document(
+            DeleteDocRequest(
+                doc_ids=[doc_id],
+                delete_file=delete_file,
+                delete_llm_cache=delete_llm_cache,
+            ),
+            background_tasks,
+        )
+
 
     @router.post(
         "/clear_cache",

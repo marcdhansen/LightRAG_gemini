@@ -1,4 +1,4 @@
-import '@/lib/extensions'; // Import all global extensions
+// import '@/lib/extensions'; // Moved to main.tsx
 import { HashRouter as Router, Routes, Route, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { useAuthStore } from '@/stores/state'
@@ -7,6 +7,9 @@ import { Toaster } from 'sonner'
 import App from './App'
 import LoginPage from '@/features/LoginPage'
 import ThemeProvider from '@/components/ThemeProvider'
+import ErrorBoundary from '@/components/ErrorBoundary'
+import { ZapIcon } from 'lucide-react'
+import { SiteInfo, webuiPrefix } from '@/lib/constants'
 
 const AppContent = () => {
   const [initializing, setInitializing] = useState(true)
@@ -60,9 +63,26 @@ const AppContent = () => {
     }
   }, [initializing, isAuthenticated, navigate]);
 
-  // Show nothing while initializing
+  // Show loading indicator while initializing
   if (initializing) {
-    return null
+    return (
+      <div className="flex h-screen w-screen flex-col bg-background">
+        <header className="border-border/40 bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex h-10 w-full border-b px-4 backdrop-blur">
+          <div className="min-w-[200px] w-auto flex items-center">
+            <a href={webuiPrefix} className="flex items-center gap-2">
+              <ZapIcon className="size-4 text-emerald-400" aria-hidden="true" />
+              <span className="font-bold md:inline-block">{SiteInfo.name}</span>
+            </a>
+          </div>
+        </header>
+        <div className="flex flex-1 items-center justify-center">
+          <div className="text-center">
+            <div className="mb-2 h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent mx-auto"></div>
+            <p className="text-sm text-muted-foreground font-mono">Verifying authentication...</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -78,17 +98,19 @@ const AppContent = () => {
 
 const AppRouter = () => {
   return (
-    <ThemeProvider>
-      <Router>
-        <AppContent />
-        <Toaster
-          position="bottom-center"
-          theme="system"
-          closeButton
-          richColors
-        />
-      </Router>
-    </ThemeProvider>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <Router>
+          <AppContent />
+          <Toaster
+            position="bottom-center"
+            theme="system"
+            closeButton
+            richColors
+          />
+        </Router>
+      </ThemeProvider>
+    </ErrorBoundary>
   )
 }
 
