@@ -1,36 +1,35 @@
-# Evaluation Framework Setup (RAGAS + Langfuse)
+# Evaluation Framework Standardization (RAGAS + Langfuse)
 
 ## Goal
 
 Establish a robust evaluation pipeline to measure RAG quality (Context Recall, Faithfulness, Answer Relevance) using RAGAS, and visualize traces/metrics in Langfuse.
 
-## Current State & Analysis
+## Status: COMPLETE (2026-01-26)
 
-* **Script**: `lightrag/evaluation/eval_rag_quality.py` exists and performs RAGAS evaluation (v0.4.3 compatible).
-* **Infrastructure**: `../langfuse/docker-compose.yml` exists for local Langfuse deployment.
-* **Missing Link**: The evaluation script currently prints results to console/JSON but does not send traces or scores to Langfuse.
+* [x] **Langfuse Integration**: Traces and RAGAS scores are automatically sent to local Langfuse.
+* [x] **Tiered Testing**: Pytest-based `light` and `heavy` paths implemented.
+* [x] **Documentation**:
+  * `docs/OBSERVABILITY.md`
+  * `docs/EVALUATION.md`
+  * `docs/ACE_FRAMEWORK.md`
+* [x] **Verification**: Light path verified (~17 min per test case on local LLMs).
 
-## Proposed Changes
+## Implementation Details
 
 ### 1. Langfuse Infrastructure
 
-* **Action**: Ensure Langfuse is running locally via Docker.
-* **Config**: Verify `localhost:3000` access and generate API keys.
+Local deployment via Docker Compose (`langfuse_docker/docker-compose.yml`). Available at `http://localhost:3000`.
 
-### 2. Code Integration (`lightrag/evaluation/eval_rag_quality.py`)
+### 2. Tiered Testing Strategy (`tests/conftest.py`)
 
-* **[NEW] Environment Variables**: Add `LANGFUSE_SECRET_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_HOST` to `.env`.
-* **[MODIFY] Ragas Callbacks**:
-  * Initialize `langfuse.callback.LangfuseCallbackHandler`.
-  * Pass handler to Ragas `evaluate()` function.
+* `--run-light`: Only runs basic verification (limit=1).
+* `--run-heavy`: Runs full benchmarks and academic datasets.
+* `--run-integration`: Starts/Stops the LightRAG server and wipes storage for clean tests.
 
-### 3. Documentation
+### 3. Pytest Wrapper (`tests/test_rag_quality.py`)
 
-* **[UPDATE] `README_EVALUASTION_RAGAS.md`**: Add Langfuse setup instructions.
+Wraps `eval_rag_quality.py` to allow execution within the standard test suite with automatic indexing of sample documents.
 
-## Verification Plan
+## Next Phase: Graph Reranking
 
-1. **Start Langfuse**: `cd ../langfuse && docker-compose up -d`.
-2. **Configure**: Login to Langfuse, create project, get keys.
-3. **Run Eval**: `uv run lightrag/evaluation/eval_rag_quality.py` (using sample dataset).
-4. **Verify**: Check Langfuse UI for new traces and scores.
+Implement performance-focused graph reranking to improve precision and reduce noise in retrieved context.

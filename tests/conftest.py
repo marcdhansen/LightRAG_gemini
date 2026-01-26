@@ -101,6 +101,8 @@ def pytest_configure(config):
     config.addinivalue_line(
         "markers", "manual: marks tests intended for manual/interactive execution"
     )
+    config.addinivalue_line("markers", "light: marks tests as part of the light path (quick verification)")
+    config.addinivalue_line("markers", "heavy: marks tests as part of the heavy path (benchmarks, full eval)")
 
 
 def pytest_terminal_summary(terminalreporter, exitstatus, config):
@@ -120,6 +122,10 @@ def pytest_terminal_summary(terminalreporter, exitstatus, config):
     suite_label = "INTEGRATION"  # Default
     if "offline" in markexpr.lower():
         suite_label = "OFFLINE"
+    elif "light" in markexpr.lower():
+        suite_label = "LIGHT"
+    elif "heavy" in markexpr.lower():
+        suite_label = "HEAVY"
     elif is_integration and is_manual:
         suite_label = "FULL"
     elif is_manual and not is_integration:
@@ -193,6 +199,18 @@ def pytest_addoption(parser):
         default=False,
         help="Run manual tests that require human interaction or specific environment state",
     )
+    parser.addoption(
+        "--run-heavy",
+        action="store_true",
+        default=False,
+        help="Run heavy tests (benchmarks, full evaluations) that take a long time",
+    )
+    parser.addoption(
+        "--run-light",
+        action="store_true",
+        default=False,
+        help="Run only light path tests for quick verification",
+    )
 
 
 def pytest_collection_modifyitems(config, items):
@@ -205,12 +223,18 @@ def pytest_collection_modifyitems(config, items):
         reason="Requires external services(DB/API), use --run-integration to run"
     )
     skip_manual = pytest.mark.skip(reason="Manual test, use --run-manual to run")
+    skip_heavy = pytest.mark.skip(reason="Heavy/slow test, use --run-heavy to run")
+    skip_light = pytest.mark.skip(reason="Not a light test, use --run-light to exclude")
 
     for item in items:
         if "integration" in item.keywords and not config.getoption("--run-integration"):
             item.add_marker(skip_integration)
         if "manual" in item.keywords and not config.getoption("--run-manual"):
             item.add_marker(skip_manual)
+        if "heavy" in item.keywords and not config.getoption("--run-heavy"):
+            item.add_marker(skip_heavy)
+        if config.getoption("--run-light") and "light" not in item.keywords:
+            item.add_marker(skip_light)
 
 
 @pytest.fixture(scope="session")

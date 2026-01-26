@@ -4,14 +4,13 @@ This is the central directory for all project-specific planning, tracking, and i
 
 ## 🎯 Current Objective
 
-- **Task**: Refactor Project Structure (lightrag-07t)
+- **Task**: Standardize Evaluation & Testing (lightrag-doc-test)
 - **Status**: [✓] COMPLETED
-- **Result**: Workspace structure aligned with "Progressive Disclosure" principles. Global docs symlinked.
-- **Next Step**: Set up evaluation framework (RAGAS + Langfuse)
+- **Result**: Tiered testing (Light/Heavy), Integrated Langfuse Tracing, Comprehensive Evaluation Docs.
+- **Next Step**: Implement performance-focused graph reranking.
 
 ## 🚀 Active Work
 
-- **[ACE Prototype Documentation](../../docs/ACE_PROTOTYPE.md)**: Details of the implemented Agentic Context Evolution prototype.
 - **[Implementation Plan](ImplementationPlan.md)**: Detailed technical breakdown of current and upcoming phases.
 - **[Task Tracker (Beads)](https://github.com/steveyegge/beads)**: Absolute source of truth for Project Tasks (`bd list`).
 
@@ -22,6 +21,9 @@ This is the central directory for all project-specific planning, tracking, and i
 ## 📖 Instructions & Guides (Local)
 
 - **[Project README](../../README.md)**: Main project documentation.
+- **[Observability & Langfuse](../../docs/OBSERVABILITY.md)**: Setup and benefits of Langfuse tracing.
+- **[Evaluation & RAGAS](../../docs/EVALUATION.md)**: How to run and interpret RAGAS benchmarks.
+- **[ACE Framework](../../docs/ACE_FRAMEWORK.md)**: High-level overview of Agentic Context Evolution.
 - **[Local Setup Hints](../../docs/local_setup_hints.md)**: specific commands for manual testing.
 - **[Frontend Build Guide](../../docs/FrontendBuildGuide.md)**: Instructions for building the WebUI.
 - **[Docker Deployment](../../docs/DockerDeployment.md)**: Guide for containerized setup.
@@ -34,10 +36,11 @@ This is the central directory for all project-specific planning, tracking, and i
 
 ## 📈 Recent Accomplishments
 
+- ✓ **Evaluation & Testing Standardization** (2026-01-26): Implemented tiered testing (Light/Heavy), integrated Langfuse, and created documentation for RAGAS and ACE.
 - ✓ **Refactor Project Structure** (2026-01-26): Cleaned up workspace, moved docs, created global symlinks.
 - ✓ **ACE Minimal Prototype** (2026-01-22): Implemented and verified the Core Loop (Generate-Reflect-Curate).
 - ✓ **Ragas Compatibility Fix** (2026-01-22): Resolved `TypeError` in Ragas 0.4.3 using Legacy wrappers.
 - ✓ **Baseline RAGAS Evaluation** (2026-01-22): Preliminary pass successful.
 
 ---
-*Last Updated: 2026-01-26*
+Last Updated: 2026-01-26
