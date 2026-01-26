@@ -293,6 +293,7 @@ class LogEntry(BaseModel):
     message: str
     context: dict = {}
 
+
 def create_app(args):
     # Check frontend build first and get status
     webui_assets_exist, is_frontend_outdated = check_frontend_build()
@@ -1117,7 +1118,6 @@ def create_app(args):
     app.include_router(create_query_routes(rag, api_key, args.top_k))
     app.include_router(create_graph_routes(rag, api_key))
     app.include_router(create_highlight_routes(api_key))
-
 
     # Legacy redirect for /upload to /documents/upload
     @app.post("/upload", include_in_schema=False)

@@ -1717,10 +1717,11 @@ def get_pipeline_status_lock(
         "pipeline_status", workspace=actual_workspace, enable_logging=enable_logging
     )
 
+
 def append_pipeline_log(pipeline_status: dict, message: str, level: int = 20):
     """
     Append a message to the pipeline status history if it meets the log level criteria.
-    
+
     Args:
         pipeline_status: The pipeline status dictionary
         message: The message to append
@@ -1728,8 +1729,8 @@ def append_pipeline_log(pipeline_status: dict, message: str, level: int = 20):
     """
     # Get current log level, default to WARNING (30) if not set
     # This matches standard Python logging defaults where INFO (20) < WARNING (30)
-    current_level = pipeline_status.get("log_level", 30) 
-    
+    current_level = pipeline_status.get("log_level", 30)
+
     if level >= current_level:
         if "history_messages" in pipeline_status:
             pipeline_status["history_messages"].append(message)

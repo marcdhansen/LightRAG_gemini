@@ -145,7 +145,7 @@ function App() {
         }
       } catch (error) {
         console.error('Critical initialization error caught in App:', error);
-        // We catch here to allow the app to finish loading if possible, 
+        // We catch here to allow the app to finish loading if possible,
         // or let the ErrorBoundary handle it if we re-throw.
         if (error instanceof InvalidApiKeyError || error instanceof RequireApiKeError) {
           console.log('Auth required/invalid - keeping initializing=false to show Login or alert');

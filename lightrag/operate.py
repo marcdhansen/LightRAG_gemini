@@ -3968,7 +3968,9 @@ async def _merge_all_chunks(
         f"Round-robin merged chunks: {origin_len} -> {len(merged_chunks)} (deduplicated {origin_len - len(merged_chunks)})"
     )
 
-    logger.debug(f"[_merge_all_chunks] Merged {len(merged_chunks)} chunks. Sample chunk: {merged_chunks[0] if merged_chunks else 'None'}")
+    logger.debug(
+        f"[_merge_all_chunks] Merged {len(merged_chunks)} chunks. Sample chunk: {merged_chunks[0] if merged_chunks else 'None'}"
+    )
     return merged_chunks
 
 
@@ -4286,23 +4288,23 @@ async def _get_node_data(
         entities_vdb, MemgraphVectorStorage
     ):
         logger.info("[Memgraph] Executing unified neighbor search (Vector+Graph)")
-        
+
         # Compute embedding for the query keywords string
         query_embedding_res = await entities_vdb.embedding_func([query])
         query_embedding = query_embedding_res[0]
         if hasattr(query_embedding, "tolist"):
-             query_embedding = query_embedding.tolist()
+            query_embedding = query_embedding.tolist()
 
         node_datas = await knowledge_graph_inst.get_unified_neighbor_search(
             query_embedding=query_embedding,
             top_k=query_param.top_k,
             vector_index_name=entities_vdb.label,
-            cosine_threshold=entities_vdb.cosine_better_than_threshold
+            cosine_threshold=entities_vdb.cosine_better_than_threshold,
         )
-        
+
         # If unified search returns nothing, return empty
         if not node_datas:
-             return [], []
+            return [], []
 
         use_relations = await _find_most_related_edges_from_entities(
             node_datas,
@@ -4592,33 +4594,33 @@ async def _get_edge_data(
     if isinstance(knowledge_graph_inst, MemgraphStorage) and isinstance(
         relationships_vdb, MemgraphVectorStorage
     ):
-       logger.info("[Memgraph] Executing unified edge search (Vector+Graph)")
-       
-       query_embedding_res = await relationships_vdb.embedding_func([keywords])
-       query_embedding = query_embedding_res[0]
-       if hasattr(query_embedding, "tolist"):
-             query_embedding = query_embedding.tolist()
-       
-       edge_datas = await knowledge_graph_inst.get_unified_edge_search(
+        logger.info("[Memgraph] Executing unified edge search (Vector+Graph)")
+
+        query_embedding_res = await relationships_vdb.embedding_func([keywords])
+        query_embedding = query_embedding_res[0]
+        if hasattr(query_embedding, "tolist"):
+            query_embedding = query_embedding.tolist()
+
+        edge_datas = await knowledge_graph_inst.get_unified_edge_search(
             query_embedding=query_embedding,
             top_k=query_param.top_k,
             vector_index_name=relationships_vdb.label,
-            cosine_threshold=relationships_vdb.cosine_better_than_threshold
-       )
-       
-       if not edge_datas:
+            cosine_threshold=relationships_vdb.cosine_better_than_threshold,
+        )
+
+        if not edge_datas:
             return [], []
 
-       use_entities = await _find_most_related_entities_from_relationships(
+        use_entities = await _find_most_related_entities_from_relationships(
             edge_datas,
             query_param,
             knowledge_graph_inst,
         )
 
-       logger.info(
+        logger.info(
             f"Global query (Unified): {len(use_entities)} entites, {len(edge_datas)} relations"
-       )
-       return edge_datas, use_entities
+        )
+        return edge_datas, use_entities
 
     logger.info(
         f"Query edges: {keywords} (top_k:{query_param.top_k}, cosine:{relationships_vdb.cosine_better_than_threshold})"

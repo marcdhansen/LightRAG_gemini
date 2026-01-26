@@ -2916,14 +2916,19 @@ class LightRAG:
             dict[str, str]: Final operation status
         """
         logger.info(f"[{self.workspace}] Dropping all data from all storages...")
-        
+
         results = []
-        
+
         # 1. Drop KV storages
         for kv_storage in [
-            self.full_docs, self.text_chunks, self.full_entities, 
-            self.full_relations, self.entity_chunks, self.relation_chunks,
-            self.doc_status, self.llm_response_cache
+            self.full_docs,
+            self.text_chunks,
+            self.full_entities,
+            self.full_relations,
+            self.entity_chunks,
+            self.relation_chunks,
+            self.doc_status,
+            self.llm_response_cache,
         ]:
             if kv_storage:
                 results.append(await kv_storage.drop())
@@ -2940,8 +2945,11 @@ class LightRAG:
         # Check for any errors
         if any(r.get("status") == "error" for r in results):
             errors = [r.get("message") for r in results if r.get("status") == "error"]
-            return {"status": "error", "message": f"Some drops failed: {'; '.join(errors)}"}
-            
+            return {
+                "status": "error",
+                "message": f"Some drops failed: {'; '.join(errors)}",
+            }
+
         logger.info(f"[{self.workspace}] All data dropped successfully.")
         return {"status": "success", "message": "all data dropped"}
 

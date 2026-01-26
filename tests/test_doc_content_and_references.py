@@ -173,8 +173,10 @@ def test_document_content_and_reference_streaming(test_document):
         if target_ref is None:
             print("\n❌ Target document not found! Retrieved references:")
             for ref in reference_items:
-                print(f"   - ID: {ref.get('reference_id')} | DocID: {ref.get('doc_id')} | File: {ref.get('file_path')}")
-        
+                print(
+                    f"   - ID: {ref.get('reference_id')} | DocID: {ref.get('doc_id')} | File: {ref.get('file_path')}"
+                )
+
         assert (
             target_ref is not None
         ), f"Our document {doc_id} was not among the retrieved references"
@@ -226,11 +228,11 @@ def test_query_references_non_streaming(test_document):
     references = data["references"]
 
     our_ref = next((r for r in references if r["reference_id"] == doc_id), None)
-    
+
     if our_ref is None:
         print("\n❌ Target document not found! Retrieved references:")
         for ref in references:
-             print(f"   - ID: {ref.get('reference_id')} | File: {ref.get('file_path')}")
+            print(f"   - ID: {ref.get('reference_id')} | File: {ref.get('file_path')}")
 
     assert our_ref is not None, "Our document not found in references"
     assert "content" in our_ref

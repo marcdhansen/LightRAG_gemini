@@ -534,7 +534,7 @@ class MemgraphStorage(BaseGraphStorage):
                     RETURN g_node, degree, similarity
                     ORDER BY similarity DESC
                     """
-                    
+
                     result = await session.run(
                         query,
                         index_name=idx_name,
@@ -552,25 +552,28 @@ class MemgraphStorage(BaseGraphStorage):
                         node_props = dict(g_node)
                         # Clean up labels
                         if "labels" in node_props:
-                             node_props["labels"] = [
-                                l for l in node_props["labels"]
-                                if l != workspace_label
-                             ]
-                        
+                            node_props["labels"] = [
+                                label
+                                for label in node_props["labels"]
+                                if label != workspace_label
+                            ]
+
                         # Add computed rank/degree to match operate.py expectation
                         node_props["rank"] = degree
-                        
+
                         nodes.append(node_props)
-                    
+
                     await result.consume()
                     return nodes
 
                 except Exception as e:
                     last_exception = e
-                    continue # Try next index name
+                    continue  # Try next index name
 
             # If we exhausted all indices or failed
-            logger.warning(f"[{self.workspace}] Unified neighbor search failed with specialized indices. Error: {last_exception}")
+            logger.warning(
+                f"[{self.workspace}] Unified neighbor search failed with specialized indices. Error: {last_exception}"
+            )
             return []
 
     async def get_unified_edge_search(
@@ -584,8 +587,8 @@ class MemgraphStorage(BaseGraphStorage):
         Unified search: Vector Search (Relations) -> Get Edge Properties
         """
         if self._driver is None:
-             raise RuntimeError("Memgraph driver is not initialized.")
-        
+            raise RuntimeError("Memgraph driver is not initialized.")
+
         potential_index_names = [
             vector_index_name,
             f"{vector_index_name}_idx",
@@ -617,15 +620,15 @@ class MemgraphStorage(BaseGraphStorage):
                         embedding=query_embedding,
                         threshold=cosine_threshold,
                     )
-                    
+
                     edges = []
                     async for record in result:
                         edge = record["r"]
                         src = record["src"]
                         tgt = record["tgt"]
-                        
+
                         edge_props = dict(edge)
-                        
+
                         # Ensure we return valid relation data structure
                         if "weight" not in edge_props:
                             edge_props["weight"] = 1.0
@@ -634,18 +637,20 @@ class MemgraphStorage(BaseGraphStorage):
                             "src_id": src["entity_id"],
                             "tgt_id": tgt["entity_id"],
                             "created_at": edge_props.get("created_at"),
-                             **edge_props
+                            **edge_props,
                         }
                         edges.append(combined)
-                    
+
                     await result.consume()
                     return edges
 
                 except Exception as e:
                     last_exception = e
                     continue
-            
-            logger.warning(f"[{self.workspace}] Unified edge search failed: {last_exception}")
+
+            logger.warning(
+                f"[{self.workspace}] Unified edge search failed: {last_exception}"
+            )
             return []
 
     async def upsert_node(self, node_id: str, node_data: dict[str, str]) -> None:

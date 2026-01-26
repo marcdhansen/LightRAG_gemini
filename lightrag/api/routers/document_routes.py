@@ -85,10 +85,12 @@ router = APIRouter(
 # Temporary file prefix
 temp_prefix = "__tmp__"
 
+
 class LogEntry(BaseModel):
     level: str
     message: str
     context: dict = {}
+
 
 @router.post("/log", include_in_schema=False)
 async def log_message(entry: LogEntry):
@@ -96,7 +98,7 @@ async def log_message(entry: LogEntry):
     msg = f"[Frontend] {entry.message}"
     if entry.context:
         msg += f" | {entry.context}"
-    
+
     if entry.level.lower() == "error":
         logger.error(msg)
     elif entry.level.lower() == "warn" or entry.level.lower() == "warning":
@@ -476,7 +478,9 @@ class DocStatusResponse(BaseModel):
     metadata: Optional[dict[str, Any]] = Field(
         default=None, description="Additional metadata about the document"
     )
-    file_path: Optional[str] = Field(default=None, description="Path to the document file")
+    file_path: Optional[str] = Field(
+        default=None, description="Path to the document file"
+    )
 
     model_config = ConfigDict(
         json_schema_extra={
@@ -801,16 +805,20 @@ class PipelineStatusResponse(BaseModel):
 
 class LogLevelUpdateRequest(BaseModel):
     """Request model for updating pipeline log level"""
-    
-    log_level: int = Field(..., description="New log level (10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL)")
+
+    log_level: int = Field(
+        ...,
+        description="New log level (10=DEBUG, 20=INFO, 30=WARNING, 40=ERROR, 50=CRITICAL)",
+    )
 
     @field_validator("log_level")
     @classmethod
     def validate_log_level(cls, v: int) -> int:
         if v not in [0, 10, 20, 30, 40, 50]:
-             raise ValueError("Log level must be one of: 0 (NOTSET), 10 (DEBUG), 20 (INFO), 30 (WARNING), 40 (ERROR), 50 (CRITICAL)")
+            raise ValueError(
+                "Log level must be one of: 0 (NOTSET), 10 (DEBUG), 20 (INFO), 30 (WARNING), 40 (ERROR), 50 (CRITICAL)"
+            )
         return v
-
 
     model_config = ConfigDict(
         extra="allow"
@@ -1948,7 +1956,9 @@ async def background_delete_documents(
                                 logger.warning(security_msg)
                                 async with pipeline_status_lock:
                                     pipeline_status["latest_message"] = security_msg
-                                    append_pipeline_log(pipeline_status, security_msg, 30)
+                                    append_pipeline_log(
+                                        pipeline_status, security_msg, 30
+                                    )
                             else:
                                 # check and delete files from input_dir directory
                                 if safe_file_path.exists():
@@ -2008,7 +2018,9 @@ async def background_delete_documents(
                                                         "latest_message"
                                                     ] = file_error_msg
                                                     append_pipeline_log(
-                                                        pipeline_status, file_error_msg, 40
+                                                        pipeline_status,
+                                                        file_error_msg,
+                                                        40,
                                                     )
                                         else:
                                             security_msg = f"Security violation: Unsafe enqueued file path detected - {enqueued_file.name}"
@@ -2565,7 +2577,7 @@ def create_document_routes(
     ):
         """
         Update the pipeline log level.
-        
+
         Args:
             request: The log level update request containing the new level.
         """
@@ -2574,22 +2586,21 @@ def create_document_routes(
                 get_namespace_data,
                 get_internal_lock,
             )
-            
+
             pipeline_status = await get_namespace_data(
                 "pipeline_status", workspace=rag.workspace
             )
-            
+
             async with get_internal_lock():
                 pipeline_status["log_level"] = request.log_level
-                
+
             return {
-                "status": "success", 
-                "message": f"Log level updated to {request.log_level}"
+                "status": "success",
+                "message": f"Log level updated to {request.log_level}",
             }
         except Exception as e:
             logger.error(f"Error updating pipeline log level: {e}")
             raise HTTPException(status_code=500, detail=str(e))
-
 
     @router.get(
         "/pipeline_status",
@@ -2909,7 +2920,6 @@ def create_document_routes(
             ),
             background_tasks,
         )
-
 
     @router.post(
         "/clear_cache",
