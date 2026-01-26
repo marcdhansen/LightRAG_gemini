@@ -36,8 +36,6 @@ lightrag/evaluation/
 
 **Quick Test:** Index files from `sample_documents/` into LightRAG, then run the evaluator to reproduce results (~89-100% RAGAS score per question).
 
-
-
 ## 🚀 Quick Start
 
 ### 1. Install Dependencies
@@ -55,27 +53,32 @@ pip install -e ".[evaluation]"
 ### 2. Run Evaluation
 
 **Basic usage (uses defaults):**
+
 ```bash
 cd /path/to/LightRAG
 python lightrag/evaluation/eval_rag_quality.py
 ```
 
 **Specify custom dataset:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py --dataset my_test.json
 ```
 
 **Specify custom RAG endpoint:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py --ragendpoint http://my-server.com:9621
 ```
 
 **Specify both (short form):**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py -d my_test.json -r http://localhost:9621
 ```
 
 **Get help:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py --help
 ```
@@ -91,12 +94,52 @@ results/
 ```
 
 **Results include:**
+
 - ✅ Overall RAGAS score
 - 📊 Per-metric averages (Faithfulness, Answer Relevance, Context Recall, Context Precision)
 - 📋 Individual test case results
 - 📈 Performance breakdown by question
 
+## 🔭 Langfuse Observability
 
+ The evaluation framework integrates with **Langfuse** for real-time tracing and observability. This allows you to visualize:
+
+- Full RAG pipeline execution
+- RAGAS metric evaluation logic
+- LLM inputs and outputs
+- Latency and token usage
+
+### 1. Start Langfuse Locally
+
+ The project includes a pre-configured Docker Compose file for Langfuse (located in `langfuse_docker/`):
+
+ ```bash
+ cd langfuse_docker
+ docker-compose up -d
+ ```
+
+ Langfuse will be available at [http://localhost:3000](http://localhost:3000). The default credentials for the local instance are:
+
+- **Host**: `http://localhost:3000`
+- **Public Key**: `pk-lf-lightrag`
+- **Secret Key**: `sk-lf-lightrag`
+
+### 2. Enable Tracing
+
+ Set the following environment variables (or update your `.env`):
+
+ ```bash
+ LANGFUSE_ENABLE_TRACE=true
+ LANGFUSE_HOST=http://localhost:3000
+ LANGFUSE_PUBLIC_KEY=pk-lf-lightrag
+ LANGFUSE_SECRET_KEY=sk-lf-lightrag
+ ```
+
+### 3. View Traces
+
+ Once enabled, running the evaluation script will automatically stream traces to Langfuse. You can monitor the progress and drill down into specific test cases in the Langfuse dashboard.
+
+ ---
 
 ## 📋 Command-Line Arguments
 
@@ -110,36 +153,40 @@ The evaluation script supports command-line arguments for easy configuration:
 ### Usage Examples
 
 **Use default dataset and endpoint:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py
 ```
 
 **Custom dataset with default endpoint:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py --dataset path/to/my_dataset.json
 ```
 
 **Default dataset with custom endpoint:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py --ragendpoint http://my-server.com:9621
 ```
 
 **Custom dataset and endpoint:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py -d my_dataset.json -r http://localhost:9621
 ```
 
 **Absolute path to dataset:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py -d /path/to/custom_dataset.json
 ```
 
 **Show help message:**
+
 ```bash
 python lightrag/evaluation/eval_rag_quality.py --help
 ```
-
-
 
 ## ⚙️ Configuration
 
@@ -148,6 +195,7 @@ python lightrag/evaluation/eval_rag_quality.py --help
 The evaluation framework supports customization through environment variables:
 
 **⚠️ IMPORTANT: Both LLM and Embedding endpoints MUST be OpenAI-compatible**
+
 - The RAGAS framework requires OpenAI-compatible API interfaces
 - Custom endpoints must implement the OpenAI API format (e.g., vLLM, SGLang, LocalAI)
 - Non-compatible endpoints will cause evaluation failures
@@ -171,13 +219,16 @@ The evaluation framework supports customization through environment variables:
 ### Usage Examples
 
 **Example 1: Default Configuration (OpenAI Official API)**
+
 ```bash
 export OPENAI_API_KEY=sk-xxx
 python lightrag/evaluation/eval_rag_quality.py
 ```
+
 Both LLM and embeddings use OpenAI's official API with default models.
 
 **Example 2: Custom Models on OpenAI**
+
 ```bash
 export OPENAI_API_KEY=sk-xxx
 export EVAL_LLM_MODEL=gpt-4o-mini
@@ -186,6 +237,7 @@ python lightrag/evaluation/eval_rag_quality.py
 ```
 
 **Example 3: Same Custom OpenAI-Compatible Endpoint for Both**
+
 ```bash
 # Both LLM and embeddings use the same custom endpoint
 export EVAL_LLM_BINDING_API_KEY=your-custom-key
@@ -194,9 +246,11 @@ export EVAL_LLM_MODEL=qwen-plus
 export EVAL_EMBEDDING_MODEL=BAAI/bge-m3
 python lightrag/evaluation/eval_rag_quality.py
 ```
+
 Embeddings automatically inherit LLM endpoint configuration.
 
 **Example 4: Separate Endpoints (Cost Optimization)**
+
 ```bash
 # Use OpenAI for LLM (high quality)
 export EVAL_LLM_BINDING_API_KEY=sk-openai-key
@@ -210,9 +264,11 @@ export EVAL_EMBEDDING_MODEL=BAAI/bge-m3
 
 python lightrag/evaluation/eval_rag_quality.py
 ```
+
 LLM uses OpenAI official API, embeddings use local custom endpoint.
 
 **Example 5: Different Custom Endpoints for LLM and Embeddings**
+
 ```bash
 # LLM on one OpenAI-compatible server
 export EVAL_LLM_BINDING_API_KEY=key1
@@ -226,9 +282,11 @@ export EVAL_EMBEDDING_MODEL=custom-embedding
 
 python lightrag/evaluation/eval_rag_quality.py
 ```
+
 Both use different custom OpenAI-compatible endpoints.
 
 **Example 6: Using Environment Variables from .env File**
+
 ```bash
 # Create .env file in project root
 cat > .env << EOF
@@ -247,11 +305,13 @@ python lightrag/evaluation/eval_rag_quality.py
 The evaluation framework includes built-in concurrency control to prevent API rate limiting issues:
 
 **Why Concurrency Control Matters:**
+
 - RAGAS internally makes many concurrent LLM calls for each test case
 - Context Precision metric calls LLM once per retrieved document
 - Without control, this can easily exceed API rate limits
 
 **Default Configuration (Conservative):**
+
 ```bash
 EVAL_MAX_CONCURRENT=2    # Serial evaluation (one test at a time)
 EVAL_QUERY_TOP_K=10      # OP_K query parameter of LightRAG
@@ -267,8 +327,6 @@ EVAL_LLM_TIMEOUT=180     # 3-minute timeout per request
 | **Context Precision returns NaN** | Lower `EVAL_QUERY_TOP_K` to reduce LLM calls per test case |
 | **Rate limit errors (429)** | Increase `EVAL_LLM_MAX_RETRIES` and decrease `EVAL_MAX_CONCURRENT` |
 | **Request timeouts** | Increase `EVAL_LLM_TIMEOUT` to 180 or higher |
-
-
 
 ## 📝 Test Dataset
 
@@ -350,6 +408,7 @@ pip install ragas datasets
 ### "Warning: LM returned 1 generations instead of requested 3" or Context Precision NaN
 
 **Cause**: This warning indicates API rate limiting or concurrent request overload:
+
 - RAGAS makes multiple LLM calls per test case (faithfulness, relevancy, recall, precision)
 - Context Precision calls LLM once per retrieved document (with `EVAL_QUERY_TOP_K=10`, that's 10 calls)
 - Concurrent evaluation multiplies these calls: `EVAL_MAX_CONCURRENT × LLM calls per test`
@@ -357,18 +416,21 @@ pip install ragas datasets
 **Solutions** (in order of effectiveness):
 
 1. **Serial Evaluation** (Default):
+
    ```bash
    export EVAL_MAX_CONCURRENT=1
    python lightrag/evaluation/eval_rag_quality.py
    ```
 
 2. **Reduce Retrieved Documents**:
+
    ```bash
    export EVAL_QUERY_TOP_K=5  # Halves Context Precision LLM calls
    python lightrag/evaluation/eval_rag_quality.py
    ```
 
 3. **Increase Retry & Timeout**:
+
    ```bash
    export EVAL_LLM_MAX_RETRIES=10
    export EVAL_LLM_TIMEOUT=180
@@ -382,10 +444,12 @@ pip install ragas datasets
 ### "AttributeError: 'InstructorLLM' object has no attribute 'agenerate_prompt'" or NaN results
 
 This error occurs with RAGAS 0.3.x when LLM and Embeddings are not explicitly configured. The evaluation framework now handles this automatically by:
+
 - Using environment variables to configure evaluation models
 - Creating proper LLM and Embeddings instances for RAGAS
 
 **Solution**: Ensure you have set one of the following:
+
 - `OPENAI_API_KEY` environment variable (default)
 - `EVAL_LLM_BINDING_API_KEY` for custom API key
 
@@ -403,17 +467,17 @@ python lightrag/evaluation/eval_rag_quality.py
 ### "LightRAG query API errors during evaluation"
 
 The evaluation uses your configured LLM (OpenAI by default). Ensure:
+
 - API keys are set in `.env`
 - Network connection is stable
 
 ### Evaluation requires running LightRAG API
 
 The evaluator queries a running LightRAG API server at `http://localhost:9621`. Make sure:
+
 1. LightRAG API server is running (`python lightrag/api/lightrag_server.py`)
 2. Documents are indexed in your LightRAG instance
 3. API is accessible at the configured URL
-
-
 
 ## 📝 Next Steps
 

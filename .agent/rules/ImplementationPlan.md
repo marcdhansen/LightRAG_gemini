@@ -1,48 +1,36 @@
-# Project Structure Improvement Plan
+# Evaluation Framework Setup (RAGAS + Langfuse)
 
 ## Goal
 
-Restructure the `antigravity_lightrag` workspace to enable "progressive disclosure" of information, distinguishing between Global, Workspace, and Project contexts.
+Establish a robust evaluation pipeline to measure RAG quality (Context Recall, Faithfulness, Answer Relevance) using RAGAS, and visualize traces/metrics in Langfuse.
 
 ## Current State & Analysis
 
-* **Workspace Root** (`antigravity_lightrag/`): Not a git repo. Contains mixed-level content.
-  * `testing.md` (Duplicate of repo file).
-  * `hints.md`, `SECURITY.md` (Need classification).
-  * `docs/`, `references/`, `langfuse/` (Valid workspace resources).
-* **Project Root** (`LightRAG/`): Active Git repo.
+* **Script**: `lightrag/evaluation/eval_rag_quality.py` exists and performs RAGAS evaluation (v0.4.3 compatible).
+* **Infrastructure**: `../langfuse/docker-compose.yml` exists for local Langfuse deployment.
+* **Missing Link**: The evaluation script currently prints results to console/JSON but does not send traces or scores to Langfuse.
 
-## Proposed Hierarchy
+## Proposed Changes
 
-### 1. Global Context (`~/.gemini`)
+### 1. Langfuse Infrastructure
 
-* Standard agent memory and global rules.
+* **Action**: Ensure Langfuse is running locally via Docker.
+* **Config**: Verify `localhost:3000` access and generate API keys.
 
-### 2. Workspace Context (`antigravity_lightrag/`)
+### 2. Code Integration (`lightrag/evaluation/eval_rag_quality.py`)
 
-* **Purpose**: The "Workbench" or "Laboratory". Contains the overarching experiment context, reference materials, and local tooling that surrounds the main project.
-* **New Files**:
-  * `[NEW] WORKSPACE_README.md`: The entry point. Explains that this folder contains the LightRAG project plus research implementation details (Memgraph, Langfuse setup) and papers.
-* **Cleanup**:
-  * `[DELETE] testing.md` (Duplicate).
-  * `[MOVE] hints.md` -> `LightRAG/docs/local_setup_hints.md` (if specific to running code) OR keep as `workspace_notes.md`.
-  * `[MOVE] SECURITY.md` -> `LightRAG/SECURITY.md` (security usually belongs to the codebase).
+* **[NEW] Environment Variables**: Add `LANGFUSE_SECRET_KEY`, `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_HOST` to `.env`.
+* **[MODIFY] Ragas Callbacks**:
+  * Initialize `langfuse.callback.LangfuseCallbackHandler`.
+  * Pass handler to Ragas `evaluate()` function.
 
-### 3. Project Context (`LightRAG/`)
+### 3. Documentation
 
-* **Purpose**: The reusable software artifact.
-* **Changes**:
-  * Receive moved files (`SECURITY.md`).
-  * Ensure `README.md` is self-contained for the logic.
-
-### 4. Global Links & Skills
-
-* **Symlink**: Create a symlink `LightRAG/global_docs` -> `~/.gemini/` to allow easy access to global rules/memory from the project root.
-* **Skills**: Use the `Librarian` skill to verify and index the new structure.
+* **[UPDATE] `README_EVALUASTION_RAGAS.md`**: Add Langfuse setup instructions.
 
 ## Verification Plan
 
-1. **Structure Check**: `ls -F ..` and `ls -F .` to verify clean separation.
-2. **Symlink Check**: Verify `readlink LightRAG/global_docs` works.
-3. **Git Status**: `git status` in `LightRAG` to ensure moved files are tracked (symlinks usually should be ignored or handled carefully if personal). *Correction*: Accessing `~/.gemini` involves absolute paths that might not be portable. Instead of a symlink in git, we might just provide a script or a local (non-committed) symlink. User asked for it, we will create it but add to `.gitignore`.
-4. **User Review**: Ask user to verify `WORKSPACE_README.md`.
+1. **Start Langfuse**: `cd ../langfuse && docker-compose up -d`.
+2. **Configure**: Login to Langfuse, create project, get keys.
+3. **Run Eval**: `uv run lightrag/evaluation/eval_rag_quality.py` (using sample dataset).
+4. **Verify**: Check Langfuse UI for new traces and scores.

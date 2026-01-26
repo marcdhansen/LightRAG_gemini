@@ -99,6 +99,7 @@ try:
     from langchain_openai import ChatOpenAI, OpenAIEmbeddings
     from langchain_community.embeddings import OllamaEmbeddings
     from tqdm.auto import tqdm
+    from langfuse.langchain import CallbackHandler as LangfuseCallbackHandler
 
     RAGAS_AVAILABLE = True
 
@@ -500,6 +501,14 @@ class RAGEvaluator:
                         # Give tqdm time to initialize and claim its screen position
                         await asyncio.sleep(0.05)
 
+                    callbacks = []
+                    if os.getenv("LANGFUSE_ENABLE_TRACE", "false").lower() == "true":
+                        try:
+                            langfuse_handler = LangfuseCallbackHandler()
+                            callbacks.append(langfuse_handler)
+                        except Exception as e:
+                            logger.warning("Failed to initialize Langfuse callback: %s", e)
+
                     eval_results = evaluate(
                         dataset=eval_dataset,
                         metrics=[
@@ -512,6 +521,7 @@ class RAGEvaluator:
                         embeddings=self.eval_embeddings,
                         run_config=RunConfig(timeout=self.eval_timeout, max_workers=1),
                         _pbar=pbar,
+                        callbacks=callbacks,
                     )
 
                     # Convert to DataFrame (RAGAS v0.3+ API)
@@ -891,10 +901,14 @@ class RAGEvaluator:
             "max_ragas_score": round(max_score, 4),
         }
 
-    async def run(self) -> Dict[str, Any]:
+    async def run(self, limit: int = None) -> Dict[str, Any]:
         """Run complete evaluation pipeline"""
 
         start_time = time.time()
+
+        if limit:
+            logger.info("Setting limit to %d test cases", limit)
+            self.test_cases = self.test_cases[:limit]
 
         # Evaluate responses
         results = await self.evaluate_responses()
@@ -1022,6 +1036,14 @@ Examples:
             help="LightRAG API endpoint URL (default: http://localhost:9621 or $LIGHTRAG_API_URL environment variable)",
         )
 
+        parser.add_argument(
+            "--limit",
+            "-l",
+            type=int,
+            default=None,
+            help="Limit the number of test cases to evaluate",
+        )
+
         args = parser.parse_args()
 
         logger.info("%s", "=" * 70)
@@ -1031,7 +1053,7 @@ Examples:
         evaluator = RAGEvaluator(
             test_dataset_path=args.dataset, rag_api_url=args.ragendpoint
         )
-        await evaluator.run()
+        await evaluator.run(limit=args.limit)
     except Exception as e:
         logger.exception("❌ Error: %s", e)
         sys.exit(1)
