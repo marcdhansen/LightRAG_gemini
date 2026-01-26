@@ -15,6 +15,7 @@ import { toast } from 'sonner'
 import { copyToClipboard } from '@/utils/clipboard'
 import { ReferenceDocumentViewer } from '@/components/retrieval/ReferenceDocumentViewer'
 import type { QueryMode, ReferenceItem } from '@/api/lightrag'
+import UserPromptInputWithHistory from '@/components/ui/UserPromptInputWithHistory'
 
 // Helper function to generate unique IDs with browser compatibility
 const generateUniqueId = () => {
@@ -640,6 +641,7 @@ export default function RetrievalTesting() {
   const clearMessages = useCallback(() => {
     setMessages([])
     useSettingsStore.getState().setRetrievalHistory([])
+    useSettingsStore.getState().setUserPromptHistory([])
   }, [setMessages])
 
   // Handle copying message content with robust clipboard support
@@ -818,17 +820,30 @@ export default function RetrievalTesting() {
                 }}
               />
             ) : (
-              <Input
+              <UserPromptInputWithHistory
                 ref={inputRef as React.RefObject<HTMLInputElement>}
                 id="query-input"
-                autoComplete="on"
                 className="w-full"
                 value={inputValue}
-                onChange={handleChange}
+                onChange={(value) => {
+                  setInputValue(value)
+                  if (inputError) setInputError('')
+                }}
+                history={useSettingsStore.getState().userPromptHistory}
+                onSelectFromHistory={(prompt) => {
+                  setInputValue(prompt)
+                  if (inputRef.current) {
+                    inputRef.current.focus()
+                  }
+                }}
+                onDeleteFromHistory={(index) => {
+                  const currentHistory = useSettingsStore.getState().userPromptHistory
+                  const newHistory = [...currentHistory]
+                  newHistory.splice(index, 1)
+                  useSettingsStore.getState().setUserPromptHistory(newHistory)
+                }}
                 onKeyDown={handleKeyDown}
-                onPaste={handlePaste}
                 placeholder={t('retrievePanel.retrieval.placeholder')}
-                disabled={isLoading}
               />
             )}
             {/* Error message below input */}

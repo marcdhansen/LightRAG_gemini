@@ -146,6 +146,7 @@ test = [
     "pgvector",
     "pre-commit",
     "ruff",
+    "pytest-playwright>=0.4.4",
 ]
 
 evaluation = [
