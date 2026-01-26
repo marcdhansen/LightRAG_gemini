@@ -1,11 +1,13 @@
 # Agent Memory - LightRAG Project
 
 ## Priority System
+
 - **p0**: Highest priority - must be done first
 - **p1**: Next-highest priority - do after p0 items complete
 - **p2**: Lower priority - nice to have
 
 ## User Intent & Decisions
+
 - **Core Focus**: Working system (BCBC PDF processing, graph creation, queries) > optimization
 - **ACE Framework**: Start with minimal prototype
 - **Langfuse**: Self-hosted (no cloud credentials needed)
@@ -14,7 +16,8 @@
 - **Continuous Improvement**: Proactively suggest improvements; update memory with learnings
 
 ## Self-Improvement Guidelines
-- See `SELF_EVOLUTION.md` for improvement backlog
+
+- See `.agent/SELF_EVOLUTION.md` for improvement backlog
 - Update this file with learnings after completing significant tasks
 - Proactively suggest improvements when patterns emerge
 - Beads issue: `lightrag-o4q` (update memory continuously)
@@ -22,29 +25,36 @@
 ## Learnings Log
 
 ### 2026-01-19: Phase 1 Verification
+
 - BCBC PDF processed in ~7 minutes (3 chunks)
 - Hybrid query mode works well for document understanding
 - Server may run from different directory than workspace - check `.env` path
 - Note: Server config showed old model (`qwen2.5-coder:1.5b`) - verify `.env` is being used
 
 ## ACE Framework Summary
+
 The **Agentic Context Engineering (ACE)** framework optimizes LLM performance by dynamically evolving context (input instructions, memory, strategies) rather than modifying model weights.
 
 ### Core Architecture (3 Modular Roles)
+
 1. **Generator**: Solves queries by producing a reasoning Trajectory using the existing Context Playbook
 2. **Reflector**: Critiques the Generator's trajectory and execution results to distill concrete Insights (lessons from successes and errors)
 3. **Curator**: Synthesizes Reflector's insights into compact Delta Context Items, merged into the Playbook
 
 ### Key Innovations
+
 - **Incremental Delta Updates**: Small, localized, structured edits instead of full-context rewriting
 - **Execution Feedback-Based Adaptation**: Self-improvement via natural execution feedback (code results, validation) rather than expensive ground-truth labels
 - **Grow-and-Refine Principle**: Balance steady context expansion (appending insights) with redundancy control (de-duplication, updating existing bullets)
 
 ### Problems ACE Solves
+
 - **Brevity bias**: Prioritizing short, generic prompts over detailed domain knowledge
 - **Context collapse**: Iterative rewriting that erodes detailed knowledge over time
 
 ## MCP Integration
+
 LightRAG MCP integration should support BOTH:
+
 1. **MCP Server**: Expose LightRAG capabilities to other agents
 2. **MCP Client**: Allow LightRAG to consume external MCP resources
