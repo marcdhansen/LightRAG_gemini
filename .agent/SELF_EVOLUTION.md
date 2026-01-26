@@ -60,6 +60,8 @@ This document tracks ideas for continuous improvement of both the AI agent capab
 ### Operational Learnings
 
 - **Git Repository Location**: The git root is nested in `LightRAG/`. ALWAYS run git commands from `/Users/marchansen/antigravity_lightrag/LightRAG`. The workspace root is NOT a git repository.
+- **Workspace Pattern**: Maintain the distinction between `Workspace` (Experiment/Lab) and `Project` (Git Repo). Always check if the current directory is a wrapper before initializing git or moving files.
+- **Strict Mission Protocol**: Any structural change or code modification MUST have a Beads issue. Run `bd create` upon task definition, not after execution.
 
 ### Model Selection Criteria
 
