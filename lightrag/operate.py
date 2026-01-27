@@ -40,6 +40,7 @@ from lightrag.utils import (
     apply_source_ids_limit,
     merge_source_ids,
     make_relation_chunk_key,
+    apply_rerank_if_enabled,
 )
 from lightrag.base import (
     BaseGraphStorage,
@@ -3695,6 +3696,55 @@ async def _perform_kg_search(
     }
 
 
+async def rerank_graph_elements(
+    query: str,
+    elements: list[dict],
+    global_config: dict,
+    element_type: str,
+    query_param: QueryParam,
+) -> list[dict]:
+    """
+    Rerank graph elements (entities or relations) based on relevance to the query.
+    """
+    if not elements:
+        return elements
+
+    # Format elements for reranking
+    formatted_elements = []
+    for el in elements:
+        if element_type == "entity":
+            content = f"Entity: {el.get('entity_name', '')} | Type: {el.get('entity_type', '')} | Description: {el.get('description', '')}"
+        else:  # relation
+            src = el.get("src_id") or (el.get("src_tgt")[0] if "src_tgt" in el else "")
+            tgt = el.get("tgt_id") or (el.get("src_tgt")[1] if "src_tgt" in el else "")
+            content = f"Relation: {src} -> {tgt} | Description: {el.get('description', '')}"
+
+        # Create a proxy dict for apply_rerank_if_enabled
+        formatted_elements.append({"content": content, "_original": el})
+
+    # Call reranker
+    # Using the same top_k as initial retrieval for now
+    top_n = query_param.top_k
+    reranked_proxies = await apply_rerank_if_enabled(
+        query=query,
+        retrieved_docs=formatted_elements,
+        global_config=global_config,
+        enable_rerank=True,
+        top_n=top_n,
+    )
+
+    # Extract original elements with updated scores
+    results = []
+    for proxy in reranked_proxies:
+        original = proxy["_original"]
+        # Add rerank score if present
+        if "relevance_score" in proxy:
+            original["rerank_score"] = proxy["relevance_score"]
+        results.append(original)
+
+    return results
+
+
 async def _apply_token_truncation(
     search_result: dict[str, Any],
     query_param: QueryParam,
@@ -4198,6 +4248,38 @@ async def _build_query_context(
         else:
             if not search_result["chunk_tracking"]:
                 return None
+
+    # Stage 1.5: Rerank graph elements if enabled
+    if query_param.enable_rerank:
+        if (
+            getattr(query_param, "rerank_entities", True)
+            and search_result["final_entities"]
+        ):
+            logger.info(
+                f"Reranking {len(search_result['final_entities'])} entities..."
+            )
+            search_result["final_entities"] = await rerank_graph_elements(
+                query,
+                search_result["final_entities"],
+                text_chunks_db.global_config,
+                "entity",
+                query_param,
+            )
+
+        if (
+            getattr(query_param, "rerank_relations", True)
+            and search_result["final_relations"]
+        ):
+            logger.info(
+                f"Reranking {len(search_result['final_relations'])} relations..."
+            )
+            search_result["final_relations"] = await rerank_graph_elements(
+                query,
+                search_result["final_relations"],
+                text_chunks_db.global_config,
+                "relation",
+                query_param,
+            )
 
     # Stage 2: Apply token truncation for LLM efficiency
     truncation_result = await _apply_token_truncation(

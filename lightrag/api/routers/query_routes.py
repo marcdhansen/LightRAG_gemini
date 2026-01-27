@@ -92,7 +92,17 @@ class QueryRequest(BaseModel):
 
     enable_rerank: Optional[bool] = Field(
         default=None,
-        description="Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued. Default is True.",
+        description="Enable reranking for retrieved items. If True but no rerank model is configured, a warning will be issued. Default is True.",
+    )
+
+    rerank_entities: Optional[bool] = Field(
+        default=None,
+        description="Whether to rerank retrieved entities if enable_rerank is True.",
+    )
+
+    rerank_relations: Optional[bool] = Field(
+        default=None,
+        description="Whether to rerank retrieved relations if enable_rerank is True.",
     )
 
     include_references: Optional[bool] = Field(

@@ -339,6 +339,10 @@ class RAGEvaluator:
                 # Can be enabled via env var if a reranker is actually configured
                 "enable_rerank": os.environ.get("EVAL_ENABLE_RERANK", "true").lower()
                 == "true",
+                "rerank_entities": os.environ.get("EVAL_RERANK_ENTITIES", "true").lower()
+                == "true",
+                "rerank_relations": os.environ.get("EVAL_RERANK_RELATIONS", "true").lower()
+                == "true",
             }
 
             # Get API key from environment for authentication

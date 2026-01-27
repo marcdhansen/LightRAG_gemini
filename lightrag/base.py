@@ -158,9 +158,16 @@ class QueryParam:
     """
 
     enable_rerank: bool = os.getenv("RERANK_BY_DEFAULT", "true").lower() == "true"
-    """Enable reranking for retrieved text chunks. If True but no rerank model is configured, a warning will be issued.
+    """Enable reranking for retrieved items (chunks, entities, relations).
+    If True but no rerank model is configured, a warning will be issued.
     Default is True to enable reranking when rerank model is available.
     """
+
+    rerank_entities: bool = True
+    """Whether to rerank retrieved entities if enable_rerank is True."""
+
+    rerank_relations: bool = True
+    """Whether to rerank retrieved relations if enable_rerank is True."""
 
     include_references: bool = False
     """If True, includes reference list in the response for supported endpoints.
