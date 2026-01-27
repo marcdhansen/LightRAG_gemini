@@ -1,24 +1,23 @@
-# Task: Phase 5 ACE Curator (lightrag-56n)
+# Task: Skill Enhancement - Flight Director (lightrag-ijs)
 
 ## Status: IN_PROGRESS
 
 ### Objective
 
-Implement the full ACE Curator logic including automated graph pruning, entity deduplication, and incorporating Reflector insights into the Context Playbook.
+Enhance the Flight Director skill to automate SMP validation, specifically for Return To Base (RTB) procedures including temporary file cleanup and documentation linting.
 
 ### Tasks
 
-- [ ] Define the prompt for Curator reflection/action.
-- [ ] Implement `ACECurator.curate` logic to update the Playbook with semantic versioning/lessons.
-- [ ] Implement `ACECurator.apply_repairs` for automated entity merging (deduplication).
-- [ ] Integrate Curator into the Core ACE Loop in `lightrag/core.py`.
-- [ ] Add unit tests for Curator (Repair/Deduplication).
-- [ ] Verify integrated loop with a small document (e.g., `test_ephemeral.txt`).
+- [x] Analyze current `check_flight_readiness.py` logic.
+- [x] Implement detection for temporary `rag_storage_*` directories.
+- [x] Implement detection for common orphan files (`test_output.txt`, `debug_*.py`).
+- [x] Integrate `markdownlint` check for planning documents.
+- [x] Add a "Dry Run" or "Auto-fix" mode if possible, or clear instructions for the agent.
+- [x] Verify the script by running it in the current repo.
 
 ### Steps
 
-1. [ ] Analyze `ACEReflector` output format to ensure `ACECurator` can parse repairs.
-2. [ ] Update `lightrag/ace/curator.py` with expanded logic.
-3. [ ] Update `lightrag/ace/reflector.py` if needed to better suggest repairs.
-4. [ ] Implement a test case for entity deduplication (merging "Einstein" and "Albert Einstein").
-5. [ ] Run integration test.
+1. [ ] Update `ImplementationPlan.md` with the skill enhancement phase.
+2. [ ] Modify `~/.gemini/antigravity/skills/FlightDirector/scripts/check_flight_readiness.py`.
+3. [ ] Test `--pfc` and `--rtb` in the current environment.
+4. [ ] Perform a clean RTB using the new script.

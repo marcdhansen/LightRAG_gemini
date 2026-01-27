@@ -4,9 +4,9 @@ This is the central directory for all project-specific planning, tracking, and i
 
 ## 🎯 Current Objective
 
-- **Task**: Phase 5: ACE Curator (lightrag-curator)
+- **Task**: Infrastructure & Process Improvements (Flight Director, YAML-default)
 - **Status**: ACTIVE
-- **Result**: Automated graph repair and pruning logic.
+- **Result**: Robust automated checks and optimized extraction paths.
 - **Next Step**: Phase 6: ACE Optimizer - Systematic prompt refinement.
 
 ## 🚀 Active Work
