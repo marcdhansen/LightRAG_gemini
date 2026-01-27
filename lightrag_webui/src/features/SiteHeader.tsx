@@ -49,6 +49,9 @@ function TabsNavigation() {
         <NavigationTab value="api" currentTab={currentTab}>
           {t('header.api')}
         </NavigationTab>
+        <NavigationTab value="ace-review" currentTab={currentTab}>
+          ACE Review
+        </NavigationTab>
       </TabsList>
     </div>
   )

@@ -26,6 +26,7 @@ Establish the full ACE cycle in production and provide visual tooling for graph 
 * [x] **UI Integration**: Add reranking toggles and ACE controls to the WebUI.
 * [x] **ACE Asymmetric Routing**: Implement routing logic for Extraction vs. Reflection models (lightrag-043).
 * [x] **ACE Curator (Phase 5)**: Implement graph pruning and deduplication logic (lightrag-56n).
+* [x] **ACE Human-in-the-Loop**: Enable manual review of graph repairs via WebUI (Beads: lightrag-euu).
 
 ## Phase: Infrastructure & Process Improvements (Current)
 

@@ -325,5 +325,16 @@ export type HighlightResponse = {
     sentence_probabilities: number[]
 }
 
+export type RepairType = {
+    id: string
+    action: 'delete_relation' | 'delete_entity' | 'merge_entities'
+    source?: string
+    target?: string
+    name?: string
+    sources?: string[]
+    status: 'pending' | 'approved' | 'rejected'
+    created_at: string
+}
+
 export const InvalidApiKeyError = 'Invalid API Key'
 export const RequireApiKeError = 'API Key required'

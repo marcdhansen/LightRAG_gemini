@@ -20,6 +20,7 @@ class ACEConfig:
     # Evolution Settings
     max_history_items: int = 50
     enable_auto_curation: bool = True
+    enable_human_in_the_loop: bool = False
 
     def __post_init__(self):
         self.ensure_base_dir()

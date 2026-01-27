@@ -71,3 +71,19 @@ During testing with the `qwen2.5-coder:1.5b` model on beekeeping texts, we disco
 ```
 
 This discovery validates the critical need for **ACE Phase 3**, where the **Reflector** will verify edges against source chunks and the **Curator** will prune such illogical connections.
+
+## 👨‍💻 Human-in-the-Loop (HITL) Review
+
+ACE supports a Human-in-the-Loop workflow for graph repairs. When enabled, repair actions (deletions, merges) proposed by the Curator are **staged** rather than automatically applied.
+
+### Configuration
+
+Set `enable_human_in_the_loop=True` in your `ACEConfig`.
+
+### Workflow
+
+1. **Staging**: The Curator identifies necessary repairs but saves them to a pending queue.
+2. **Review**: Users can view pending repairs in the **ACE Review** tab of the WebUI.
+3. **Action**: Users can **Approve** (apply) or **Reject** (discard) each repair.
+
+This ensures that critical graph modifications—especially destructive ones like deletions—are verified by a human expert.

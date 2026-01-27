@@ -35,7 +35,8 @@ import {
   LoginResponse,
   DeleteDocResponse,
   HighlightRequest,
-  HighlightResponse
+  HighlightResponse,
+  RepairType
 } from './types'
 
 // Export basic health check from here too for convenience
@@ -786,5 +787,20 @@ export const updatePipelineLogLevel = async (logLevel: number): Promise<{
  */
 export const getHighlights = async (request: HighlightRequest): Promise<HighlightResponse> => {
   const response = await axiosInstance.post('/highlight', request)
+  return response.data
+}
+
+export const getPendingRepairs = async (): Promise<RepairType[]> => {
+  const response = await axiosInstance.get('/ace/repairs/pending')
+  return response.data
+}
+
+export const approveRepair = async (repairId: string): Promise<any> => {
+  const response = await axiosInstance.post(`/ace/repairs/${repairId}/approve`)
+  return response.data
+}
+
+export const rejectRepair = async (repairId: string): Promise<any> => {
+  const response = await axiosInstance.post(`/ace/repairs/${repairId}/reject`)
   return response.data
 }
