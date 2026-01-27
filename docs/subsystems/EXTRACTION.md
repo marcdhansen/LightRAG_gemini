@@ -69,7 +69,8 @@ When multiple chunks describe the same entity (e.g., "Elon Musk" mentioned in
 
 | Variable | Default | Purpose |
 | :--- | :--- | :--- |
-| `MAX_GLEANING` | 1 | Attempts to extract missed entities from ambiguous text. |
+| `MAX_GLEANING` | 1 | Attempts to extract missed entities from text. |
+
 | `EXTRACTION_FORMAT` | `standard` | Toggle between `standard` and `yaml`. |
 | `ENTITY_TYPES` | `organization,person,...` | Filter for specific categories. |
 
