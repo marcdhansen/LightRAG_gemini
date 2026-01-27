@@ -1,0 +1,21 @@
+{
+  "doc-b3605d9b002cc66b8b98fbe9a59a43f2": {
+    "entity_names": [
+      "Domain",
+      "Chunk",
+      "Answer",
+      "Beekeeper",
+      "LLM",
+      "Heart Disease",
+      "LightRAG",
+      "Metric",
+      "Agriculture",
+      "Query",
+      "Honey Bees"
+    ],
+    "count": 11,
+    "create_time": 1769522810,
+    "update_time": 1769522810,
+    "_id": "doc-b3605d9b002cc66b8b98fbe9a59a43f2"
+  }
+}

@@ -38,3 +38,19 @@ ACE components are integrated into the core LightRAG API and can be triggered vi
 
 - [ACE Core Implementation](../lightrag/ace/)
 - [SOTA Roadmap](SOTA_ROADMAP.md)
+
+## 🔬 Discoveries
+
+### Hallucination by Proximity
+
+During testing with the `qwen2.5-coder:1.5b` model on beekeeping texts, we discovered a "Hallucination by Proximity" phenomenon. The LLM incorrectly created a semantic relationship between **Beekeeper** and **Heart Disease** because the source text mentioned Cardiologists diagnosing heart disease immediately after a paragraph about beekeeping.
+
+**Example Edge:**
+
+```xml
+<edge source="Beekeeper" target="Heart Disease">
+  <data key="d8">Beekeepers diagnose potential heart issues...</data>
+</edge>
+```
+
+This discovery validates the critical need for **ACE Phase 3**, where the **Reflector** will verify edges against source chunks and the **Curator** will prune such illogical connections.

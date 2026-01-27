@@ -1,0 +1,20 @@
+{
+  "doc-b3605d9b002cc66b8b98fbe9a59a43f2": {
+    "status": "processed",
+    "chunks_count": 2,
+    "chunks_list": [
+      "chunk-4079384841456dc0f5cf2c022cc22d4d",
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "content_summary": "--- Page 3 ---\nQuery + LLM\nEntity Name:  Beekeeper\nEntity Type: PERSON\nDescription: A Beekeeper is \nan individual who produces ...\nOriginal Chunks ID: xxx\nSource: Honey Bee\nTarget: Industrial agriculture\nKeywords: Agriculture ...\nDescription:Honey Be...",
+    "content_length": 9549,
+    "created_at": "2026-01-27T14:03:39.717844+00:00",
+    "updated_at": "2026-01-27T14:06:50.523622+00:00",
+    "file_path": "unknown_source",
+    "track_id": "insert_20260127_140339_8b4a6fd3",
+    "metadata": {
+      "processing_start_time": 1769522619,
+      "processing_end_time": 1769522810
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "Beekeeper": {
+    "chunk_ids": [
+      "chunk-4079384841456dc0f5cf2c022cc22d4d"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Beekeeper"
+  },
+  "Agriculture": {
+    "chunk_ids": [
+      "chunk-4079384841456dc0f5cf2c022cc22d4d"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Agriculture"
+  },
+  "Honey Bees": {
+    "chunk_ids": [
+      "chunk-4079384841456dc0f5cf2c022cc22d4d"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Honey Bees"
+  },
+  "Heart Disease": {
+    "chunk_ids": [
+      "chunk-4079384841456dc0f5cf2c022cc22d4d"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Heart Disease"
+  },
+  "LightRAG": {
+    "chunk_ids": [
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "LightRAG"
+  },
+  "LLM": {
+    "chunk_ids": [
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "LLM"
+  },
+  "Query": {
+    "chunk_ids": [
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Query"
+  },
+  "Answer": {
+    "chunk_ids": [
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Answer"
+  },
+  "Domain": {
+    "chunk_ids": [
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Domain"
+  },
+  "Metric": {
+    "chunk_ids": [
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "count": 1,
+    "create_time": 1769522809,
+    "update_time": 1769522809,
+    "_id": "Metric"
+  },
+  "Chunk": {
+    "chunk_ids": [
+      "chunk-cca80148383765d34c05dfbfcd91d252"
+    ],
+    "count": 1,
+    "create_time": 1769522810,
+    "update_time": 1769522810,
+    "_id": "Chunk"
+  }
+}

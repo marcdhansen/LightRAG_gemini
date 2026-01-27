@@ -1,0 +1,22 @@
+{
+  "core_directives": [
+    "Always answer based on the retrieved context.",
+    "If the context is insufficient, state what is missing.",
+    "Maintain a helpful and professional tone."
+  ],
+  "strategies": {
+    "query_handling": "Decompose complex queries into sub-questions.",
+    "error_recovery": "If extraction fails, fallback to keyword search."
+  },
+  "lessons_learned": [
+    "Insight 1: Beekeeping can be a comprehensive approach for diagnosing various ailments including heart disease.",
+    "Beekeeping is a valuable method to diagnose issues related to heart health in bees and can provide insights into how diseases might affect other animals.",
+    "Insight 1: The context provides clear information about the abilities of beekeepers in monitoring hive conditions and managing bees, which are key skills for diagnosing heart issues.",
+    "Bees play a vital role in maintaining healthy hives, which indirectly contributes to the overall well-being of beekeepers. This interaction showcases the importance of observing bees within their environment to detect potential issues such as heart disease, highlighting their contribution to honey production and agricultural productivity.",
+    "Insight 1: Beehive conditions can indirectly contribute to the health of beekeepers",
+    "Insight 2: Monitoring hive conditions is crucial for maintaining a healthy hive and preventing pest infestations",
+    "Insight 3: Utilizing techniques to handle bees effectively is essential for ensuring bee health and productivity."
+  ],
+  "version": 1,
+  "last_updated": ""
+}

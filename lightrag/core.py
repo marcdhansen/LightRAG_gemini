@@ -473,7 +473,7 @@ class LightRAG:
             self.ace_playbook = ContextPlaybook(self.ace_config)
             self.ace_generator = ACEGenerator(self, self.ace_playbook)
             self.ace_reflector = ACEReflector(self)
-            self.ace_curator = ACECurator(self.ace_playbook)
+            self.ace_curator = ACECurator(self, self.ace_playbook)
             logger.info("ACE Framework initialized")
 
         # Handle deprecated parameters
@@ -4094,6 +4094,62 @@ class LightRAG:
             self.amerge_entities(
                 source_entities, target_entity, merge_strategy, target_entity_data
             )
+        )
+
+    async def adelete_entity(self, entity_name: str) -> dict[str, Any]:
+        """Asynchronously delete an entity and all its relationships.
+
+        Removes the entity from the knowledge graph and vector database.
+
+        Args:
+            entity_name: Name of the entity to delete
+
+        Returns:
+            Dictionary containing operation status
+        """
+        from lightrag.utils_graph import adelete_by_entity
+
+        return await adelete_by_entity(
+            self.chunk_entity_relation_graph,
+            self.entities_vdb,
+            self.relationships_vdb,
+            entity_name,
+            self.entity_chunks,
+            self.relation_chunks,
+        )
+
+    def delete_entity(self, entity_name: str) -> dict[str, Any]:
+        loop = always_get_an_event_loop()
+        return loop.run_until_complete(self.adelete_entity(entity_name))
+
+    async def adelete_relation(
+        self, source_entity: str, target_entity: str
+    ) -> dict[str, Any]:
+        """Asynchronously delete a relation between two entities.
+
+        Removes the relation from the knowledge graph and vector database.
+
+        Args:
+            source_entity: Name of the source entity
+            target_entity: Name of the target entity
+
+        Returns:
+            Dictionary containing operation status
+        """
+        from lightrag.utils_graph import adelete_by_relation
+
+        return await adelete_by_relation(
+            self.chunk_entity_relation_graph,
+            self.relationships_vdb,
+            source_entity,
+            target_entity,
+            self.relation_chunks,
+        )
+
+    def delete_relation(self, source_entity: str, target_entity: str) -> dict[str, Any]:
+        loop = always_get_an_event_loop()
+        return loop.run_until_complete(
+            self.adelete_relation(source_entity, target_entity)
         )
 
     async def aexport_data(

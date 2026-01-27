@@ -71,18 +71,41 @@ class ACEGenerator:
 
         # 5. Execute LLM
         # We use the LightRAG instance's configured LLM function
-        # Note: llm_model_func might be wrapped or expect specific kwargs
         try:
             response = await self.rag.llm_model_func(full_prompt)
         except Exception as e:
             logger.error(f"ACE Generator: LLM execution failed: {e}")
             return {"error": "LLM execution failed", "details": str(e)}
 
+        generation_result = {
+            "response": response,
+            "context_data": context_data,
+        }
+
+        # 6. ACE Reflection Loop (Insights & Lessons)
+        trajectory = [{"step": "generation", "status": "Execution successful"}]
+        try:
+            insights = await self.rag.ace_reflector.reflect(query, generation_result)
+            if insights:
+                await self.rag.ace_curator.curate(insights)
+                trajectory.append({"step": "reflection_insights", "status": f"Added {len(insights)} insights"})
+        except Exception as e:
+            logger.error(f"ACE Generator: Reflection/Curation failed: {e}")
+
+        # 7. ACE Graph Repair (New in Phase 3)
+        try:
+            repairs = await self.rag.ace_reflector.reflect_graph_issues(query, generation_result)
+            if repairs:
+                await self.rag.ace_curator.apply_repairs(repairs)
+                trajectory.append({"step": "graph_repair", "status": f"Applied {len(repairs)} repairs"})
+        except Exception as e:
+            logger.error(f"ACE Generator: Graph repair failed: {e}")
+
         return {
             "response": response,
             "context_data": context_data,
             "playbook_used": self.playbook.content.to_dict(),
-            "trajectory": [{"step": "generation", "status": "Execution successful"}],
+            "trajectory": trajectory,
         }
 
     def _format_context_data(self, data: Dict[str, Any]) -> str:
