@@ -44,6 +44,12 @@ RAGAS requires a "Judge LLM" to score the responses. By default, it is configure
 
 RAGAS evaluations are automatically traced in **Langfuse** if enabled. This allows you to inspect the reasoning of the Judge LLM itself.
 
+## 📊 Benchmark Results
+
+For detailed performance analysis of specific features, refer to:
+
+- [Graph Reranking Benchmark (Jan 2026)](GRAPH_RERANKING.md#benchmarking-results) - Demonstrates +13.8% quality improvement using entity/relation prioritization.
+
 ---
 
 ## 📚 Resources

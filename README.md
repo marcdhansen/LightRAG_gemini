@@ -52,6 +52,8 @@
 ---
 
 ## 🎉 News
+
+- [2026.01]🎯[New Feature]: **Graph Reranking**: Optimized retrieval quality by implementing granular reranking for entities and relations, achieving a **+13.8% performance boost** and perfect faithfulness in benchmarks. See [Documentation](./docs/GRAPH_RERANKING.md).
 - [2026.01]🎯[New Feature]: **ACE Framework (Alpha)**: Introduced the Agentic Context Evolution framework for self-improving RAG via a Generate-Reflect-Curate loop.
 - [2025.11]🎯[New Feature]: Integrated **RAGAS for Evaluation** and **Langfuse for Tracing**. Updated the API to return retrieved contexts alongside query results to support context precision metrics.
 - [2025.10]🎯[Scalability Enhancement]: Eliminated processing bottlenecks to support **Large-Scale Datasets Efficiently**.
@@ -97,7 +99,7 @@
 
 The LightRAG Server is designed to provide Web UI and API support. The Web UI facilitates document indexing, knowledge graph exploration, and a simple RAG query interface. LightRAG Server also provide an Ollama compatible interfaces, aiming to emulate LightRAG as an Ollama chat model. This allows AI chat bot, such as Open WebUI, to access LightRAG easily.
 
-* Install from PyPI
+- Install from PyPI
 
 ```bash
 # Using uv (recommended)
@@ -117,7 +119,7 @@ cp env.example .env  # Update the .env with your LLM and embedding configuration
 lightrag-server
 ```
 
-* Installation from Source
+- Installation from Source
 
 ```bash
 git clone https://github.com/marcdhansen/LightRAG_gemini.git
@@ -146,7 +148,7 @@ cp env.example .env  # Update the .env with your LLM and embedding configuration
 lightrag-server
 ```
 
-* Launching the LightRAG Server with Docker Compose
+- Launching the LightRAG Server with Docker Compose
 
 ```bash
 git clone https://github.com/marcdhansen/LightRAG_gemini.git
@@ -160,7 +162,7 @@ docker compose up
 
 ### Install  LightRAG Core
 
-* Install from source (Recommended)
+- Install from source (Recommended)
 
 ```bash
 cd LightRAG
@@ -172,7 +174,7 @@ source .venv/bin/activate  # Activate the virtual environment (Linux/macOS)
 # Or: pip install -e .
 ```
 
-* Install from PyPI
+- Install from PyPI
 
 ```bash
 uv pip install lightrag-hku
@@ -201,7 +203,7 @@ LightRAG's demands on the capabilities of Large Language Models (LLMs) are signi
 
 ### Quick Start for LightRAG Server
 
-* For more information about LightRAG Server, please refer to [LightRAG Server](./lightrag/api/README.md).
+- For more information about LightRAG Server, please refer to [LightRAG Server](./lightrag/api/README.md).
 
 ### Quick Start for LightRAG core
 
@@ -412,7 +414,7 @@ LightRAG requires the utilization of LLM and Embedding models to accomplish docu
 <details>
 <summary> <b>Using Open AI-like APIs</b> </summary>
 
-* LightRAG also supports Open AI-like chat/embeddings APIs:
+- LightRAG also supports Open AI-like chat/embeddings APIs:
 
 ```python
 import os
@@ -462,7 +464,7 @@ async def initialize_rag():
 <details>
 <summary> <b>Using Hugging Face Models</b> </summary>
 
-* If you want to use Hugging Face models, you only need to set LightRAG as follows:
+- If you want to use Hugging Face models, you only need to set LightRAG as follows:
 
 See `lightrag_hf_demo.py`
 
@@ -522,11 +524,11 @@ rag = LightRAG(
 )
 ```
 
-* **Increasing context size**
+- **Increasing context size**
 
 In order for LightRAG to work context should be at least 32k tokens. By default Ollama models have context size of 8k. You can achieve this using one of two ways:
 
-* **Increasing the `num_ctx` parameter in Modelfile**
+- **Increasing the `num_ctx` parameter in Modelfile**
 
 1. Pull the model:
 
@@ -534,25 +536,25 @@ In order for LightRAG to work context should be at least 32k tokens. By default 
 ollama pull qwen2
 ```
 
-2. Display the model file:
+1. Display the model file:
 
 ```bash
 ollama show --modelfile qwen2 > Modelfile
 ```
 
-3. Edit the Modelfile by adding the following line:
+1. Edit the Modelfile by adding the following line:
 
 ```bash
 PARAMETER num_ctx 32768
 ```
 
-4. Create the modified model:
+1. Create the modified model:
 
 ```bash
 ollama create -f Modelfile qwen2m
 ```
 
-* **Setup `num_ctx` via Ollama API**
+- **Setup `num_ctx` via Ollama API**
 
 Tiy can use `llm_model_kwargs` param to configure ollama:
 
@@ -578,7 +580,7 @@ rag = LightRAG(
 >
 > `EmbeddingFunc` cannot be nested. Functions that have been decorated with `@wrap_embedding_func_with_attrs` (such as `openai_embed`, `ollama_embed`, etc.) cannot be wrapped again using `EmbeddingFunc()`. This is why we call `xxx_embed.func` (the underlying unwrapped function) instead of `xxx_embed` directly when creating custom embedding functions.
 
-* **Low RAM GPUs**
+- **Low RAM GPUs**
 
 In order to run this experiment on low RAM GPU you should select small model and tune context window (increasing context increase memory consumption). For example, running this ollama example on repurposed mining GPU with 6Gb of RAM required to set context size to 26k while using `gemma2:2b`. It was able to find 197 entities and 19 relations on `book.txt`.
 
@@ -762,9 +764,9 @@ rag = LightRAG(
 
 To enhance retrieval quality, documents can be re-ranked based on a more effective relevance scoring model. The `rerank.py` file provides three Reranker provider driver functions:
 
-* **Cohere / vLLM**: `cohere_rerank`
-* **Jina AI**: `jina_rerank`
-* **Aliyun**: `ali_rerank`
+- **Cohere / vLLM**: `cohere_rerank`
+- **Jina AI**: `jina_rerank`
+- **Aliyun**: `ali_rerank`
 
 You can inject one of these functions into the `rerank_model_func` attribute of the LightRAG object. This will enable LightRAG's query function to re-order retrieved text blocks using the injected function. For detailed usage, please refer to the `examples/rerank_example.py` file.
 
@@ -886,14 +888,14 @@ rag.insert(documents, file_paths=file_paths)
 
 LightRAG uses 4 types of storage for different purposes:
 
-* KV_STORAGE: llm response cache, text chunks, document information
-* VECTOR_STORAGE: entities vectors, relation vectors, chunks vectors
-* GRAPH_STORAGE: entity relation graph
-* DOC_STATUS_STORAGE: document indexing status
+- KV_STORAGE: llm response cache, text chunks, document information
+- VECTOR_STORAGE: entities vectors, relation vectors, chunks vectors
+- GRAPH_STORAGE: entity relation graph
+- DOC_STATUS_STORAGE: document indexing status
 
 Each storage type has several implementations:
 
-* KV_STORAGE supported implementations:
+- KV_STORAGE supported implementations:
 
 ```
 JsonKVStorage    JsonFile (default)
@@ -902,7 +904,7 @@ RedisKVStorage   Redis
 MongoKVStorage   MongoDB
 ```
 
-* GRAPH_STORAGE supported implementations:
+- GRAPH_STORAGE supported implementations:
 
 ```
 NetworkXStorage      NetworkX (default)
@@ -913,7 +915,7 @@ MemgraphStorage.     Memgraph
 
 > Testing has shown that Neo4J delivers superior performance in production environments compared to PostgreSQL with AGE plugin.
 
-* VECTOR_STORAGE supported implementations:
+- VECTOR_STORAGE supported implementations:
 
 ```
 NanoVectorDBStorage         NanoVector (default)
@@ -924,7 +926,7 @@ QdrantVectorDBStorage       Qdrant
 MongoVectorDBStorage        MongoDB
 ```
 
-* DOC_STATUS_STORAGE: supported implementations:
+- DOC_STATUS_STORAGE: supported implementations:
 
 ```
 JsonDocStatusStorage        JsonFile (default)
@@ -937,9 +939,9 @@ Example connection configurations for each storage type can be found in the `env
 <details>
 <summary> <b>Using Neo4J Storage</b> </summary>
 
-* For production level scenarios you will most likely want to leverage an enterprise solution
-* for KG storage. Running Neo4J in Docker is recommended for seamless local testing.
-* See: https://hub.docker.com/_/neo4j
+- For production level scenarios you will most likely want to leverage an enterprise solution
+- for KG storage. Running Neo4J in Docker is recommended for seamless local testing.
+- See: <https://hub.docker.com/_/neo4j>
 
 ```python
 export NEO4J_URI="neo4j://localhost:7687"
@@ -973,10 +975,10 @@ see test_neo4j.py for a working example.
 
 For production level scenarios you will most likely want to leverage an enterprise solution. PostgreSQL can provide a one-stop solution for you as KV store, VectorDB (pgvector) and GraphDB (apache AGE). PostgreSQL version 16.6 or higher is supported.
 
-* PostgreSQL is lightweight,the whole binary distribution including all necessary plugins can be zipped to 40MB: Ref to [Windows Release](https://github.com/ShanGor/apache-age-windows/releases/tag/PG17%2Fv1.5.0-rc0) as it is easy to install for Linux/Mac.
-* If you prefer docker, please start with this image if you are a beginner to avoid hiccups (Default user password:rag/rag): https://hub.docker.com/r/gzdaniel/postgres-for-rag
-* How to start? Ref to: [examples/lightrag_gemini_postgres_demo.py](https://github.com/marcdhansen/LightRAG_gemini/blob/main/examples/lightrag_gemini_postgres_demo.py)
-* For high-performance graph database requirements, Neo4j is recommended as Apache AGE's performance is not as competitive.
+- PostgreSQL is lightweight,the whole binary distribution including all necessary plugins can be zipped to 40MB: Ref to [Windows Release](https://github.com/ShanGor/apache-age-windows/releases/tag/PG17%2Fv1.5.0-rc0) as it is easy to install for Linux/Mac.
+- If you prefer docker, please start with this image if you are a beginner to avoid hiccups (Default user password:rag/rag): <https://hub.docker.com/r/gzdaniel/postgres-for-rag>
+- How to start? Ref to: [examples/lightrag_gemini_postgres_demo.py](https://github.com/marcdhansen/LightRAG_gemini/blob/main/examples/lightrag_gemini_postgres_demo.py)
+- For high-performance graph database requirements, Neo4j is recommended as Apache AGE's performance is not as competitive.
 
 </details>
 
@@ -1022,9 +1024,9 @@ rag = LightRAG(
 <details>
 <summary> <b>Using Memgraph for Storage</b> </summary>
 
-* Memgraph is a high-performance, in-memory graph database compatible with the Neo4j Bolt protocol.
-* You can run Memgraph locally using Docker for easy testing:
-* See: https://memgraph.com/download
+- Memgraph is a high-performance, in-memory graph database compatible with the Neo4j Bolt protocol.
+- You can run Memgraph locally using Docker for easy testing:
+- See: <https://memgraph.com/download>
 
 ```python
 export MEMGRAPH_URI="bolt://localhost:7687"
@@ -1090,7 +1092,7 @@ To maintain compatibility with legacy data, the default workspace for PostgreSQL
 
 ### AGENTS.md -- Guiding Coding Agents
 
-AGENTS.md is a simple, open format for guiding coding agents (https://agents.md/). It is a dedicated, predictable place to provide the context and instructions to help AI coding agents work on LightRAG project. Different AI coders should not maintain separate guidance files individually. If any AI coder cannot automatically recognize AGENTS.md, symbolic links can be used as a solution. After establishing symbolic links, you can prevent them from being committed to the Git repository by configuring your local `.gitignore_global`.
+AGENTS.md is a simple, open format for guiding coding agents (<https://agents.md/>). It is a dedicated, predictable place to provide the context and instructions to help AI coding agents work on LightRAG project. Different AI coders should not maintain separate guidance files individually. If any AI coder cannot automatically recognize AGENTS.md, symbolic links can be used as a solution. After establishing symbolic links, you can prevent them from being committed to the Git repository by configuring your local `.gitignore_global`.
 
 ## Edit Entities and Relations
 
@@ -1251,6 +1253,7 @@ await rag.adelete_by_entity("Google")
 ```
 
 When deleting an entity:
+
 - Removes the entity node from the knowledge graph
 - Deletes all associated relationships
 - Removes related embedding vectors from the vector database
@@ -1272,6 +1275,7 @@ await rag.adelete_by_relation("Google", "Gmail")
 ```
 
 When deleting a relationship:
+
 - Removes the specified relationship edge
 - Deletes the relationship's embedding vector from the vector database
 - Preserves both entity nodes and their other relationships
@@ -1289,12 +1293,14 @@ await rag.adelete_by_doc_id("doc-12345")
 ```
 
 Optimized processing when deleting by document ID:
+
 - **Smart Cleanup**: Automatically identifies and removes entities and relationships that belong only to this document
 - **Preserve Shared Knowledge**: If entities or relationships exist in other documents, they are preserved and their descriptions are rebuilt
 - **Cache Optimization**: Clears related LLM cache to reduce storage overhead
 - **Incremental Rebuilding**: Reconstructs affected entity and relationship descriptions from remaining documents
 
 The deletion process includes:
+
 1. Delete all text chunks related to the document
 2. Identify and delete entities and relationships that belong only to this document
 3. Rebuild entities and relationships that still exist in other documents
@@ -1313,6 +1319,7 @@ Note: Deletion by document ID is an asynchronous operation as it involves comple
 4. **Backup Recommendations**: Consider backing up data before performing important deletion operations
 
 **Batch Deletion Recommendations:**
+
 - For batch deletion operations, consider using asynchronous methods for better performance
 - For large-scale deletions, consider processing in batches to avoid excessive system load
 
@@ -1379,11 +1386,11 @@ rag.merge_entities(
 
 When merging entities:
 
-* All relationships from source entities are redirected to the target entity
-* Duplicate relationships are intelligently merged
-* Self-relationships (loops) are prevented
-* Source entities are removed after merging
-* Relationship weights and attributes are preserved
+- All relationships from source entities are redirected to the target entity
+- Duplicate relationships are intelligently merged
+- Self-relationships (loops) are prevented
+- Source entities are removed after merging
+- Relationship weights and attributes are preserved
 
 </details>
 
@@ -1392,6 +1399,7 @@ When merging entities:
 LightRAG now seamlessly integrates with [RAG-Anything](https://github.com/HKUDS/RAG-Anything), a comprehensive **All-in-One Multimodal Document Processing RAG system** built specifically for LightRAG. RAG-Anything enables advanced parsing and retrieval-augmented generation (RAG) capabilities, allowing you to handle multimodal documents seamlessly and extract structured content—including text, images, tables, and formulas—from various document formats for integration into your RAG pipeline.
 
 **Key Features:**
+
 - **End-to-End Multimodal Pipeline**: Complete workflow from document ingestion and parsing to intelligent multimodal query answering
 - **Universal Document Support**: Seamless processing of PDFs, Office documents (DOC/DOCX/PPT/PPTX/XLS/XLSX), images, and diverse file formats
 - **Specialized Content Analysis**: Dedicated processors for images, tables, mathematical equations, and heterogeneous content types
@@ -1399,10 +1407,13 @@ LightRAG now seamlessly integrates with [RAG-Anything](https://github.com/HKUDS/
 - **Hybrid Intelligent Retrieval**: Advanced search capabilities spanning textual and multimodal content with contextual understanding
 
 **Quick Start:**
+
 1. Install RAG-Anything:
+
    ```bash
    pip install raganything
    ```
+
 2. Process multimodal documents:
     <details>
     <summary> <b> RAGAnything Usage Example </b></summary>
@@ -1499,6 +1510,7 @@ LightRAG now seamlessly integrates with [RAG-Anything](https://github.com/HKUDS/
         if __name__ == "__main__":
             asyncio.run(load_existing_lightrag())
     ```
+
     </details>
 
 For detailed documentation and advanced usage, please refer to the [RAG-Anything repository](https://github.com/HKUDS/RAG-Anything).
@@ -1538,13 +1550,16 @@ print("Token usage:", token_tracker.get_usage())
 ```
 
 ### Usage Tips
+
 - Use context managers for long sessions or batch operations to automatically track all token consumption
 - For scenarios requiring segmented statistics, use manual mode and call reset() when appropriate
 - Regular checking of token usage helps detect abnormal consumption early
 - Actively use this feature during development and testing to optimize production costs
 
 ### Practical Examples
+
 You can refer to these examples for implementing token tracking:
+
 - `examples/lightrag_gemini_track_token_demo.py`: Token tracking example using Google Gemini model
 - `examples/lightrag_siliconcloud_track_token_demo.py`: Token tracking example using SiliconCloud model
 
@@ -1589,6 +1604,7 @@ rag.export_data("graph_data.md", file_format="md")
 # Export data in Text
 rag.export_data("graph_data.txt", file_format="txt")
 ```
+
 </details>
 
 <details>
@@ -1599,15 +1615,16 @@ Include vector embeddings in the export (optional):
 ```python
 rag.export_data("complete_data.csv", include_vector_data=True)
 ```
+
 </details>
 
 ### Data Included in Export
 
 All exports include:
 
-* Entity information (names, IDs, metadata)
-* Relation data (connections between entities)
-* Relationship information from vector database
+- Entity information (names, IDs, metadata)
+- Relation data (connections between entities)
+- Relationship information from vector database
 
 ## Cache
 
@@ -1661,6 +1678,7 @@ If you encounter these errors when using LightRAG:
 3. **Both errors in sequence**
    - **Cause**: Neither initialization method was called
    - **Solution**: Always follow this pattern:
+
    ```python
    rag = LightRAG(...)
    await rag.initialize_storages()
@@ -2046,7 +2064,6 @@ def extract_queries(file_path):
 </div>
 
 ---
-
 
 ## 📖 Citation
 
