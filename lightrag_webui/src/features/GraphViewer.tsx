@@ -110,7 +110,11 @@ const GraphEvents = () => {
   return null
 }
 
-const GraphViewer = () => {
+interface GraphViewerProps {
+  minimal?: boolean;
+}
+
+const GraphViewer = ({ minimal = false }: GraphViewerProps) => {
   const [isThemeSwitching, setIsThemeSwitching] = useState(false)
   const [showLogs, setShowLogs] = useState(false)
   const sigmaRef = useRef<any>(null)
@@ -221,8 +225,8 @@ const GraphViewer = () => {
         <FocusOnNode node={autoFocusedNode} move={moveToSelectedNode} />
 
         <div className="absolute top-2 left-2 flex items-start gap-2">
-          <GraphLabels />
-          {showNodeSearchBar && !isThemeSwitching && (
+          {!minimal && <GraphLabels />}
+          {showNodeSearchBar && !isThemeSwitching && !minimal && (
             <GraphSearch
               value={searchInitSelectedNode}
               queryLabel={useSettingsStore.use.queryLabel()}
@@ -236,17 +240,21 @@ const GraphViewer = () => {
           <LayoutsControl />
           <ZoomControl />
           <FullScreenControl />
-          <LegendButton />
-          <Settings />
-          <Button
-            variant="ghost"
-            size="icon"
-            tooltip="View Logs"
-            onClick={() => setShowLogs(!showLogs)}
-            className={showLogs ? 'bg-primary/20 text-primary' : ''}
-          >
-            <Terminal className="h-4 w-4" />
-          </Button>
+          {!minimal && (
+            <>
+              <LegendButton />
+              <Settings />
+              <Button
+                variant="ghost"
+                size="icon"
+                tooltip="View Logs"
+                onClick={() => setShowLogs(!showLogs)}
+                className={showLogs ? 'bg-primary/20 text-primary' : ''}
+              >
+                <Terminal className="h-4 w-4" />
+              </Button>
+            </>
+          )}
           {/* <ThemeToggle /> */}
         </div>
 
