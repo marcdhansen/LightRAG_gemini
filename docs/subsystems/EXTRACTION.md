@@ -79,5 +79,4 @@ When multiple chunks describe the same entity (e.g., "Elon Musk" mentioned in
   quotes, lowercased for type check) to prevent duplicate nodes.
 - **JSON Repair**: Uses `json_repair` to fix common LLM formatting errors
   (missing brackets, trailing commas).
-- **Transient Retries**: Automatically retries failed LLM calls with
-  exponential backoff.
+- **Transient Retries**: Automatically retries failed LLM calls with backoff.
