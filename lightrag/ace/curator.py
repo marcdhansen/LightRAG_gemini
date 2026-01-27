@@ -58,8 +58,21 @@ class ACECurator:
                 elif action == "delete_entity":
                     name = repair.get("name")
                     if name:
-                        logger.info(f"ACE Curator: Deleting entity {name}")
-                        await self.rag.adelete_entity(name)
+                         logger.info(f"ACE Curator: Deleting entity {name}")
+                         await self.rag.adelete_entity(name)
+                elif action == "merge_entities":
+                    sources = repair.get("sources")
+                    target = repair.get("target")
+                    if sources and target:
+                        logger.info(f"ACE Curator: Merging {sources} into {target}")
+                        await self.rag.amerge_entities(
+                            source_entities=sources,
+                            target_entity=target,
+                            merge_strategy={
+                                "description": "concatenate",
+                                "entity_type": "keep_first",
+                            },
+                        )
                 else:
                     logger.warning(f"ACE Curator: Unknown repair action '{action}'")
             except Exception as e:

@@ -1,7 +1,24 @@
-# Task: Implement Asymmetric Routing for ACE (lightrag-043)
+# Task: Phase 5 ACE Curator (lightrag-56n)
 
-- [x] **Define Configuration**: Update `LightRAG` and `QueryParam` to support `reflection_llm_model`. <!-- id: 0 -->
-- [x] **Update Core ACE Loop**: Modify `lightrag.py` to route reflection and curation tasks to the `reflection_llm_model`. <!-- id: 1 -->
-- [x] **Implement Model Threshold Check**: Add logic to warn or prevent using < 7B models for reflection if an alternative is available. <!-- id: 2 -->
-- [x] **Test Routing**: Create a test script to verify that extraction uses the default model while reflection uses the specified specialist model. <!-- id: 3 -->
-- [x] **Verify with Langfuse**: Ensure traces clearly show which model was used for which step. <!-- id: 4 -->
+## Status: IN_PROGRESS
+
+### Objective
+
+Implement the full ACE Curator logic including automated graph pruning, entity deduplication, and incorporating Reflector insights into the Context Playbook.
+
+### Tasks
+
+- [ ] Define the prompt for Curator reflection/action.
+- [ ] Implement `ACECurator.curate` logic to update the Playbook with semantic versioning/lessons.
+- [ ] Implement `ACECurator.apply_repairs` for automated entity merging (deduplication).
+- [ ] Integrate Curator into the Core ACE Loop in `lightrag/core.py`.
+- [ ] Add unit tests for Curator (Repair/Deduplication).
+- [ ] Verify integrated loop with a small document (e.g., `test_ephemeral.txt`).
+
+### Steps
+
+1. [ ] Analyze `ACEReflector` output format to ensure `ACECurator` can parse repairs.
+2. [ ] Update `lightrag/ace/curator.py` with expanded logic.
+3. [ ] Update `lightrag/ace/reflector.py` if needed to better suggest repairs.
+4. [ ] Implement a test case for entity deduplication (merging "Einstein" and "Albert Einstein").
+5. [ ] Run integration test.

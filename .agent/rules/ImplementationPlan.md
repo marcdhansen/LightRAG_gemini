@@ -25,4 +25,4 @@ Establish the full ACE cycle in production and provide visual tooling for graph 
 * [x] **ACE Phase 3**: Finalize minimal framework prototype and deployment endpoints (Beads: lightrag-q29).
 * [x] **UI Integration**: Add reranking toggles and ACE controls to the WebUI.
 * [x] **ACE Asymmetric Routing**: Implement routing logic for Extraction vs. Reflection models (lightrag-043).
-* [ ] **ACE Curator (Phase 5)**: Implement graph pruning and deduplication logic.
+* [x] **ACE Curator (Phase 5)**: Implement graph pruning and deduplication logic (lightrag-56n).

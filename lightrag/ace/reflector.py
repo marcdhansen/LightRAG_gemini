@@ -64,27 +64,31 @@ class ACEReflector:
         self, query: str, generation_result: Dict[str, Any]
     ) -> List[Dict[str, Any]]:
         """
-        Analyzes retrieved context for hallucinations or illogical relationships.
+        Analyzes retrieved context for hallucinations, illogical relationships, or duplicate entities.
         Returns a list of repair actions.
         """
         context_data = generation_result.get("context_data", {})
 
         relations = context_data.get("relationships", [])
+        entities = context_data.get("entities", [])
         chunks = context_data.get("chunks", [])
 
-        if not relations:
+        if not chunks:
             return []
 
         # Construct Repair Reflection Prompt
         prompt = (
             "You are the Reflector component of the ACE Framework, specializing in Graph Integrity.\n"
-            "CRITICAL TASK: Verify the retrieved relationships and entities against the source text chunks provided below. "
-            "Identify anything that is NOT supported by the source text or is logically impossible.\n\n"
+            "CRITICAL TASK: Verify the retrieved graph data against the source text chunks provided below.\n\n"
             "### Source Text Chunks\n"
         )
 
         for i, c in enumerate(chunks[:5]):
             prompt += f"Chunk {i}: {c.get('content')}\n"
+
+        prompt += "\n### Entities to Verify\n"
+        for i, e in enumerate(entities[:50]):
+            prompt += f"{i}. {e.get('entity_name')} ({e.get('entity_type')}): {e.get('description')}\n"
 
         prompt += "\n### Relationships to Verify\n"
         for i, r in enumerate(relations[:50]):
@@ -94,19 +98,18 @@ class ACEReflector:
 
         prompt += (
             "\n### Verification Logic\n"
-            "Compare each relationship against the source chunks. If the relationship is not supported by "
-            "the text, or if it makes a medically or scientifically impossible claim, you MUST delete it.\n\n"
-            "### Example\n"
-            "Relation: 'Beekeeper -> Heart Disease' (Description: Beekeepers diagnose heart disease)\n"
-            "Source Text: 'Beekeepers manage hives... Heart disease is a serious condition.'\n"
-            'Result: [{"action": "delete_relation", "source": "Beekeeper", "target": "Heart Disease", "reason": "Not in source text and medically false."}]\n\n'
-            "\n### Actual Tasks\n"
-            "1. **Relation Verification:** Check each relationship against source chunks. Delete if unsupported or false.\n"
-            "2. **Entity Verification:** Look at the entities mentioned. If an entity itself is a hallucination (not mentioned or implied by the text), suggest deleting it.\n"
-            "For each issue, suggest a repair action in JSON format.\n"
+            "1. **Relation Verification:** Compare each relationship against the source chunks. If the relationship is not supported by "
+            "the text, or if it is logically impossible, you MUST delete it.\n"
+            "2. **Entity Verification:** Look at the entities. If an entity is a hallucination (not in text), delete it.\n"
+            "3. **De-duplication:** If you see multiple entities that refer to the SAME real-world object (e.g., 'AI' and 'Artificial Intelligence'), "
+            "recommend a MERGE. Use the full name as the target.\n\n"
+            "### Repair Actions JSON Format\n"
             "Actions: \n"
-            "  - `{\"action\": \"delete_relation\", \"source\": \"Node A\", \"target\": \"Node B\", \"reason\": \"...\"}`\n"
-            "  - `{\"action\": \"delete_entity\", \"name\": \"Node X\", \"reason\": \"...\"}`\n"
+            '  - `{"action": "delete_relation", "source": "Node A", "target": "Node B", "reason": "..."}`\n'
+            '  - `{"action": "delete_entity", "name": "Node X", "reason": "..."}`\n'
+            '  - `{"action": "merge_entities", "sources": ["AI", "A.I."], "target": "Artificial Intelligence", "reason": "..."}`\n\n'
+            "### Example\n"
+            'Result: [{"action": "delete_relation", "source": "Einstein", "target": "Mars", "reason": "Text says he died on Earth."}]\n\n'
             "Return ONLY the JSON list. If everything is correct, return []."
         )
 
@@ -119,15 +122,22 @@ class ACEReflector:
                 cleaned_output = cleaned_output.replace("```json", "").replace(
                     "```", ""
                 )
+            
+            # Find the first [ and last ] to extract JSON if LLM added text
+            start = cleaned_output.find("[")
+            end = cleaned_output.rfind("]")
+            if start != -1 and end != -1:
+                cleaned_output = cleaned_output[start : end + 1]
 
             # Basic parsing
             repairs = json.loads(cleaned_output)
             if isinstance(repairs, list):
                 # Filter to only supported actions for safety
+                valid_actions = ["delete_relation", "delete_entity", "merge_entities"]
                 valid_repairs = [
                     r
                     for r in repairs
-                    if r.get("action") in ["delete_relation", "delete_entity"]
+                    if r.get("action") in valid_actions
                 ]
                 if valid_repairs:
                     logger.info(

@@ -36,16 +36,30 @@ This is the central directory for all project-specific planning, tracking, and i
 
 ## 📈 Recent Accomplishments
 
-- ✓ **ACE Asymmetric Routing** (2026-01-27): Implemented model-specific routing for extraction vs. reflection (lightrag-043).
-- ✓ **Documentation Validator** (2026-01-27): Created `scripts/validate_docs.py` to ensure `ARCHITECTURE.md` integrity (lightrag-rxg).
-- ✓ **Gold Standard Tests** (2026-01-27): Implemented `tests/test_gold_standard_extraction.py` validating extraction quality with pass/fail thresholds (lightrag-d9h).
-- ✓ **Graph Visualization** (2026-01-27): Implemented `GraphControl` with `useLightragGraph` and integrated Sigma.js for knowledge graph inspection.
-- ✓ **ACE Phase 3** (2026-01-27): Finalized minimal ACE framework prototype (Generator/Reflector/Curator stubs).
-- ✓ **Graph Reranking Implementation** (2026-01-27): Implemented `rerank_entities` and `rerank_relations` toggles, integrated into context building, and benchmarked with Ragas (+13.8% boost).
-- ✓ **Evaluation & Testing Standardization** (2026-01-26): Implemented tiered testing (Light/Heavy), integrated Langfuse, and created documentation for RAGAS and ACE.
-- ✓ **Refactor Project Structure** (2026-01-26): Cleaned up workspace, moved docs, created global symlinks.
-- ✓ **ACE Minimal Prototype** (2026-01-22): Implemented and verified the Core Loop (Generate-Reflect-Curate).
-- ✓ **Ragas Compatibility Fix** (2026-01-22): Resolved `TypeError` in Ragas 0.4.3 using Legacy wrappers.
+- ✓ **ACE Phase 5: Curator** (2026-01-27): Implemented automated graph repair
+  (deletion, merging) and integrated into ACE query loop.
+- ✓ **ACE Asymmetric Routing** (2026-01-27): Implemented model-specific routing
+  for extraction vs. reflection (lightrag-043).
+- ✓ **Documentation Validator** (2026-01-27): Created `scripts/validate_docs.py`
+  to ensure `ARCHITECTURE.md` integrity (lightrag-rxg).
+- ✓ **Gold Standard Tests** (2026-01-27): Implemented `tests/test_gold_standard_extraction.py`
+  validating extraction quality with pass/fail thresholds (lightrag-d9h).
+- ✓ **Graph Visualization** (2026-01-27): Implemented `GraphControl` with
+  `useLightragGraph` and integrated Sigma.js for knowledge graph inspection.
+- ✓ **ACE Phase 3** (2026-01-27): Finalized minimal ACE framework prototype
+  (Generator/Reflector/Curator stubs).
+- ✓ **Graph Reranking Implementation** (2026-01-27): Implemented `rerank_entities`
+  and `rerank_relations` toggles, integrated into context building, and
+  benchmarked with Ragas (+13.8% boost).
+- ✓ **Evaluation & Testing Standardization** (2026-01-26): Implemented tiered
+  testing (Light/Heavy), integrated Langfuse, and created documentation for
+  RAGAS and ACE.
+- ✓ **Refactor Project Structure** (2026-01-26): Cleaned up workspace, moved docs,
+  created global symlinks.
+- ✓ **ACE Minimal Prototype** (2026-01-22): Implemented and verified the Core
+  Loop (Generate-Reflect-Curate).
+- ✓ **Ragas Compatibility Fix** (2026-01-22): Resolved `TypeError` in Ragas 0.4.3
+  using Legacy wrappers.
 - ✓ **Baseline RAGAS Evaluation** (2026-01-22): Preliminary pass successful.
 
 ---
