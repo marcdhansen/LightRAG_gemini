@@ -18,6 +18,6 @@ Establish a robust evaluation pipeline to measure RAG quality (Context Recall, F
 
 Establish the full ACE cycle in production and provide visual tooling for graph inspection.
 
-* [ ] **Graph Visualization**: Implement/Verify a dedicated visualizer for the knowledge graph (Beads: lightrag-b8r).
+* [x] **Graph Visualization**: Implement/Verify a dedicated visualizer for the knowledge graph (Beads: lightrag-42q).
 * [x] **ACE Phase 3**: Finalize minimal framework prototype and deployment endpoints (Beads: lightrag-q29).
 * [x] **UI Integration**: Add reranking toggles and ACE controls to the WebUI.
