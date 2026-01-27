@@ -17,6 +17,7 @@ import {
   QueryRequest,
   ReferenceItem,
   QueryResponse,
+  ACEQueryResponse,
   EntityUpdateResponse,
   DocActionResponse,
   ScanResponse,
@@ -225,6 +226,13 @@ export const getDocumentsScanProgress = async (): Promise<LightragDocumentsScanP
 
 export const queryText = async (request: QueryRequest): Promise<QueryResponse> => {
   const response = await axiosInstance.post('/query', request)
+  return response.data
+}
+
+export const aceQuery = async (
+  request: QueryRequest & { auto_reflect?: boolean }
+): Promise<ACEQueryResponse> => {
+  const response = await axiosInstance.post('/ace/query', request)
   return response.data
 }
 

@@ -44,6 +44,7 @@ export type MessageWithError = Message & {
    * Used to prevent red error text during streaming of incomplete LaTeX formulas.
    */
   latexRendered?: boolean
+  isACE?: boolean
 }
 
 // Restore original component definition and export
@@ -62,7 +63,7 @@ export const ChatMessage = ({
   const [isThinkingExpanded, setIsThinkingExpanded] = useState<boolean>(false)
 
   // Directly use props passed from the parent.
-  const { thinkingContent, displayContent, thinkingTime, isThinking } = message
+  const { thinkingContent, displayContent, thinkingTime, isThinking, isACE } = message
 
   // Reset expansion state when new thinking starts
   useEffect(() => {
@@ -153,128 +154,141 @@ export const ChatMessage = ({
         ? 'max-w-[80%] bg-primary text-primary-foreground'
         : message.isError
           ? 'w-[95%] bg-red-100 text-red-600 dark:bg-red-950 dark:text-red-400'
-          : 'w-[95%] bg-muted'
-        } rounded-lg px-4 py-2`}
+          : isACE
+            ? 'w-[95%] bg-indigo-50 border-indigo-200 dark:bg-indigo-950/30 dark:border-indigo-800 border-2 shadow-lg shadow-indigo-500/10'
+            : 'w-[95%] bg-muted border border-transparent'
+        } rounded-lg px-4 py-2 relative transition-all duration-300`}
     >
+      {isACE && (
+        <div className="absolute -top-2 -right-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-md z-10 animate-pulse">
+          ACE MODE
+        </div>
+      )}
       {/* Thinking process display - only for assistant messages */}
       {/* Always render to prevent layout shift when switching tabs */}
-      {message.role === 'assistant' && (isThinking || thinkingTime !== null) && (
-        <div className={cn(
-          'mb-2',
-          // Reduce visual priority in inactive tabs while maintaining layout
-          !isTabActive && 'opacity-50'
-        )}>
-          <div
-            className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 text-sm cursor-pointer select-none"
-            onClick={() => {
-              // Allow expansion when there's thinking content, even during thinking process
-              if (finalThinkingContent && finalThinkingContent.trim() !== '') {
-                setIsThinkingExpanded(!isThinkingExpanded)
-              }
-            }}
-          >
-            {isThinking ? (
-              <>
-                {/* Only show spinner animation in active tab to save resources */}
-                {isTabActive && <LoaderIcon className="mr-2 size-4 animate-spin" />}
-                <span>{t('retrievePanel.chatMessage.thinking')}</span>
-              </>
-            ) : (
-              typeof thinkingTime === 'number' && <span>{t('retrievePanel.chatMessage.thinkingTime', { time: thinkingTime })}</span>
-            )}
-            {/* Show chevron when there's thinking content, even during thinking process */}
-            {finalThinkingContent && finalThinkingContent.trim() !== '' && <ChevronDownIcon className={`ml-2 size-4 shrink-0 transition-transform ${isThinkingExpanded ? 'rotate-180' : ''}`} />}
-          </div>
-          {/* Show thinking content when expanded and content exists, even during thinking process */}
-          {isThinkingExpanded && finalThinkingContent && finalThinkingContent.trim() !== '' && (
-            <div className="mt-2 pl-4 border-l-2 border-primary/20 dark:border-primary/40 text-sm prose dark:prose-invert max-w-none break-words prose-p:my-1 prose-headings:my-2 [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-6 [&_.footnotes]:pt-3 [&_.footnotes]:border-t [&_.footnotes]:border-border [&_.footnotes_ol]:text-xs [&_.footnotes_li]:my-0.5 [&_a[href^='#fn']]:text-primary [&_a[href^='#fn']]:no-underline [&_a[href^='#fn']]:hover:underline [&_a[href^='#fnref']]:text-primary [&_a[href^='#fnref']]:no-underline [&_a[href^='#fnref']]:hover:underline text-foreground">
-              {isThinking && (
-                <div className="mb-2 text-xs text-gray-400 dark:text-gray-300 italic">
-                  {t('retrievePanel.chatMessage.thinkingInProgress', 'Thinking in progress...')}
-                </div>
+      {
+        message.role === 'assistant' && (isThinking || thinkingTime !== null) && (
+          <div className={cn(
+            'mb-2',
+            // Reduce visual priority in inactive tabs while maintaining layout
+            !isTabActive && 'opacity-50'
+          )}>
+            <div
+              className="flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors duration-200 text-sm cursor-pointer select-none"
+              onClick={() => {
+                // Allow expansion when there's thinking content, even during thinking process
+                if (finalThinkingContent && finalThinkingContent.trim() !== '') {
+                  setIsThinkingExpanded(!isThinkingExpanded)
+                }
+              }}
+            >
+              {isThinking ? (
+                <>
+                  {/* Only show spinner animation in active tab to save resources */}
+                  {isTabActive && <LoaderIcon className="mr-2 size-4 animate-spin" />}
+                  <span>{t('retrievePanel.chatMessage.thinking')}</span>
+                </>
+              ) : (
+                typeof thinkingTime === 'number' && <span>{t('retrievePanel.chatMessage.thinkingTime', { time: thinkingTime })}</span>
               )}
+              {/* Show chevron when there's thinking content, even during thinking process */}
+              {finalThinkingContent && finalThinkingContent.trim() !== '' && <ChevronDownIcon className={`ml-2 size-4 shrink-0 transition-transform ${isThinkingExpanded ? 'rotate-180' : ''}`} />}
+            </div>
+            {/* Show thinking content when expanded and content exists, even during thinking process */}
+            {isThinkingExpanded && finalThinkingContent && finalThinkingContent.trim() !== '' && (
+              <div className="mt-2 pl-4 border-l-2 border-primary/20 dark:border-primary/40 text-sm prose dark:prose-invert max-w-none break-words prose-p:my-1 prose-headings:my-2 [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-6 [&_.footnotes]:pt-3 [&_.footnotes]:border-t [&_.footnotes]:border-border [&_.footnotes_ol]:text-xs [&_.footnotes_li]:my-0.5 [&_a[href^='#fn']]:text-primary [&_a[href^='#fn']]:no-underline [&_a[href^='#fn']]:hover:underline [&_a[href^='#fnref']]:text-primary [&_a[href^='#fnref']]:no-underline [&_a[href^='#fnref']]:hover:underline text-foreground">
+                {isThinking && (
+                  <div className="mb-2 text-xs text-gray-400 dark:text-gray-300 italic">
+                    {t('retrievePanel.chatMessage.thinkingInProgress', 'Thinking in progress...')}
+                  </div>
+                )}
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm, remarkFootnotes, remarkMath]}
+                  rehypePlugins={[
+                    rehypeRaw,
+                    ...((katexPlugin && (message.latexRendered ?? true)) ? [[katexPlugin, {
+                      errorColor: theme === 'dark' ? '#ef4444' : '#dc2626',
+                      throwOnError: false,
+                      displayMode: false,
+                      strict: false,
+                      trust: true,
+                      // Add silent error handling to avoid console noise
+                      errorCallback: (error: string, latex: string) => {
+                        // Only show detailed errors in development environment
+                        if (process.env.NODE_ENV === 'development') {
+                          console.warn('KaTeX rendering error in thinking content:', error, 'for LaTeX:', latex);
+                        }
+                      }
+                    }] as any] : [])
+                  ]}
+                  skipHtml={false}
+                  components={thinkingMarkdownComponents}
+                >
+                  {finalThinkingContent}
+                </ReactMarkdown>
+              </div>
+            )}
+          </div>
+        )
+      }
+      {/* Main content display */}
+      {
+        finalDisplayContent && (
+          <div className="relative">
+            <div
+              className={`prose dark:prose-invert max-w-none text-sm break-words prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 [&_.katex]:text-current [&_.katex-display]:my-4 [&_.katex-display]:max-w-full [&_.katex-display_>.base]:overflow-x-auto [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-8 [&_.footnotes]:pt-4 [&_.footnotes]:border-t [&_.footnotes_ol]:text-sm [&_.footnotes_li]:my-1 ${message.role === 'user' ? 'text-primary-foreground' : 'text-foreground'
+                } ${message.role === 'user'
+                  ? '[&_.footnotes]:border-primary-foreground/30 [&_a[href^="#fn"]]:text-primary-foreground [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary-foreground [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
+                  : '[&_.footnotes]:border-border [&_a[href^="#fn"]]:text-primary [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
+                }`}
+            >
               <ReactMarkdown
                 remarkPlugins={[remarkGfm, remarkFootnotes, remarkMath]}
                 rehypePlugins={[
                   rehypeRaw,
-                  ...((katexPlugin && (message.latexRendered ?? true)) ? [[katexPlugin, {
-                    errorColor: theme === 'dark' ? '#ef4444' : '#dc2626',
-                    throwOnError: false,
-                    displayMode: false,
-                    strict: false,
-                    trust: true,
-                    // Add silent error handling to avoid console noise
-                    errorCallback: (error: string, latex: string) => {
-                      // Only show detailed errors in development environment
-                      if (process.env.NODE_ENV === 'development') {
-                        console.warn('KaTeX rendering error in thinking content:', error, 'for LaTeX:', latex);
+                  ...((katexPlugin && (message.latexRendered ?? true)) ? [[
+                    katexPlugin,
+                    {
+                      errorColor: theme === 'dark' ? '#ef4444' : '#dc2626',
+                      throwOnError: false,
+                      displayMode: false,
+                      strict: false,
+                      trust: true,
+                      // Add silent error handling to avoid console noise
+                      errorCallback: (error: string, latex: string) => {
+                        // Only show detailed errors in development environment
+                        if (process.env.NODE_ENV === 'development') {
+                          console.warn('KaTeX rendering error in main content:', error, 'for LaTeX:', latex);
+                        }
                       }
                     }
-                  }] as any] : [])
+                  ] as any] : [])
                 ]}
                 skipHtml={false}
-                components={thinkingMarkdownComponents}
+                components={mainMarkdownComponents}
               >
-                {finalThinkingContent}
+                {finalDisplayContent}
               </ReactMarkdown>
             </div>
-          )}
-        </div>
-      )}
-      {/* Main content display */}
-      {finalDisplayContent && (
-        <div className="relative">
-          <div
-            className={`prose dark:prose-invert max-w-none text-sm break-words prose-headings:mt-4 prose-headings:mb-2 prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 [&_.katex]:text-current [&_.katex-display]:my-4 [&_.katex-display]:max-w-full [&_.katex-display_>.base]:overflow-x-auto [&_sup]:text-[0.75em] [&_sup]:align-[0.1em] [&_sup]:leading-[0] [&_sub]:text-[0.75em] [&_sub]:align-[-0.2em] [&_sub]:leading-[0] [&_mark]:bg-yellow-200 [&_mark]:dark:bg-yellow-800 [&_u]:underline [&_del]:line-through [&_ins]:underline [&_ins]:decoration-green-500 [&_.footnotes]:mt-8 [&_.footnotes]:pt-4 [&_.footnotes]:border-t [&_.footnotes_ol]:text-sm [&_.footnotes_li]:my-1 ${message.role === 'user' ? 'text-primary-foreground' : 'text-foreground'
-              } ${message.role === 'user'
-                ? '[&_.footnotes]:border-primary-foreground/30 [&_a[href^="#fn"]]:text-primary-foreground [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary-foreground [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
-                : '[&_.footnotes]:border-border [&_a[href^="#fn"]]:text-primary [&_a[href^="#fn"]]:no-underline [&_a[href^="#fn"]]:hover:underline [&_a[href^="#fnref"]]:text-primary [&_a[href^="#fnref"]]:no-underline [&_a[href^="#fnref"]]:hover:underline'
-              }`}
-          >
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm, remarkFootnotes, remarkMath]}
-              rehypePlugins={[
-                rehypeRaw,
-                ...((katexPlugin && (message.latexRendered ?? true)) ? [[
-                  katexPlugin,
-                  {
-                    errorColor: theme === 'dark' ? '#ef4444' : '#dc2626',
-                    throwOnError: false,
-                    displayMode: false,
-                    strict: false,
-                    trust: true,
-                    // Add silent error handling to avoid console noise
-                    errorCallback: (error: string, latex: string) => {
-                      // Only show detailed errors in development environment
-                      if (process.env.NODE_ENV === 'development') {
-                        console.warn('KaTeX rendering error in main content:', error, 'for LaTeX:', latex);
-                      }
-                    }
-                  }
-                ] as any] : [])
-              ]}
-              skipHtml={false}
-              components={mainMarkdownComponents}
-            >
-              {finalDisplayContent}
-            </ReactMarkdown>
+            {message.role === 'assistant' && message.references && (
+              <ReferenceList
+                references={message.references}
+                onReferenceClick={onReferenceClick}
+              />
+            )}
           </div>
-          {message.role === 'assistant' && message.references && (
-            <ReferenceList
-              references={message.references}
-              onReferenceClick={onReferenceClick}
-            />
-          )}
-        </div>
-      )}
+        )
+      }
       {/* Loading indicator - only show in active tab */}
-      {isTabActive && (() => {
-        // More comprehensive loading state check
-        const hasVisibleContent = finalDisplayContent && finalDisplayContent.trim() !== '';
-        const isLoadingState = !hasVisibleContent && !isThinking && !thinkingTime;
-        return isLoadingState && <LoaderIcon className="animate-spin duration-2000" />
-      })()}
-    </div>
+      {
+        isTabActive && (() => {
+          // More comprehensive loading state check
+          const hasVisibleContent = finalDisplayContent && finalDisplayContent.trim() !== '';
+          const isLoadingState = !hasVisibleContent && !isThinking && !thinkingTime;
+          return isLoadingState && <LoaderIcon className="animate-spin duration-2000" />
+        })()
+      }
+    </div >
   )
 }
 

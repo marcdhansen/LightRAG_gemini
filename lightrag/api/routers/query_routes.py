@@ -212,6 +212,12 @@ class ACEQueryResponse(BaseModel):
     playbook_used: Dict[str, Any] = Field(
         description="The state of the Context Playbook when the query was executed"
     )
+    references: Optional[List[ReferenceItem]] = Field(
+        default=None, description="List of references used in the query"
+    )
+    data: Optional[Dict[str, Any]] = Field(
+        default=None, description="The structured context data used in the query"
+    )
 
 
 class StreamChunkResponse(BaseModel):
@@ -807,6 +813,12 @@ def create_query_routes(rag, api_key: Optional[str] = None, top_k: int = 60):
 
             if "error" in result:
                 raise HTTPException(status_code=500, detail=result["error"])
+
+            # Map context_data to data and extract references
+            if "context_data" in result:
+                result["data"] = result.pop("context_data")
+                if "references" in result["data"]:
+                    result["references"] = result["data"]["references"]
 
             return ACEQueryResponse(**result)
         except Exception as e:

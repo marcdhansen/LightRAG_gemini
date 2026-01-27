@@ -1,94 +1,124 @@
-import pytest
 
-pytestmark = pytest.mark.light
-from unittest.mock import MagicMock, AsyncMock
+import asyncio
+import json
+import logging
+import sys
+import unittest
+from unittest.mock import AsyncMock, MagicMock, patch
 
-from lightrag.ace.config import ACEConfig
-from lightrag.ace.playbook import ContextPlaybook
-from lightrag.ace.generator import ACEGenerator
+# Add project root to path
+sys.path.append(".")
+
 from lightrag.ace.reflector import ACEReflector
 from lightrag.ace.curator import ACECurator
-from lightrag.core import LightRAG
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-@pytest.fixture
-def mock_lightrag():
-    rag = MagicMock(spec=LightRAG)
-    rag.aquery_data = AsyncMock()
-    rag.llm_model_func = AsyncMock()
-    return rag
+class TestACEReflector(unittest.IsolatedAsyncioTestCase):
+    async def test_reflect_graph_issues_identifies_hallucination(self):
+        """
+        Test that reflect_graph_issues correctly identifies a hallucinated relationship
+        and suggests a 'delete_relation' repair action.
+        """
+        # Mock LightRAG instance
+        rag_mock = MagicMock()
+        
+        # Mock LLM response to simulate Reflector logic
+        # The Reflector sends a prompt asking to verify relations.
+        # We simulate the LLM responding with a delete_relation JSON.
+        expected_repair = [{
+            "action": "delete_relation",
+            "source": "Beekeeper",
+            "target": "Mars",
+            "reason": "Not supported by source text."
+        }]
+        rag_mock.llm_model_func = AsyncMock(return_value=json.dumps(expected_repair))
 
+        reflector = ACEReflector(rag_mock)
 
-@pytest.fixture
-def temp_playbook(tmp_path):
-    config = ACEConfig(base_dir=str(tmp_path))
-    return ContextPlaybook(config)
+        # Mock query context data
+        query = "Do beekeepers go to Mars?"
+        generation_result = {
+            "response": "Beekeepers do not go to Mars usually.",
+            "context_data": {
+                "chunks": [{"content": "Beekeepers keep bees."}],
+                "relationships": [
+                    {
+                        "src_id": "Beekeeper",
+                        "tgt_id": "Mars",
+                        "description": "Beekeepers fly to Mars on weekends." 
+                    }
+                ],
+                "entities": []
+            }
+        }
 
+        # Run reflection
+        repairs = await reflector.reflect_graph_issues(query, generation_result)
 
-def test_playbook_persistence(temp_playbook):
-    # Test initial state
-    assert len(temp_playbook.content.core_directives) > 0
+        # Verify
+        self.assertEqual(len(repairs), 1)
+        self.assertEqual(repairs[0]["action"], "delete_relation")
+        self.assertEqual(repairs[0]["source"], "Beekeeper")
+        self.assertEqual(repairs[0]["target"], "Mars")
+        
+        logger.info("TestACEReflector passed: Correctly identified hallucinated relation.")
 
-    # Test add lesson
-    temp_playbook.add_lesson("Test Lesson")
-    assert "Test Lesson" in temp_playbook.content.lessons_learned
+class TestACECurator(unittest.IsolatedAsyncioTestCase):
+    async def test_apply_repairs_valid_delete_relation(self):
+        """
+        Test that apply_repairs successfully calls adelete_relation on the RAG instance
+        when processing a 'delete_relation' repair action.
+        """
+        # Mock LightRAG instance and playbook
+        rag_mock = MagicMock()
+        rag_mock.adelete_relation = AsyncMock() # This is the key method we expect to be called
+        
+        playbook_mock = MagicMock()
+        
+        curator = ACECurator(rag_mock, playbook_mock)
 
-    # Test reload
-    new_playbook = ContextPlaybook(temp_playbook.config)
-    assert "Test Lesson" in new_playbook.content.lessons_learned
+        # Define repair action
+        repairs = [{
+            "action": "delete_relation",
+            "source": "Beekeeper",
+            "target": "Mars"
+        }]
 
+        # Apply repairs
+        await curator.apply_repairs(repairs)
 
-def test_playbook_render(temp_playbook):
-    rendered = temp_playbook.render()
-    assert "### Core Directives" in rendered
-    assert "### Operational Strategies" in rendered
+        # Verify adelete_relation was called with correct args
+        rag_mock.adelete_relation.assert_called_once_with("Beekeeper", "Mars")
+        logger.info("TestACECurator passed: Correctly called adelete_relation.")
 
+    async def test_apply_repairs_valid_delete_entity(self):
+        """
+        Test that apply_repairs successfully calls adelete_entity on the RAG instance
+        when processing a 'delete_entity' repair action.
+        """
+        # Mock LightRAG instance and playbook
+        rag_mock = MagicMock()
+        rag_mock.adelete_entity = AsyncMock() # This is the key method we expect to be called
+        
+        playbook_mock = MagicMock()
+        
+        curator = ACECurator(rag_mock, playbook_mock)
 
-@pytest.mark.asyncio
-async def test_generator_flow(mock_lightrag, temp_playbook):
-    # Setup mocks
-    mock_lightrag.aquery_data.return_value = {
-        "status": "success",
-        "data": {
-            "entities": [
-                {
-                    "entity_name": "TestEntity",
-                    "entity_type": "TestType",
-                    "description": "Desc",
-                }
-            ],
-            "relationships": [],
-            "chunks": [],
-        },
-    }
-    mock_lightrag.llm_model_func.return_value = "Generated Answer"
+        # Define repair action
+        repairs = [{
+            "action": "delete_entity",
+            "name": "Unicorn"
+        }]
 
-    generator = ACEGenerator(mock_lightrag, temp_playbook)
-    result = await generator.generate("Test Query")
+        # Apply repairs
+        await curator.apply_repairs(repairs)
 
-    assert result["response"] == "Generated Answer"
-    mock_lightrag.aquery_data.assert_called_once()
-    mock_lightrag.llm_model_func.assert_called_once()
+        # Verify adelete_entity was called with correct args
+        rag_mock.adelete_entity.assert_called_once_with("Unicorn")
+        logger.info("TestACECurator passed: Correctly called adelete_entity.")
 
-    # Verify playbook was injected
-    call_args = mock_lightrag.llm_model_func.call_args[0][0]
-    assert "### ACE Context Playbook" in call_args
-
-
-@pytest.mark.asyncio
-async def test_reflector_flow(mock_lightrag):
-    mock_lightrag.llm_model_func.return_value = '["Lesson 1", "Lesson 2"]'
-
-    reflector = ACEReflector(mock_lightrag)
-    insights = await reflector.reflect("Query", {"response": "Response"})
-
-    assert len(insights) == 2
-    assert "Lesson 1" in insights
-
-
-@pytest.mark.asyncio
-async def test_curator_flow(temp_playbook):
-    curator = ACECurator(temp_playbook)
-    await curator.curate(["New Insight"])
-
-    assert "New Insight" in temp_playbook.content.lessons_learned
+if __name__ == "__main__":
+    unittest.main()

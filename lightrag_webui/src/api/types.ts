@@ -37,6 +37,8 @@ export type QueryRequest = {
     rerank_relations?: boolean
     include_references?: boolean
     include_chunk_content?: boolean
+    enable_ace?: boolean
+    auto_reflect?: boolean
 }
 
 /**
@@ -55,6 +57,15 @@ export type ReferenceItem = {
 export type QueryResponse = {
     response: string
     references?: ReferenceItem[]
+}
+
+export type ACEQueryResponse = {
+    response: string
+    trajectory?: any[]
+    insights?: string[]
+    playbook_used: any
+    references?: ReferenceItem[]
+    data?: any
 }
 
 /**

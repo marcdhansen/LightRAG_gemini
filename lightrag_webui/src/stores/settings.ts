@@ -137,7 +137,9 @@ const useSettingsStoreBase = create<SettingsState>()(
         rerank_entities: true,
         rerank_relations: true,
         include_references: true,
-        include_chunk_content: true
+        include_chunk_content: true,
+        enable_ace: false,
+        auto_reflect: true
       },
 
       setTheme: (theme: Theme) => set({ theme }),
@@ -242,7 +244,7 @@ const useSettingsStoreBase = create<SettingsState>()(
     {
       name: 'settings-storage',
       storage: createJSONStorage(() => localStorage),
-      version: 21,
+      version: 22,
       migrate: (persistedState: any, version: number) => {
         try {
           if (!persistedState) return {};
@@ -356,6 +358,12 @@ const useSettingsStoreBase = create<SettingsState>()(
               state.querySettings.rerank_relations = true
             }
           }
+          if (version < 22) {
+            if (state.querySettings) {
+              state.querySettings.enable_ace = false
+              state.querySettings.auto_reflect = true
+            }
+          }
 
           // FINAL VALIDATION: Ensure critical fields exist and have correct types
           if (!Array.isArray(state.retrievalHistory)) {
@@ -382,7 +390,9 @@ const useSettingsStoreBase = create<SettingsState>()(
               rerank_entities: true,
               rerank_relations: true,
               include_references: true,
-              include_chunk_content: true
+              include_chunk_content: true,
+              enable_ace: false,
+              auto_reflect: true
             }
           }
 

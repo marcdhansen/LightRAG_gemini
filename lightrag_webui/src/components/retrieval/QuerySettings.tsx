@@ -535,6 +535,50 @@ export default function QuerySettings() {
                   onCheckedChange={(checked) => handleChange('include_chunk_content', checked)}
                 />
               </div>
+
+              <div className="flex items-center gap-2 pt-2 border-t border-gray-100 dark:border-gray-800">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <label htmlFor="enable_ace" className="flex-1 ml-1 cursor-help font-semibold text-primary">
+                        {t('retrievePanel.querySettings.enableACE', 'Enable ACE Mode')}
+                      </label>
+                    </TooltipTrigger>
+                    <TooltipContent side="left">
+                      <p>{t('retrievePanel.querySettings.enableACETooltip', 'Enable Agentic Context Evolution for self-improving retrieval')}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                <Checkbox
+                  className="mr-10 cursor-pointer"
+                  id="enable_ace"
+                  checked={querySettings.enable_ace}
+                  onCheckedChange={(checked) => handleChange('enable_ace', checked)}
+                />
+              </div>
+
+              {querySettings.enable_ace && (
+                <div className="flex items-center gap-2 pl-4">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <label htmlFor="auto_reflect" className="flex-1 ml-1 cursor-help opacity-80">
+                          {t('retrievePanel.querySettings.autoReflect', 'Auto-Reflect')}
+                        </label>
+                      </TooltipTrigger>
+                      <TooltipContent side="left">
+                        <p>{t('retrievePanel.querySettings.autoReflectTooltip', 'Automatically perform reflection and update playbook after query')}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                  <Checkbox
+                    className="mr-10 cursor-pointer"
+                    id="auto_reflect"
+                    checked={querySettings.auto_reflect}
+                    onCheckedChange={(checked) => handleChange('auto_reflect', checked)}
+                  />
+                </div>
+              )}
             </>
 
           </div>

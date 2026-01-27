@@ -3,7 +3,7 @@ import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { throttle } from '@/lib/utils'
-import { queryText, queryTextStream } from '@/api/lightrag'
+import { queryText, queryTextStream, aceQuery } from '@/api/lightrag'
 import { errorMessage } from '@/lib/utils'
 import { useSettingsStore } from '@/stores/settings'
 import { useDebounce } from '@/hooks/useDebounce'
@@ -232,7 +232,8 @@ export default function RetrievalTesting() {
         thinkingTime: null,        // Explicitly initialize to null
         thinkingContent: undefined, // Explicitly initialize to undefined
         displayContent: undefined,  // Explicitly initialize to undefined
-        isThinking: false          // Explicitly initialize to false
+        isThinking: false,          // Explicitly initialize to false
+        isACE: state.querySettings.enable_ace || false
       }
 
       const prevMessages = [...messages]
@@ -387,7 +388,13 @@ export default function RetrievalTesting() {
 
       try {
         // Run query
-        if (state.querySettings.stream) {
+        if (state.querySettings.enable_ace) {
+          const response = await aceQuery(queryParams)
+          updateAssistantMessage(response.response)
+          if (response.references) {
+            updateReferences(response.references)
+          }
+        } else if (state.querySettings.stream) {
           let errorMessage = ''
           await queryTextStream(queryParams, updateAssistantMessage, updateReferences, (error) => {
             errorMessage += error
