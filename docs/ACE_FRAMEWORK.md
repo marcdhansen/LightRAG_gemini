@@ -36,5 +36,5 @@ ACE components are integrated into the core LightRAG API and can be triggered vi
 
 ## 📚 Resources
 
-- [ACE Core Implementation](file:///Users/marchansen/antigravity_lightrag/LightRAG/lightrag/ace/)
+- [ACE Core Implementation](../lightrag/ace/)
 - [SOTA Roadmap](SOTA_ROADMAP.md)
