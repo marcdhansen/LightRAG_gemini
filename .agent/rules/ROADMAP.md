@@ -37,6 +37,7 @@ This is the central directory for all project-specific planning, tracking, and i
 ## 📈 Recent Accomplishments
 
 - ✓ **Documentation Validator** (2026-01-27): Created `scripts/validate_docs.py` to ensure `ARCHITECTURE.md` integrity (lightrag-rxg).
+- ✓ **Gold Standard Tests** (2026-01-27): Implemented `tests/test_gold_standard_extraction.py` validating extraction quality with pass/fail thresholds (lightrag-d9h).
 - ✓ **Graph Visualization** (2026-01-27): Implemented `GraphControl` with `useLightragGraph` and integrated Sigma.js for knowledge graph inspection.
 - ✓ **ACE Phase 3** (2026-01-27): Finalized minimal ACE framework prototype (Generator/Reflector/Curator stubs).
 - ✓ **Graph Reranking Implementation** (2026-01-27): Implemented `rerank_entities` and `rerank_relations` toggles, integrated into context building, and benchmarked with Ragas (+13.8% boost).
