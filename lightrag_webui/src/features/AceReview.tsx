@@ -102,7 +102,7 @@ export default function AceReview() {
 
             <div className="grid gap-4">
                 {repairs.map((repair) => (
-                    <Card key={repair.id}>
+                    <Card key={repair.id} data-testid="repair-card">
                         <CardHeader className="flex flex-row items-center gap-4">
                             <div className="p-2 bg-yellow-100 dark:bg-yellow-900 rounded-full">
                                 <AlertTriangleIcon className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
