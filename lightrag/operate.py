@@ -3033,13 +3033,13 @@ async def extract_entities(
                     # New entity from gleaning stage
                     maybe_nodes[entity_name] = list(glean_entities)
 
-            for edge_key, glean_edges in glean_edges.items():
+            for edge_key, glean_edge_list in glean_edges.items():
                 if edge_key in maybe_edges:
                     # Compare description lengths and keep the better one
                     original_desc_len = len(
                         maybe_edges[edge_key][0].get("description", "") or ""
                     )
-                    glean_desc_len = len(glean_edges[0].get("description", "") or "")
+                    glean_desc_len = len(glean_edge_list[0].get("description", "") or "")
 
                     if glean_desc_len > original_desc_len:
                         maybe_edges[edge_key] = list(glean_edges)
@@ -3812,7 +3812,7 @@ async def _apply_token_truncation(
     for _i, entity in enumerate(final_entities):
         entity_name = entity["entity_name"]
         created_at = entity.get("created_at", "UNKNOWN")
-        if isinstance(created_at, (int, float)):
+        if isinstance(created_at, int | float):
             created_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(created_at))
 
         # Store mapping from entity name to original data
@@ -3832,7 +3832,7 @@ async def _apply_token_truncation(
     relations_context = []
     for _i, relation in enumerate(final_relations):
         created_at = relation.get("created_at", "UNKNOWN")
-        if isinstance(created_at, (int, float)):
+        if isinstance(created_at, int | float):
             created_at = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(created_at))
 
         # Handle different relation data formats

@@ -27,6 +27,9 @@ jobs:
               with:
                 bun-version: latest
 
+            - name: Install WebUI dependencies
+              run: cd lightrag_webui && bun install --frozen-lockfile
+
             - name: Install dependencies
               run: |
                 python -m pip install --upgrade pip

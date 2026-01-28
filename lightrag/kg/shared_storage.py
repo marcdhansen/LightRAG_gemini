@@ -52,7 +52,7 @@ def direct_log(message, enable_output: bool = True, level: str = "DEBUG"):
 
 
 T = TypeVar("T")
-LockType = Union[ProcessLock, asyncio.Lock]
+LockType = ProcessLock | asyncio.Lock
 
 _is_multiprocess = None
 _workers = None
