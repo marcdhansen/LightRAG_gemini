@@ -69,7 +69,7 @@ async def llm_model_func(
     prompt,
     system_prompt=None,
     history_messages=None,
-    keyword_extraction=False,
+    _keyword_extraction=False,
     **kwargs,
 ) -> str:
     if history_messages is None:
