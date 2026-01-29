@@ -1,0 +1,795 @@
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/lightrag_azure_openai_demo.py:38:5
+   |
+36 |     system_prompt=None,
+37 |     history_messages=None,
+38 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+39 |     **kwargs,
+40 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/lightrag_gemini_postgres_demo.py:72:5
+   |
+70 |     system_prompt=None,
+71 |     history_messages=None,
+72 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+73 |     **kwargs,
+74 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/lightrag_openai_compatible_demo.py:93:5
+   |
+91 |     system_prompt=None,
+92 |     history_messages=None,
+93 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+94 |     **kwargs,
+95 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/unofficial-sample/lightrag_lmdeploy_demo.py:24:5
+   |
+22 |     system_prompt=None,
+23 |     history_messages=None,
+24 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+25 |     **kwargs,
+26 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/unofficial-sample/lightrag_openai_neo4j_milvus_redis_demo.py:36:5
+   |
+34 |     system_prompt=None,
+35 |     history_messages=None,
+36 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+37 |     **kwargs,
+38 | ) -> str:
+   |
+
+ARG002 Unused method argument: `query`
+  --> lightrag/ace/reflector.py:86:15
+   |
+85 |     async def reflect_graph_issues(
+86 |         self, query: str, generation_result: dict[str, Any]
+   |               ^^^^^
+87 |     ) -> list[dict[str, Any]]:
+88 |         """
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/auth.py:104:13
+    |
+102 |               }
+103 |           except jwt.PyJWTError:
+104 | /             raise HTTPException(
+105 | |                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
+106 | |             )
+    | |_____________^
+    |
+
+ARG001 Unused function argument: `server`
+  --> lightrag/api/gunicorn_config.py:95:17
+   |
+95 | def on_starting(server):
+   |                 ^^^^^^
+96 |     """
+97 |     Executed when Gunicorn starts, before forking the first worker processes
+   |
+
+ARG001 Unused function argument: `server`
+   --> lightrag/api/gunicorn_config.py:124:13
+    |
+124 | def on_exit(server):
+    |             ^^^^^^
+125 |     """
+126 |     Executed when Gunicorn is shutting down.
+    |
+
+ARG001 Unused function argument: `server`
+   --> lightrag/api/gunicorn_config.py:140:15
+    |
+140 | def post_fork(server, worker):
+    |               ^^^^^^
+141 |     """
+142 |     Executed after a worker has been forked.
+    |
+
+ARG001 Unused function argument: `worker`
+   --> lightrag/api/gunicorn_config.py:140:23
+    |
+140 | def post_fork(server, worker):
+    |                       ^^^^^^
+141 |     """
+142 |     Executed after a worker has been forked.
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/lightrag_server.py:643:13
+    |
+641 |                 return create_optimized_openai_llm_func(config_cache, args, llm_timeout)
+642 |         except ImportError as e:
+643 |             raise Exception(f"Failed to import {binding} LLM binding: {e}")
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+644 |
+645 |     def create_llm_model_kwargs(binding: str, args, llm_timeout: int) -> dict:
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/lightrag_server.py:661:17
+    |
+659 |                 }
+660 |             except ImportError as e:
+661 |                 raise Exception(f"Failed to import {binding} options: {e}")
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+662 |         return {}
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/lightrag_server.py:882:17
+    |
+880 |                     return await actual_func(**kwargs)
+881 |             except ImportError as e:
+882 |                 raise Exception(f"Failed to import {binding} embedding: {e}")
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+883 |
+884 |         # Step 4: Wrap in EmbeddingFunc and return
+    |
+
+ARG001 Unused function argument: `request`
+    --> lightrag/api/lightrag_server.py:1126:38
+     |
+1124 |     # Legacy redirect for /upload to /documents/upload
+1125 |     @app.post("/upload", include_in_schema=False)
+1126 |     async def legacy_upload_redirect(request: Request):
+     |                                      ^^^^^^^
+1127 |         return RedirectResponse(url="/documents/upload", status_code=307)
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/lightrag_server.py:1329:13
+     |
+1327 |         except Exception as e:
+1328 |             logger.error(f"Error getting health status: {str(e)}")
+1329 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1330 |
+1331 |     @app.post(
+     |
+
+ARG001 Unused function argument: `request`
+    --> lightrag/api/lightrag_server.py:1337:30
+     |
+1335 |         description="Wipes all documents, entities, relations, and the knowledge graph. CAUTION: Use with care.",
+1336 |     )
+1337 |     async def clear_all_data(request: Request):
+     |                              ^^^^^^^
+1338 |         """Wipes all data from all storage backends"""
+1339 |         try:
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/lightrag_server.py:1348:13
+     |
+1346 |         except Exception as e:
+1347 |             logger.error(f"Error clearing all data: {str(e)}")
+1348 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1349 |
+1350 |     # Custom StaticFiles class for smart caching
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  --> lightrag/api/routers/ace_routes.py:25:13
+   |
+23 |             logger.error(f"Error getting pending repairs: {e}")
+24 |             logger.error(traceback.format_exc())
+25 |             raise HTTPException(status_code=500, detail=str(e))
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+26 |
+27 |     @router.post(
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  --> lightrag/api/routers/ace_routes.py:43:13
+   |
+41 |             logger.error(f"Error approving repair {repair_id}: {e}")
+42 |             logger.error(traceback.format_exc())
+43 |             raise HTTPException(status_code=500, detail=str(e))
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+44 |
+45 |     @router.post(
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  --> lightrag/api/routers/ace_routes.py:61:13
+   |
+59 |             logger.error(f"Error rejecting repair {repair_id}: {e}")
+60 |             logger.error(traceback.format_exc())
+61 |             raise HTTPException(status_code=500, detail=str(e))
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+62 |
+63 |     return router
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/document_routes.py:154:9
+    |
+152 |             raise HTTPException(status_code=400, detail="Unsafe filename detected")
+153 |     except (OSError, ValueError):
+154 |         raise HTTPException(status_code=400, detail="Invalid filename")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+155 |
+156 |     return clean_name
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2206:13
+     |
+2204 |             logger.error(f"Error /documents/upload: {file.filename}: {str(e)}")
+2205 |             logger.error(traceback.format_exc())
+2206 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2207 |
+2208 |     @router.post(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2284:13
+     |
+2282 |             logger.error(f"Error /documents/text: {str(e)}")
+2283 |             logger.error(traceback.format_exc())
+2284 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2285 |
+2286 |     @router.post(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2367:13
+     |
+2365 |             logger.error(f"Error /documents/texts: {str(e)}")
+2366 |             logger.error(traceback.format_exc())
+2367 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2368 |
+2369 |     @router.delete(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2563:13
+     |
+2561 |             logger.error(traceback.format_exc())
+2562 |             append_pipeline_log(pipeline_status, error_msg, 40)
+2563 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2564 |         finally:
+2565 |             # Reset busy status after completion
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2604:13
+     |
+2602 |         except Exception as e:
+2603 |             logger.error(f"Error updating pipeline log level: {e}")
+2604 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2605 |
+2606 |     @router.get(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2709:13
+     |
+2707 |             logger.error(f"Error getting pipeline status: {str(e)}")
+2708 |             logger.error(traceback.format_exc())
+2709 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2710 |
+2711 |     # TODO: Deprecated, use /documents/paginated instead
+     |
+
+B007 Loop control variable `status` not used within loop body
+    --> lightrag/api/routers/document_routes.py:2767:34
+     |
+2765 |                 # Check if we have any documents left to process
+2766 |                 has_remaining = False
+2767 |                 for status_idx, (status, docs_list) in enumerate(status_documents):
+     |                                  ^^^^^^
+2768 |                     if status_indices[status_idx] < len(docs_list):
+2769 |                         has_remaining = True
+     |
+help: Rename unused `status` to `_status`
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2811:13
+     |
+2809 |             logger.error(f"Error GET /documents: {str(e)}")
+2810 |             logger.error(traceback.format_exc())
+2811 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2812 |
+2813 |     class DeleteDocByIdResponse(BaseModel):
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2899:13
+     |
+2897 |             logger.error(error_msg)
+2898 |             logger.error(traceback.format_exc())
+2899 |             raise HTTPException(status_code=500, detail=error_msg)
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2900 |
+2901 |     @router.delete(
+     |
+
+ARG001 Unused function argument: `request`
+    --> lightrag/api/routers/document_routes.py:2930:27
+     |
+2928 |         dependencies=[Depends(combined_auth)],
+2929 |     )
+2930 |     async def clear_cache(request: ClearCacheRequest):
+     |                           ^^^^^^^
+2931 |         """
+2932 |         Clear all cache data from the LLM response cache storage.
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2957:13
+     |
+2955 |             logger.error(f"Error clearing cache: {str(e)}")
+2956 |             logger.error(traceback.format_exc())
+2957 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2958 |
+2959 |     @router.delete(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:2992:13
+     |
+2990 |             logger.error(error_msg)
+2991 |             logger.error(traceback.format_exc())
+2992 |             raise HTTPException(status_code=500, detail=error_msg)
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2993 |
+2994 |     @router.delete(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:3030:13
+     |
+3028 |             logger.error(error_msg)
+3029 |             logger.error(traceback.format_exc())
+3030 |             raise HTTPException(status_code=500, detail=error_msg)
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3031 |
+3032 |     @router.get(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:3104:13
+     |
+3102 |             logger.error(f"Error getting track status for {track_id}: {str(e)}")
+3103 |             logger.error(traceback.format_exc())
+3104 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3105 |
+3106 |     @router.post(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:3191:13
+     |
+3189 |             logger.error(f"Error getting paginated documents: {str(e)}")
+3190 |             logger.error(traceback.format_exc())
+3191 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3192 |
+3193 |     @router.get(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:3218:13
+     |
+3216 |             logger.error(f"Error getting document status counts: {str(e)}")
+3217 |             logger.error(traceback.format_exc())
+3218 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3219 |
+3220 |     @router.post(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:3264:13
+     |
+3262 |             logger.error(f"Error initiating reprocessing of failed documents: {str(e)}")
+3263 |             logger.error(traceback.format_exc())
+3264 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3265 |
+3266 |     @router.post(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:3326:13
+     |
+3324 |             logger.error(f"Error requesting pipeline cancellation: {str(e)}")
+3325 |             logger.error(traceback.format_exc())
+3326 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3327 |
+3328 |     @router.get(
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/document_routes.py:3348:13
+     |
+3346 |         except Exception as e:
+3347 |             logger.error(f"Error getting content for document {doc_id}: {str(e)}")
+3348 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+3349 |
+3350 |     return router
+     |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+  --> lightrag/api/routers/highlight_routes.py:48:13
+   |
+46 |         except Exception as e:
+47 |             logger.error(f"Error in highlight endpoint: {e}")
+48 |             raise HTTPException(status_code=500, detail=str(e))
+   |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+49 |
+50 |     return router
+   |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/ollama_api.py:152:9
+    |
+150 |         return model_class(**body)
+151 |     except json.JSONDecodeError:
+152 |         raise HTTPException(status_code=400, detail="Invalid JSON in request body")
+    |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+153 |     except Exception as e:
+154 |         raise HTTPException(
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/ollama_api.py:154:9
+    |
+152 |           raise HTTPException(status_code=400, detail="Invalid JSON in request body")
+153 |       except Exception as e:
+154 | /         raise HTTPException(
+155 | |             status_code=400, detail=f"Error parsing request body: {str(e)}"
+156 | |         )
+    | |_________^
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/ollama_api.py:460:17
+    |
+458 |             except Exception as e:
+459 |                 logger.error(f"Ollama generate error: {str(e)}", exc_info=True)
+460 |                 raise HTTPException(status_code=500, detail=str(e))
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+461 |
+462 |         @self.router.post(
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/ollama_api.py:725:17
+    |
+723 |             except Exception as e:
+724 |                 logger.error(f"Ollama chat error: {str(e)}", exc_info=True)
+725 |                 raise HTTPException(status_code=500, detail=str(e))
+    |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/query_routes.py:501:13
+    |
+499 |         except Exception as e:
+500 |             logger.error(f"Error processing query: {str(e)}", exc_info=True)
+501 |             raise HTTPException(status_code=500, detail=str(e))
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+502 |
+503 |     @router.post(
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/query_routes.py:787:13
+    |
+785 |         except Exception as e:
+786 |             logger.error(f"Error processing streaming query: {str(e)}", exc_info=True)
+787 |             raise HTTPException(status_code=500, detail=str(e))
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+788 |
+789 |     @router.post(
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+   --> lightrag/api/routers/query_routes.py:828:13
+    |
+826 |         except Exception as e:
+827 |             logger.error(f"Error in ACE query: {str(e)}", exc_info=True)
+828 |             raise HTTPException(status_code=500, detail=str(e))
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+829 |
+830 |     @router.post(
+    |
+
+B904 Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling
+    --> lightrag/api/routers/query_routes.py:1245:13
+     |
+1243 |         except Exception as e:
+1244 |             logger.error(f"Error processing data query: {str(e)}", exc_info=True)
+1245 |             raise HTTPException(status_code=500, detail=str(e))
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+1246 |
+1247 |     return router
+     |
+
+B027 `StorageNameSpace.initialize` is an empty method in an abstract base class, but has no abstract decorator
+   --> lightrag/base.py:183:5
+    |
+181 |       global_config: dict[str, Any]
+182 |
+183 | /     async def initialize(self):
+184 | |         """Initialize the storage"""
+185 | |         pass
+    | |____________^
+186 |
+187 |       async def finalize(self):
+    |
+
+B027 `StorageNameSpace.finalize` is an empty method in an abstract base class, but has no abstract decorator
+   --> lightrag/base.py:187:5
+    |
+185 |           pass
+186 |
+187 | /     async def finalize(self):
+188 | |         """Finalize the storage"""
+189 | |         pass
+    | |____________^
+190 |
+191 |       @abstractmethod
+    |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:1895:89
+     |
+1893 |                                 pipeline_status["cur_batch"] = processed_count
+1894 |
+1895 |                                 log_message = f"Extracting stage {current_file_number}/{total_files}: {file_path}"
+     |                                                                                         ^^^^^^^^^^^
+1896 |                                 logger.info(log_message)
+1897 |                                 append_pipeline_log(pipeline_status, log_message, 10)
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2022:85
+     |
+2020 | …                     if isinstance(e, PipelineCancelledException):
+2021 | …                         # User cancellation - log brief message only, no traceback
+2022 | …                         error_msg = f"User cancelled {current_file_number}/{total_files}: {file_path}"
+     |                                                                               ^^^^^^^^^^^
+2023 | …                         logger.warning(error_msg)
+2024 | …                         async with pipeline_status_lock:
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2032:97
+     |
+2030 | …                     # Other exceptions - log with traceback
+2031 | …                     logger.error(traceback.format_exc())
+2032 | …                     error_msg = f"Failed to extract document {current_file_number}/{total_files}: {file_path}"
+     |                                                                                       ^^^^^^^^^^^
+2033 | …                     logger.error(error_msg)
+2034 | …                     async with pipeline_status_lock:
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2113:49
+     |
+2111 | …                         relation_chunks_storage=self.relation_chunks,
+2112 | …                         current_file_number=current_file_number,
+2113 | …                         total_files=total_files,
+     |                                       ^^^^^^^^^^^
+2114 | …                         file_path=file_path,
+2115 | …                     )
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2146:102
+     |
+2145 | …                     async with pipeline_status_lock:
+2146 | …                         log_message = f"Completed processing file {current_file_number}/{total_files}: {file_path}"
+     |                                                                                            ^^^^^^^^^^^
+2147 | …                         logger.info(log_message)
+2148 | …                         pipeline_status["latest_message"] = log_message
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2157:102
+     |
+2155 | …                     if isinstance(e, PipelineCancelledException):
+2156 | …                         # User cancellation - log brief message only, no traceback
+2157 | …                         error_msg = f"User cancelled during merge {current_file_number}/{total_files}: {file_path}"
+     |                                                                                            ^^^^^^^^^^^
+2158 | …                         logger.warning(error_msg)
+2159 | …                         async with pipeline_status_lock:
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2167:107
+     |
+2165 | …                     # Other exceptions - log with traceback
+2166 | …                     logger.error(traceback.format_exc())
+2167 | …                     error_msg = f"Merging stage failed in document {current_file_number}/{total_files}: {file_path}"
+     |                                                                                             ^^^^^^^^^^^
+2168 | …                     logger.error(error_msg)
+2169 | …                     async with pipeline_status_lock:
+     |
+
+B025 try-except block with duplicate exception `Exception`
+   --> lightrag/kg/deprecated/chroma_impl.py:245:16
+    |
+243 |             raise
+244 |
+245 |         except Exception as e:
+    |                ^^^^^^^^^
+246 |             logger.error(f"Error during prefix search in ChromaDB: {str(e)}")
+247 |             raise
+    |
+
+B007 Loop control variable `doc_id` not used within loop body
+   --> lightrag/kg/json_doc_status_impl.py:312:13
+    |
+311 |         # Remove sort key from documents
+312 |         for doc_id, doc in all_docs:
+    |             ^^^^^^
+313 |             if hasattr(doc, "_sort_key"):
+314 |                 delattr(doc, "_sort_key")
+    |
+help: Rename unused `doc_id` to `_doc_id`
+
+B023 Function definition does not bind loop variable `workspace_label`
+   --> lightrag/kg/memgraph_impl.py:691:36
+    |
+689 |                     async def execute_upsert(tx: AsyncManagedTransaction):
+690 |                         query = f"""
+691 |                         MERGE (n:`{workspace_label}` {{entity_id: $entity_id}})
+    |                                    ^^^^^^^^^^^^^^^
+692 |                         SET n += $properties
+693 |                         SET n:`{entity_type}`
+    |
+
+B023 Function definition does not bind loop variable `source`
+   --> lightrag/kg/memgraph_impl.py:913:45
+    |
+911 |                 """
+912 |                 result = await tx.run(
+913 |                     query, source_entity_id=source, target_entity_id=target
+    |                                             ^^^^^^
+914 |                 )
+915 |                 logger.debug(
+    |
+
+B023 Function definition does not bind loop variable `target`
+   --> lightrag/kg/memgraph_impl.py:913:70
+    |
+911 |                 """
+912 |                 result = await tx.run(
+913 |                     query, source_entity_id=source, target_entity_id=target
+    |                                                                      ^^^^^^
+914 |                 )
+915 |                 logger.debug(
+    |
+
+B023 Function definition does not bind loop variable `source`
+   --> lightrag/kg/memgraph_impl.py:916:62
+    |
+914 |                 )
+915 |                 logger.debug(
+916 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+    |                                                              ^^^^^^
+917 |                 )
+918 |                 await result.consume()  # Ensure result is fully consumed
+    |
+
+B023 Function definition does not bind loop variable `target`
+   --> lightrag/kg/memgraph_impl.py:916:76
+    |
+914 |                 )
+915 |                 logger.debug(
+916 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+    |                                                                            ^^^^^^
+917 |                 )
+918 |                 await result.consume()  # Ensure result is fully consumed
+    |
+
+B025 try-except block with duplicate exception `PyMongoError`
+    --> lightrag/kg/mongo_impl.py:2370:16
+     |
+2368 |             )
+2369 |
+2370 |         except PyMongoError as e:
+     |                ^^^^^^^^^^^^
+2371 |             logger.error(
+2372 |                 f"[{self.workspace}] Error searching by prefix in {self.namespace}: {str(e)}"
+     |
+
+B023 Function definition does not bind loop variable `source`
+    --> lightrag/kg/neo4j_impl.py:1609:45
+     |
+1607 |                 """
+1608 |                 result = await tx.run(
+1609 |                     query, source_entity_id=source, target_entity_id=target
+     |                                             ^^^^^^
+1610 |                 )
+1611 |                 logger.debug(
+     |
+
+B023 Function definition does not bind loop variable `target`
+    --> lightrag/kg/neo4j_impl.py:1609:70
+     |
+1607 |                 """
+1608 |                 result = await tx.run(
+1609 |                     query, source_entity_id=source, target_entity_id=target
+     |                                                                      ^^^^^^
+1610 |                 )
+1611 |                 logger.debug(
+     |
+
+B023 Function definition does not bind loop variable `source`
+    --> lightrag/kg/neo4j_impl.py:1612:62
+     |
+1610 |                 )
+1611 |                 logger.debug(
+1612 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+     |                                                              ^^^^^^
+1613 |                 )
+1614 |                 await result.consume()  # Ensure result is fully consumed
+     |
+
+B023 Function definition does not bind loop variable `target`
+    --> lightrag/kg/neo4j_impl.py:1612:76
+     |
+1610 |                 )
+1611 |                 logger.debug(
+1612 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+     |                                                                            ^^^^^^
+1613 |                 )
+1614 |                 await result.consume()  # Ensure result is fully consumed
+     |
+
+B023 Function definition does not bind loop variable `insert_query`
+    --> lightrag/kg/postgres_impl.py:2568:46
+     |
+2566 |             # Note: register_vector is already called on pool init, no need to call it again
+2567 |             async def _batch_insert(connection: asyncpg.Connection) -> None:
+2568 |                 await connection.executemany(insert_query, batch_values)
+     |                                              ^^^^^^^^^^^^
+2569 |
+2570 |             await db._run_with_retry(_batch_insert)
+     |
+
+B023 Function definition does not bind loop variable `batch_values`
+    --> lightrag/kg/postgres_impl.py:2568:60
+     |
+2566 |             # Note: register_vector is already called on pool init, no need to call it again
+2567 |             async def _batch_insert(connection: asyncpg.Connection) -> None:
+2568 |                 await connection.executemany(insert_query, batch_values)
+     |                                                            ^^^^^^^^^^^^
+2569 |
+2570 |             await db._run_with_retry(_batch_insert)
+     |
+
+Found 73 errors.

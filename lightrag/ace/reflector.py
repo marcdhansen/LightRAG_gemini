@@ -83,7 +83,7 @@ class ACEReflector:
             return [f"Reflection failed: {e}"]
 
     async def reflect_graph_issues(
-        self, query: str, generation_result: dict[str, Any]
+        self, _query: str, generation_result: dict[str, Any]
     ) -> list[dict[str, Any]]:
         """
         Analyzes retrieved context for hallucinations, illogical relationships, or duplicate entities.

@@ -1,0 +1,614 @@
+[
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 14,
+      "row": 106
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/auth.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 104
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 104,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 76,
+      "row": 643
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/lightrag_server.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 643
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 643,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 76,
+      "row": 661
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/lightrag_server.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 661
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 661,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 78,
+      "row": 882
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/lightrag_server.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 882
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 882,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 1329
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/lightrag_server.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 1329
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 1329,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 1348
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/lightrag_server.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 1348
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 1348,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 25
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/ace_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 25
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 25,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 43
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/ace_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 43
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 43,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 61
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/ace_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 61
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 61,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 72,
+      "row": 154
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 154
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 154,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2206
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2206
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2206,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2284
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2284
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2284,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2367
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2367
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2367,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2563
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2563
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2563,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2604
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2604
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2604,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2709
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2709
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2709,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2811
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2811
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2811,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 67,
+      "row": 2899
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2899
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2899,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 2957
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2957
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2957,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 67,
+      "row": 2992
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 2992
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 2992,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 67,
+      "row": 3030
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 3030
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 3030,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 3104
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 3104
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 3104,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 3191
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 3191
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 3191,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 3218
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 3218
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 3218,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 3264
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 3264
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 3264,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 3326
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 3326
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 3326,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 3348
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/document_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 3348
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 3348,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 48
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/highlight_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 48
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 48,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 84,
+      "row": 152
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/ollama_api.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 152
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 152,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 10,
+      "row": 156
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/ollama_api.py",
+    "fix": null,
+    "location": {
+      "column": 9,
+      "row": 154
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 154,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 68,
+      "row": 460
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/ollama_api.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 460
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 460,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 68,
+      "row": 725
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/ollama_api.py",
+    "fix": null,
+    "location": {
+      "column": 17,
+      "row": 725
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 725,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 501
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/query_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 501
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 501,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 787
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/query_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 787
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 787,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 828
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/query_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 828
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 828,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  },
+  {
+    "cell": null,
+    "code": "B904",
+    "end_location": {
+      "column": 64,
+      "row": 1245
+    },
+    "filename": "/Users/marchansen/antigravity_lightrag/LightRAG/lightrag/api/routers/query_routes.py",
+    "fix": null,
+    "location": {
+      "column": 13,
+      "row": 1245
+    },
+    "message": "Within an `except` clause, raise exceptions with `raise ... from err` or `raise ... from None` to distinguish them from errors in exception handling",
+    "noqa_row": 1245,
+    "url": "https://docs.astral.sh/ruff/rules/raise-without-from-inside-except"
+  }
+]

@@ -7,7 +7,7 @@ import time
 from contextvars import ContextVar
 from multiprocessing import Manager
 from multiprocessing.synchronize import Lock as ProcessLock
-from typing import Any, Generic, Optional, TypeVar, Union
+from typing import Any, Generic, Optional, TypeVar
 
 from lightrag.exceptions import PipelineNotInitializedError
 

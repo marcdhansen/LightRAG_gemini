@@ -528,7 +528,7 @@ class EmbeddingFunc:
 
         # Optional: Verify vector count matches input text count
         actual_vectors = total_elements // expected_dim
-        if args and isinstance(args[0], (list, tuple)):
+        if args and isinstance(args[0], list | tuple):
             expected_vectors = len(args[0])
             if actual_vectors != expected_vectors:
                 raise ValueError(
@@ -1187,7 +1187,7 @@ class SanitizingJSONEncoder(json.JSONEncoder):
                 new_dict[clean_k] = clean_v
             return new_dict
 
-        elif isinstance(obj, (list, tuple)):
+        elif isinstance(obj, list | tuple):
             # Sanitize list/tuple elements
             cleaned = [self._sanitize_for_encoding(item) for item in obj]
             return type(obj)(cleaned) if isinstance(obj, tuple) else cleaned

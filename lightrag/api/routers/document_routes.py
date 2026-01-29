@@ -151,7 +151,7 @@ def sanitize_filename(filename: str, input_dir: Path) -> str:
         if not final_path.is_relative_to(input_dir.resolve()):
             raise HTTPException(status_code=400, detail="Unsafe filename detected")
     except (OSError, ValueError):
-        raise HTTPException(status_code=400, detail="Invalid filename")
+        raise HTTPException(status_code=400, detail="Invalid filename") from None
 
     return clean_name
 
@@ -2203,7 +2203,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error /documents/upload: {file.filename}: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.post(
         "/text", response_model=InsertResponse, dependencies=[Depends(combined_auth)]
@@ -2281,7 +2281,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error /documents/text: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.post(
         "/texts",
@@ -2364,7 +2364,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error /documents/texts: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.delete(
         "", response_model=ClearDocumentsResponse, dependencies=[Depends(combined_auth)]
@@ -2560,7 +2560,7 @@ def create_document_routes(
             logger.error(traceback.format_exc())
             logger.error(traceback.format_exc())
             append_pipeline_log(pipeline_status, error_msg, 40)
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
         finally:
             # Reset busy status after completion
             async with pipeline_status_lock:
@@ -2601,7 +2601,7 @@ def create_document_routes(
             }
         except Exception as e:
             logger.error(f"Error updating pipeline log level: {e}")
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.get(
         "/pipeline_status",
@@ -2706,7 +2706,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error getting pipeline status: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     # TODO: Deprecated, use /documents/paginated instead
     @router.get(
@@ -2764,7 +2764,7 @@ def create_document_routes(
             while total_documents < max_documents:
                 # Check if we have any documents left to process
                 has_remaining = False
-                for status_idx, (status, docs_list) in enumerate(status_documents):
+                for status_idx, (_, docs_list) in enumerate(status_documents):
                     if status_indices[status_idx] < len(docs_list):
                         has_remaining = True
                         break
@@ -2808,7 +2808,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error GET /documents: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     class DeleteDocByIdResponse(BaseModel):
         """Response model for single document deletion operation."""
@@ -2896,7 +2896,7 @@ def create_document_routes(
             error_msg = f"Error initiating document deletion for {delete_request.doc_ids}: {str(e)}"
             logger.error(error_msg)
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=error_msg)
+            raise HTTPException(status_code=500, detail=error_msg) from None
 
     @router.delete(
         "/{doc_id}",
@@ -2927,7 +2927,7 @@ def create_document_routes(
         response_model=ClearCacheResponse,
         dependencies=[Depends(combined_auth)],
     )
-    async def clear_cache(request: ClearCacheRequest):
+    async def clear_cache(_: ClearCacheRequest):
         """
         Clear all cache data from the LLM response cache storage.
 
@@ -2954,7 +2954,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error clearing cache: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.delete(
         "/delete_entity",
@@ -2989,7 +2989,7 @@ def create_document_routes(
             error_msg = f"Error deleting entity '{request.entity_name}': {str(e)}"
             logger.error(error_msg)
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=error_msg)
+            raise HTTPException(status_code=500, detail=error_msg) from None
 
     @router.delete(
         "/delete_relation",
@@ -3027,7 +3027,7 @@ def create_document_routes(
             error_msg = f"Error deleting relation from '{request.source_entity}' to '{request.target_entity}': {str(e)}"
             logger.error(error_msg)
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=error_msg)
+            raise HTTPException(status_code=500, detail=error_msg) from None
 
     @router.get(
         "/track_status/{track_id}",
@@ -3101,7 +3101,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error getting track status for {track_id}: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.post(
         "/paginated",
@@ -3188,7 +3188,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error getting paginated documents: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.get(
         "/status_counts",
@@ -3215,7 +3215,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error getting document status counts: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.post(
         "/reprocess_failed",
@@ -3261,7 +3261,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error initiating reprocessing of failed documents: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.post(
         "/cancel_pipeline",
@@ -3323,7 +3323,7 @@ def create_document_routes(
         except Exception as e:
             logger.error(f"Error requesting pipeline cancellation: {str(e)}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.get(
         "/{doc_id}/content",
@@ -3345,6 +3345,6 @@ def create_document_routes(
             raise
         except Exception as e:
             logger.error(f"Error getting content for document {doc_id}: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     return router

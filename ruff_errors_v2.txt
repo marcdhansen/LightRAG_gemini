@@ -1,0 +1,496 @@
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/lightrag_azure_openai_demo.py:38:5
+   |
+36 |     system_prompt=None,
+37 |     history_messages=None,
+38 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+39 |     **kwargs,
+40 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/lightrag_gemini_postgres_demo.py:72:5
+   |
+70 |     system_prompt=None,
+71 |     history_messages=None,
+72 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+73 |     **kwargs,
+74 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/lightrag_openai_compatible_demo.py:93:5
+   |
+91 |     system_prompt=None,
+92 |     history_messages=None,
+93 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+94 |     **kwargs,
+95 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/unofficial-sample/lightrag_lmdeploy_demo.py:24:5
+   |
+22 |     system_prompt=None,
+23 |     history_messages=None,
+24 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+25 |     **kwargs,
+26 | ) -> str:
+   |
+
+ARG001 Unused function argument: `keyword_extraction`
+  --> examples/unofficial-sample/lightrag_openai_neo4j_milvus_redis_demo.py:36:5
+   |
+34 |     system_prompt=None,
+35 |     history_messages=None,
+36 |     keyword_extraction=False,
+   |     ^^^^^^^^^^^^^^^^^^
+37 |     **kwargs,
+38 | ) -> str:
+   |
+
+I001 [*] Import block is un-sorted or un-formatted
+ --> fix_b904.py:1:1
+  |
+1 | / import json
+2 | | import os
+  | |_________^
+3 |
+4 |   def fix_b904():
+  |
+help: Organize imports
+
+UP015 [*] Unnecessary mode argument
+  --> fix_b904.py:29:29
+   |
+27 |             continue
+28 |
+29 |         with open(filename, "r") as f:
+   |                             ^^^
+30 |             lines = f.readlines()
+   |
+help: Remove mode argument
+
+W293 [*] Blank line contains whitespace
+  --> fix_b904.py:31:1
+   |
+29 |         with open(filename, "r") as f:
+30 |             lines = f.readlines()
+31 |
+   | ^^^^^^^^
+32 |         # Sort errors in reverse order by row to avoid issues if we ever changed line counts
+33 |         file_errors.sort(key=lambda x: x["end_location"]["row"], reverse=True)
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> fix_b904.py:34:1
+   |
+32 |         # Sort errors in reverse order by row to avoid issues if we ever changed line counts
+33 |         file_errors.sort(key=lambda x: x["end_location"]["row"], reverse=True)
+34 |
+   | ^^^^^^^^
+35 |         for error in file_errors:
+36 |             end_row = error["end_location"]["row"] - 1
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> fix_b904.py:37:1
+   |
+35 |         for error in file_errors:
+36 |             end_row = error["end_location"]["row"] - 1
+37 |
+   | ^^^^^^^^^^^^
+38 |             if end_row >= len(lines):
+39 |                 continue
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> fix_b904.py:42:1
+   |
+41 |             target_line = lines[end_row]
+42 |
+   | ^^^^^^^^^^^^
+43 |             # Check if this line actually contains the end of a raise statement
+44 |             # and doesn't already have 'from'
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> fix_b904.py:47:1
+   |
+45 |             if " from " in target_line:
+46 |                 continue
+47 |
+   | ^^^^^^^^^^^^
+48 |             # Append ' from None' before the newline
+49 |             lines[end_row] = lines[end_row].rstrip() + " from None\n"
+   |
+help: Remove whitespace from blank line
+
+W293 [*] Blank line contains whitespace
+  --> fix_b904.py:51:1
+   |
+49 |             lines[end_row] = lines[end_row].rstrip() + " from None\n"
+50 |             print(f"Fixed B904 in {filename} at line {end_row + 1}")
+51 |
+   | ^^^^^^^^^^^^
+52 |         with open(filename, "w") as f:
+53 |             f.writelines(lines)
+   |
+help: Remove whitespace from blank line
+
+ARG002 Unused method argument: `query`
+  --> lightrag/ace/reflector.py:86:15
+   |
+85 |     async def reflect_graph_issues(
+86 |         self, query: str, generation_result: dict[str, Any]
+   |               ^^^^^
+87 |     ) -> list[dict[str, Any]]:
+88 |         """
+   |
+
+ARG001 Unused function argument: `server`
+  --> lightrag/api/gunicorn_config.py:95:17
+   |
+95 | def on_starting(server):
+   |                 ^^^^^^
+96 |     """
+97 |     Executed when Gunicorn starts, before forking the first worker processes
+   |
+
+ARG001 Unused function argument: `server`
+   --> lightrag/api/gunicorn_config.py:124:13
+    |
+124 | def on_exit(server):
+    |             ^^^^^^
+125 |     """
+126 |     Executed when Gunicorn is shutting down.
+    |
+
+ARG001 Unused function argument: `server`
+   --> lightrag/api/gunicorn_config.py:140:15
+    |
+140 | def post_fork(server, worker):
+    |               ^^^^^^
+141 |     """
+142 |     Executed after a worker has been forked.
+    |
+
+ARG001 Unused function argument: `worker`
+   --> lightrag/api/gunicorn_config.py:140:23
+    |
+140 | def post_fork(server, worker):
+    |                       ^^^^^^
+141 |     """
+142 |     Executed after a worker has been forked.
+    |
+
+ARG001 Unused function argument: `request`
+    --> lightrag/api/lightrag_server.py:1126:38
+     |
+1124 |     # Legacy redirect for /upload to /documents/upload
+1125 |     @app.post("/upload", include_in_schema=False)
+1126 |     async def legacy_upload_redirect(request: Request):
+     |                                      ^^^^^^^
+1127 |         return RedirectResponse(url="/documents/upload", status_code=307)
+     |
+
+ARG001 Unused function argument: `request`
+    --> lightrag/api/lightrag_server.py:1337:30
+     |
+1335 |         description="Wipes all documents, entities, relations, and the knowledge graph. CAUTION: Use with care.",
+1336 |     )
+1337 |     async def clear_all_data(request: Request):
+     |                              ^^^^^^^
+1338 |         """Wipes all data from all storage backends"""
+1339 |         try:
+     |
+
+B007 Loop control variable `status` not used within loop body
+    --> lightrag/api/routers/document_routes.py:2767:34
+     |
+2765 |                 # Check if we have any documents left to process
+2766 |                 has_remaining = False
+2767 |                 for status_idx, (status, docs_list) in enumerate(status_documents):
+     |                                  ^^^^^^
+2768 |                     if status_indices[status_idx] < len(docs_list):
+2769 |                         has_remaining = True
+     |
+help: Rename unused `status` to `_status`
+
+ARG001 Unused function argument: `request`
+    --> lightrag/api/routers/document_routes.py:2930:27
+     |
+2928 |         dependencies=[Depends(combined_auth)],
+2929 |     )
+2930 |     async def clear_cache(request: ClearCacheRequest):
+     |                           ^^^^^^^
+2931 |         """
+2932 |         Clear all cache data from the LLM response cache storage.
+     |
+
+B027 `StorageNameSpace.initialize` is an empty method in an abstract base class, but has no abstract decorator
+   --> lightrag/base.py:183:5
+    |
+181 |       global_config: dict[str, Any]
+182 |
+183 | /     async def initialize(self):
+184 | |         """Initialize the storage"""
+185 | |         pass
+    | |____________^
+186 |
+187 |       async def finalize(self):
+    |
+
+B027 `StorageNameSpace.finalize` is an empty method in an abstract base class, but has no abstract decorator
+   --> lightrag/base.py:187:5
+    |
+185 |           pass
+186 |
+187 | /     async def finalize(self):
+188 | |         """Finalize the storage"""
+189 | |         pass
+    | |____________^
+190 |
+191 |       @abstractmethod
+    |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:1895:89
+     |
+1893 |                                 pipeline_status["cur_batch"] = processed_count
+1894 |
+1895 |                                 log_message = f"Extracting stage {current_file_number}/{total_files}: {file_path}"
+     |                                                                                         ^^^^^^^^^^^
+1896 |                                 logger.info(log_message)
+1897 |                                 append_pipeline_log(pipeline_status, log_message, 10)
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2022:85
+     |
+2020 | …                     if isinstance(e, PipelineCancelledException):
+2021 | …                         # User cancellation - log brief message only, no traceback
+2022 | …                         error_msg = f"User cancelled {current_file_number}/{total_files}: {file_path}"
+     |                                                                               ^^^^^^^^^^^
+2023 | …                         logger.warning(error_msg)
+2024 | …                         async with pipeline_status_lock:
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2032:97
+     |
+2030 | …                     # Other exceptions - log with traceback
+2031 | …                     logger.error(traceback.format_exc())
+2032 | …                     error_msg = f"Failed to extract document {current_file_number}/{total_files}: {file_path}"
+     |                                                                                       ^^^^^^^^^^^
+2033 | …                     logger.error(error_msg)
+2034 | …                     async with pipeline_status_lock:
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2113:49
+     |
+2111 | …                         relation_chunks_storage=self.relation_chunks,
+2112 | …                         current_file_number=current_file_number,
+2113 | …                         total_files=total_files,
+     |                                       ^^^^^^^^^^^
+2114 | …                         file_path=file_path,
+2115 | …                     )
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2146:102
+     |
+2145 | …                     async with pipeline_status_lock:
+2146 | …                         log_message = f"Completed processing file {current_file_number}/{total_files}: {file_path}"
+     |                                                                                            ^^^^^^^^^^^
+2147 | …                         logger.info(log_message)
+2148 | …                         pipeline_status["latest_message"] = log_message
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2157:102
+     |
+2155 | …                     if isinstance(e, PipelineCancelledException):
+2156 | …                         # User cancellation - log brief message only, no traceback
+2157 | …                         error_msg = f"User cancelled during merge {current_file_number}/{total_files}: {file_path}"
+     |                                                                                            ^^^^^^^^^^^
+2158 | …                         logger.warning(error_msg)
+2159 | …                         async with pipeline_status_lock:
+     |
+
+B023 Function definition does not bind loop variable `total_files`
+    --> lightrag/core.py:2167:107
+     |
+2165 | …                     # Other exceptions - log with traceback
+2166 | …                     logger.error(traceback.format_exc())
+2167 | …                     error_msg = f"Merging stage failed in document {current_file_number}/{total_files}: {file_path}"
+     |                                                                                             ^^^^^^^^^^^
+2168 | …                     logger.error(error_msg)
+2169 | …                     async with pipeline_status_lock:
+     |
+
+B025 try-except block with duplicate exception `Exception`
+   --> lightrag/kg/deprecated/chroma_impl.py:245:16
+    |
+243 |             raise
+244 |
+245 |         except Exception as e:
+    |                ^^^^^^^^^
+246 |             logger.error(f"Error during prefix search in ChromaDB: {str(e)}")
+247 |             raise
+    |
+
+B007 Loop control variable `doc_id` not used within loop body
+   --> lightrag/kg/json_doc_status_impl.py:312:13
+    |
+311 |         # Remove sort key from documents
+312 |         for doc_id, doc in all_docs:
+    |             ^^^^^^
+313 |             if hasattr(doc, "_sort_key"):
+314 |                 delattr(doc, "_sort_key")
+    |
+help: Rename unused `doc_id` to `_doc_id`
+
+B023 Function definition does not bind loop variable `workspace_label`
+   --> lightrag/kg/memgraph_impl.py:691:36
+    |
+689 |                     async def execute_upsert(tx: AsyncManagedTransaction):
+690 |                         query = f"""
+691 |                         MERGE (n:`{workspace_label}` {{entity_id: $entity_id}})
+    |                                    ^^^^^^^^^^^^^^^
+692 |                         SET n += $properties
+693 |                         SET n:`{entity_type}`
+    |
+
+B023 Function definition does not bind loop variable `source`
+   --> lightrag/kg/memgraph_impl.py:913:45
+    |
+911 |                 """
+912 |                 result = await tx.run(
+913 |                     query, source_entity_id=source, target_entity_id=target
+    |                                             ^^^^^^
+914 |                 )
+915 |                 logger.debug(
+    |
+
+B023 Function definition does not bind loop variable `target`
+   --> lightrag/kg/memgraph_impl.py:913:70
+    |
+911 |                 """
+912 |                 result = await tx.run(
+913 |                     query, source_entity_id=source, target_entity_id=target
+    |                                                                      ^^^^^^
+914 |                 )
+915 |                 logger.debug(
+    |
+
+B023 Function definition does not bind loop variable `source`
+   --> lightrag/kg/memgraph_impl.py:916:62
+    |
+914 |                 )
+915 |                 logger.debug(
+916 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+    |                                                              ^^^^^^
+917 |                 )
+918 |                 await result.consume()  # Ensure result is fully consumed
+    |
+
+B023 Function definition does not bind loop variable `target`
+   --> lightrag/kg/memgraph_impl.py:916:76
+    |
+914 |                 )
+915 |                 logger.debug(
+916 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+    |                                                                            ^^^^^^
+917 |                 )
+918 |                 await result.consume()  # Ensure result is fully consumed
+    |
+
+B025 try-except block with duplicate exception `PyMongoError`
+    --> lightrag/kg/mongo_impl.py:2370:16
+     |
+2368 |             )
+2369 |
+2370 |         except PyMongoError as e:
+     |                ^^^^^^^^^^^^
+2371 |             logger.error(
+2372 |                 f"[{self.workspace}] Error searching by prefix in {self.namespace}: {str(e)}"
+     |
+
+B023 Function definition does not bind loop variable `source`
+    --> lightrag/kg/neo4j_impl.py:1609:45
+     |
+1607 |                 """
+1608 |                 result = await tx.run(
+1609 |                     query, source_entity_id=source, target_entity_id=target
+     |                                             ^^^^^^
+1610 |                 )
+1611 |                 logger.debug(
+     |
+
+B023 Function definition does not bind loop variable `target`
+    --> lightrag/kg/neo4j_impl.py:1609:70
+     |
+1607 |                 """
+1608 |                 result = await tx.run(
+1609 |                     query, source_entity_id=source, target_entity_id=target
+     |                                                                      ^^^^^^
+1610 |                 )
+1611 |                 logger.debug(
+     |
+
+B023 Function definition does not bind loop variable `source`
+    --> lightrag/kg/neo4j_impl.py:1612:62
+     |
+1610 |                 )
+1611 |                 logger.debug(
+1612 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+     |                                                              ^^^^^^
+1613 |                 )
+1614 |                 await result.consume()  # Ensure result is fully consumed
+     |
+
+B023 Function definition does not bind loop variable `target`
+    --> lightrag/kg/neo4j_impl.py:1612:76
+     |
+1610 |                 )
+1611 |                 logger.debug(
+1612 |                     f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
+     |                                                                            ^^^^^^
+1613 |                 )
+1614 |                 await result.consume()  # Ensure result is fully consumed
+     |
+
+B023 Function definition does not bind loop variable `insert_query`
+    --> lightrag/kg/postgres_impl.py:2568:46
+     |
+2566 |             # Note: register_vector is already called on pool init, no need to call it again
+2567 |             async def _batch_insert(connection: asyncpg.Connection) -> None:
+2568 |                 await connection.executemany(insert_query, batch_values)
+     |                                              ^^^^^^^^^^^^
+2569 |
+2570 |             await db._run_with_retry(_batch_insert)
+     |
+
+B023 Function definition does not bind loop variable `batch_values`
+    --> lightrag/kg/postgres_impl.py:2568:60
+     |
+2566 |             # Note: register_vector is already called on pool init, no need to call it again
+2567 |             async def _batch_insert(connection: asyncpg.Connection) -> None:
+2568 |                 await connection.executemany(insert_query, batch_values)
+     |                                                            ^^^^^^^^^^^^
+2569 |
+2570 |             await db._run_with_retry(_batch_insert)
+     |
+
+Found 45 errors.
+[*] 8 fixable with the `--fix` option.

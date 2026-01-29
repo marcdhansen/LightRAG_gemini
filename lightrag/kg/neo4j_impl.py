@@ -1597,20 +1597,18 @@ class Neo4JStorage(BaseGraphStorage):
         Args:
             edges: List of edges to be deleted, each edge is a (source, target) tuple
         """
+        workspace_label = self._get_workspace_label()
         for source, target in edges:
 
-            async def _do_delete_edge(tx: AsyncManagedTransaction):
-                workspace_label = self._get_workspace_label()
+            async def _do_delete_edge(
+                tx: AsyncManagedTransaction, s=source, t=target, wl=workspace_label
+            ):
                 query = f"""
-                MATCH (source:`{workspace_label}` {{entity_id: $source_entity_id}})-[r]-(target:`{workspace_label}` {{entity_id: $target_entity_id}})
+                MATCH (source:`{wl}` {{entity_id: $source_entity_id}})-[r]-(target:`{wl}` {{entity_id: $target_entity_id}})
                 DELETE r
                 """
-                result = await tx.run(
-                    query, source_entity_id=source, target_entity_id=target
-                )
-                logger.debug(
-                    f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
-                )
+                result = await tx.run(query, source_entity_id=s, target_entity_id=t)
+                logger.debug(f"[{self.workspace}] Deleted edge from '{s}' to '{t}'")
                 await result.consume()  # Ensure result is fully consumed
 
             try:

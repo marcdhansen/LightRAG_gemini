@@ -242,10 +242,6 @@ class ChromaVectorDBStorage(BaseVectorStorage):
             logger.error(f"Error while deleting vectors from {self.namespace}: {e}")
             raise
 
-        except Exception as e:
-            logger.error(f"Error during prefix search in ChromaDB: {str(e)}")
-            raise
-
     async def get_by_id(self, id: str) -> dict[str, Any] | None:
         """Get vector data by its ID
 

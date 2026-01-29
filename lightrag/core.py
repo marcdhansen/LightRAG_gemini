@@ -1857,6 +1857,7 @@ class LightRAG:
                     pipeline_status: dict,
                     pipeline_status_lock: Any,
                     semaphore: asyncio.Semaphore,
+                    total_files: int,
                 ) -> None:
                     """Process single document"""
                     # Initialize variables at the start to prevent UnboundLocalError in error handling
@@ -1934,7 +1935,7 @@ class LightRAG:
                                 chunking_result = await chunking_result
 
                             # Validate return type
-                            if not isinstance(chunking_result, (list, tuple)):
+                            if not isinstance(chunking_result, list | tuple):
                                 raise TypeError(
                                     f"chunking_func must return a list or tuple of dicts, "
                                     f"got {type(chunking_result)}"
@@ -2219,6 +2220,7 @@ class LightRAG:
                             pipeline_status,
                             pipeline_status_lock,
                             semaphore,
+                            total_files,
                         )
                     )
 

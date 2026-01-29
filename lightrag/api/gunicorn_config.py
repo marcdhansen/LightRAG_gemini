@@ -92,7 +92,7 @@ logconfig_dict = {
 }
 
 
-def on_starting(server):
+def on_starting(_server):
     """
     Executed when Gunicorn starts, before forking the first worker processes
     You can use this function to do more initialization tasks for all processes
@@ -121,7 +121,7 @@ def on_starting(server):
     print("Gunicorn initialization complete, forking workers...\n")
 
 
-def on_exit(server):
+def on_exit(_server):
     """
     Executed when Gunicorn is shutting down.
     This is a good place to release shared resources.
@@ -137,7 +137,7 @@ def on_exit(server):
     print("=" * 80)
 
 
-def post_fork(server, worker):
+def post_fork(_server, _worker):
     """
     Executed after a worker has been forked.
     This is a good place to set up worker-specific configurations.

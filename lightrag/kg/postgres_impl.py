@@ -2564,8 +2564,10 @@ class PGVectorStorage(BaseVectorStorage):
 
             # Use executemany for batch execution - significantly reduces DB round-trips
             # Note: register_vector is already called on pool init, no need to call it again
-            async def _batch_insert(connection: asyncpg.Connection) -> None:
-                await connection.executemany(insert_query, batch_values)
+            async def _batch_insert(
+                connection: asyncpg.Connection, iq=insert_query, bv=batch_values
+            ) -> None:
+                await connection.executemany(iq, bv)
 
             await db._run_with_retry(_batch_insert)
 
@@ -2657,7 +2659,7 @@ class PGVectorStorage(BaseVectorStorage):
                             vector_data = sample_result["content_vector"]
                             # pgvector returns list directly, but may also return NumPy arrays
                             # when register_vector codec is active on the connection
-                            if isinstance(vector_data, (list, tuple)):
+                            if isinstance(vector_data, list | tuple):
                                 legacy_dim = len(vector_data)
                             elif hasattr(vector_data, "__len__") and not isinstance(
                                 vector_data, str
@@ -3176,7 +3178,7 @@ class PGVectorStorage(BaseVectorStorage):
                         vector_data = result["content_vector"]
                         # Handle both pgvector-registered connections (returns list/tuple)
                         # and non-registered connections (returns JSON string)
-                        if isinstance(vector_data, (list, tuple)):
+                        if isinstance(vector_data, list | tuple):
                             vectors_dict[result["id"]] = list(vector_data)
                         elif isinstance(vector_data, str):
                             parsed = json.loads(vector_data)
@@ -3756,7 +3758,7 @@ class PGDocStatusStorage(DocStatusStorage):
             """Parse datetime and ensure it's stored as UTC time in database"""
             if dt_str is None:
                 return None
-            if isinstance(dt_str, (datetime.date, datetime.datetime)):
+            if isinstance(dt_str, datetime.date | datetime.datetime):
                 # If it's a datetime object
                 if isinstance(dt_str, datetime.datetime):
                     # If no timezone info, assume it's UTC

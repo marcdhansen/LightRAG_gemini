@@ -3039,7 +3039,9 @@ async def extract_entities(
                     original_desc_len = len(
                         maybe_edges[edge_key][0].get("description", "") or ""
                     )
-                    glean_desc_len = len(glean_edge_list[0].get("description", "") or "")
+                    glean_desc_len = len(
+                        glean_edge_list[0].get("description", "") or ""
+                    )
 
                     if glean_desc_len > original_desc_len:
                         maybe_edges[edge_key] = list(glean_edges)

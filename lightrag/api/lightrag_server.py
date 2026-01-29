@@ -640,7 +640,7 @@ def create_app(args):
                 # Use optimized function with pre-processed configuration
                 return create_optimized_openai_llm_func(config_cache, args, llm_timeout)
         except ImportError as e:
-            raise Exception(f"Failed to import {binding} LLM binding: {e}")
+            raise Exception(f"Failed to import {binding} LLM binding: {e}") from None
 
     def create_llm_model_kwargs(binding: str, args, llm_timeout: int) -> dict:
         """
@@ -658,7 +658,7 @@ def create_app(args):
                     "api_key": args.llm_binding_api_key,
                 }
             except ImportError as e:
-                raise Exception(f"Failed to import {binding} options: {e}")
+                raise Exception(f"Failed to import {binding} options: {e}") from None
         return {}
 
     def create_optimized_embedding_function(
@@ -879,7 +879,7 @@ def create_app(args):
                         kwargs["model"] = model
                     return await actual_func(**kwargs)
             except ImportError as e:
-                raise Exception(f"Failed to import {binding} embedding: {e}")
+                raise Exception(f"Failed to import {binding} embedding: {e}") from None
 
         # Step 4: Wrap in EmbeddingFunc and return
         embedding_func_instance = EmbeddingFunc(
@@ -1123,7 +1123,7 @@ def create_app(args):
 
     # Legacy redirect for /upload to /documents/upload
     @app.post("/upload", include_in_schema=False)
-    async def legacy_upload_redirect(request: Request):
+    async def legacy_upload_redirect(_: Request):
         return RedirectResponse(url="/documents/upload", status_code=307)
 
     # Add Ollama API routes
@@ -1326,7 +1326,7 @@ def create_app(args):
             }
         except Exception as e:
             logger.error(f"Error getting health status: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @app.post(
         "/clear_all_data",
@@ -1334,7 +1334,7 @@ def create_app(args):
         summary="Clear all data from all storages",
         description="Wipes all documents, entities, relations, and the knowledge graph. CAUTION: Use with care.",
     )
-    async def clear_all_data(request: Request):
+    async def clear_all_data(_: Request):
         """Wipes all data from all storage backends"""
         try:
             # The adrop_all_data method clears all storage backends for the current workspace
@@ -1345,7 +1345,7 @@ def create_app(args):
                 raise HTTPException(status_code=500, detail=result.get("message"))
         except Exception as e:
             logger.error(f"Error clearing all data: {str(e)}")
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     # Custom StaticFiles class for smart caching
     class SmartStaticFiles(StaticFiles):  # Renamed from NoCacheStaticFiles

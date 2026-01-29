@@ -678,25 +678,23 @@ class MemgraphStorage(BaseGraphStorage):
         backoff_factor = 1.1
         jitter_factor = 0.1
 
+        workspace_label = self._get_workspace_label()
+
+        async def execute_upsert(tx: AsyncManagedTransaction):
+            query = f"""
+            MERGE (n:`{workspace_label}` {{entity_id: $entity_id}})
+            SET n += $properties
+            SET n:`{entity_type}`
+            """
+            result = await tx.run(query, entity_id=node_id, properties=properties)
+            await result.consume()  # Ensure result is fully consumed
+
         for attempt in range(max_retries):
             try:
                 logger.debug(
                     f"[{self.workspace}] Attempting node upsert, attempt {attempt + 1}/{max_retries}"
                 )
                 async with self._driver.session(database=self._DATABASE) as session:
-                    workspace_label = self._get_workspace_label()
-
-                    async def execute_upsert(tx: AsyncManagedTransaction):
-                        query = f"""
-                        MERGE (n:`{workspace_label}` {{entity_id: $entity_id}})
-                        SET n += $properties
-                        SET n:`{entity_type}`
-                        """
-                        result = await tx.run(
-                            query, entity_id=node_id, properties=properties
-                        )
-                        await result.consume()  # Ensure result is fully consumed
-
                     await session.execute_write(execute_upsert)
                     break  # Success - exit retry loop
 
@@ -901,20 +899,18 @@ class MemgraphStorage(BaseGraphStorage):
             raise RuntimeError(
                 "Memgraph driver is not initialized. Call 'await initialize()' first."
             )
+        workspace_label = self._get_workspace_label()
         for source, target in edges:
 
-            async def _do_delete_edge(tx: AsyncManagedTransaction):
-                workspace_label = self._get_workspace_label()
+            async def _do_delete_edge(
+                tx: AsyncManagedTransaction, s=source, t=target, wl=workspace_label
+            ):
                 query = f"""
-                MATCH (source:`{workspace_label}` {{entity_id: $source_entity_id}})-[r]-(target:`{workspace_label}` {{entity_id: $target_entity_id}})
+                MATCH (source:`{wl}` {{entity_id: $source_entity_id}})-[r]-(target:`{wl}` {{entity_id: $target_entity_id}})
                 DELETE r
                 """
-                result = await tx.run(
-                    query, source_entity_id=source, target_entity_id=target
-                )
-                logger.debug(
-                    f"[{self.workspace}] Deleted edge from '{source}' to '{target}'"
-                )
+                result = await tx.run(query, source_entity_id=s, target_entity_id=t)
+                logger.debug(f"[{self.workspace}] Deleted edge from '{s}' to '{t}'")
                 await result.consume()  # Ensure result is fully consumed
 
             try:

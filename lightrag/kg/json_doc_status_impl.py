@@ -309,7 +309,7 @@ class JsonDocStatusStorage(DocStatusStorage):
         )
 
         # Remove sort key from documents
-        for doc_id, doc in all_docs:
+        for _, doc in all_docs:
             if hasattr(doc, "_sort_key"):
                 delattr(doc, "_sort_key")
 

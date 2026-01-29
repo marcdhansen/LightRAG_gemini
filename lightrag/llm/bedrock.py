@@ -111,7 +111,7 @@ def _handle_bedrock_exception(e: Exception, operation: str = "Bedrock API") -> N
         raise BedrockConnectionError(f"Connection error: {error_message}")
 
     # Timeout errors (retryable)
-    elif isinstance(e, (ReadTimeoutError, TimeoutError)):
+    elif isinstance(e, ReadTimeoutError | TimeoutError):
         logging.error(f"{operation} timeout error: {error_message}")
         raise BedrockTimeoutError(f"Timeout error: {error_message}")
 
@@ -119,10 +119,10 @@ def _handle_bedrock_exception(e: Exception, operation: str = "Bedrock API") -> N
     elif isinstance(
         e,
         (
-            BedrockRateLimitError,
-            BedrockConnectionError,
-            BedrockTimeoutError,
-            BedrockError,
+            BedrockRateLimitError
+            | BedrockConnectionError
+            | BedrockTimeoutError
+            | BedrockError
         ),
     ):
         raise

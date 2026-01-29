@@ -22,7 +22,7 @@ def create_ace_routes(rag, api_key: str | None = None):
         except Exception as e:
             logger.error(f"Error getting pending repairs: {e}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.post(
         "/ace/repairs/{repair_id}/approve", dependencies=[Depends(combined_auth)]
@@ -40,7 +40,7 @@ def create_ace_routes(rag, api_key: str | None = None):
         except Exception as e:
             logger.error(f"Error approving repair {repair_id}: {e}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     @router.post(
         "/ace/repairs/{repair_id}/reject", dependencies=[Depends(combined_auth)]
@@ -58,6 +58,6 @@ def create_ace_routes(rag, api_key: str | None = None):
         except Exception as e:
             logger.error(f"Error rejecting repair {repair_id}: {e}")
             logger.error(traceback.format_exc())
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     return router

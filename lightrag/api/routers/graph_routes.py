@@ -106,7 +106,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error getting graph labels: {str(e)}"
-            )
+            ) from e
 
     @router.get("/graph/label/popular", dependencies=[Depends(combined_auth)])
     async def get_popular_labels(
@@ -130,7 +130,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error getting popular labels: {str(e)}"
-            )
+            ) from e
 
     @router.get("/graph/label/search", dependencies=[Depends(combined_auth)])
     async def search_labels(
@@ -156,7 +156,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error searching labels: {str(e)}"
-            )
+            ) from e
 
     @router.get("/graphs", dependencies=[Depends(combined_auth)])
     async def get_knowledge_graph(
@@ -194,7 +194,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error getting knowledge graph: {str(e)}"
-            )
+            ) from e
 
     @router.get("/graph/entity/exists", dependencies=[Depends(combined_auth)])
     async def check_entity_exists(
@@ -217,7 +217,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error checking entity existence: {str(e)}"
-            )
+            ) from e
 
     @router.post("/graph/entity/edit", dependencies=[Depends(combined_auth)])
     async def update_entity(request: EntityUpdateRequest):
@@ -401,13 +401,13 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(
                 f"Validation error updating entity '{request.entity_name}': {str(ve)}"
             )
-            raise HTTPException(status_code=400, detail=str(ve))
+            raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
             logger.error(f"Error updating entity '{request.entity_name}': {str(e)}")
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error updating entity: {str(e)}"
-            )
+            ) from e
 
     @router.post("/graph/relation/edit", dependencies=[Depends(combined_auth)])
     async def update_relation(request: RelationUpdateRequest):
@@ -434,7 +434,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(
                 f"Validation error updating relation between '{request.source_id}' and '{request.target_id}': {str(ve)}"
             )
-            raise HTTPException(status_code=400, detail=str(ve))
+            raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
             logger.error(
                 f"Error updating relation between '{request.source_id}' and '{request.target_id}': {str(e)}"
@@ -442,7 +442,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error updating relation: {str(e)}"
-            )
+            ) from e
 
     @router.post("/graph/entity/create", dependencies=[Depends(combined_auth)])
     async def create_entity(request: EntityCreateRequest):
@@ -509,13 +509,13 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(
                 f"Validation error creating entity '{request.entity_name}': {str(ve)}"
             )
-            raise HTTPException(status_code=400, detail=str(ve))
+            raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
             logger.error(f"Error creating entity '{request.entity_name}': {str(e)}")
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error creating entity: {str(e)}"
-            )
+            ) from e
 
     @router.post("/graph/relation/create", dependencies=[Depends(combined_auth)])
     async def create_relation(request: RelationCreateRequest):
@@ -596,7 +596,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(
                 f"Validation error creating relation between '{request.source_entity}' and '{request.target_entity}': {str(ve)}"
             )
-            raise HTTPException(status_code=400, detail=str(ve))
+            raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
             logger.error(
                 f"Error creating relation between '{request.source_entity}' and '{request.target_entity}': {str(e)}"
@@ -604,7 +604,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error creating relation: {str(e)}"
-            )
+            ) from e
 
     @router.post("/graph/entities/merge", dependencies=[Depends(combined_auth)])
     async def merge_entities(request: EntityMergeRequest):
@@ -677,7 +677,7 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(
                 f"Validation error merging entities {request.entities_to_change} into '{request.entity_to_change_into}': {str(ve)}"
             )
-            raise HTTPException(status_code=400, detail=str(ve))
+            raise HTTPException(status_code=400, detail=str(ve)) from ve
         except Exception as e:
             logger.error(
                 f"Error merging entities {request.entities_to_change} into '{request.entity_to_change_into}': {str(e)}"
@@ -685,6 +685,6 @@ def create_graph_routes(rag, api_key: str | None = None):
             logger.error(traceback.format_exc())
             raise HTTPException(
                 status_code=500, detail=f"Error merging entities: {str(e)}"
-            )
+            ) from e
 
     return router

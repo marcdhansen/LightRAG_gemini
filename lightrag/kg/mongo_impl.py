@@ -2367,12 +2367,6 @@ class MongoVectorDBStorage(BaseVectorStorage):
                 f"[{self.workspace}] Error deleting relations for {entity_name}: {str(e)}"
             )
 
-        except PyMongoError as e:
-            logger.error(
-                f"[{self.workspace}] Error searching by prefix in {self.namespace}: {str(e)}"
-            )
-            return []
-
     async def get_by_id(self, id: str) -> dict[str, Any] | None:
         """Get vector data by its ID
 

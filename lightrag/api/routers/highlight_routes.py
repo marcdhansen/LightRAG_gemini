@@ -45,6 +45,6 @@ def create_highlight_routes(api_key: str | None = None):
             return HighlightResponse(**result)
         except Exception as e:
             logger.error(f"Error in highlight endpoint: {e}")
-            raise HTTPException(status_code=500, detail=str(e))
+            raise HTTPException(status_code=500, detail=str(e)) from None
 
     return router

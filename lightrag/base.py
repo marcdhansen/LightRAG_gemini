@@ -182,11 +182,11 @@ class StorageNameSpace(ABC):
 
     async def initialize(self):
         """Initialize the storage"""
-        pass
+        return
 
     async def finalize(self):
         """Finalize the storage"""
-        pass
+        return
 
     @abstractmethod
     async def index_done_callback(self) -> None:

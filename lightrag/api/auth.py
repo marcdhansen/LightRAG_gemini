@@ -103,7 +103,7 @@ class AuthHandler:
         except jwt.PyJWTError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token"
-            )
+            ) from None
 
 
 auth_handler = AuthHandler()
